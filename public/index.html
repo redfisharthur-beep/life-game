@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>人生｜多人派對遊戲</title>
-  <link rel="stylesheet" href="/style.css?v=20260827-1335" />
+  <link rel="stylesheet" href="/style.css?v=20260827-1405" />
 </head>
 <body>
   <main class="shell">
@@ -30,10 +30,17 @@
         <p id="launchMessage" class="launch-message" aria-live="polite"></p>
         <button id="leaveRoomBtn" class="ghost" type="button">離開房間</button>
       </div>
+
+      <div id="professionPanel" class="panel hidden">
+        <h2 class="profession-title">選擇職業</h2>
+        <p class="profession-subtitle">每個職業同一局只能有一位玩家</p>
+        <div id="professionGrid" class="profession-grid"></div>
+        <p id="professionMessage" class="profession-message" aria-live="polite"></p>
+      </div>
     </section>
   </main>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260827-1305"></script>
+  <script src="/app.js?v=20260827-1405"></script>
 </body>
 </html>
