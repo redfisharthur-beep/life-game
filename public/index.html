@@ -21,23 +21,14 @@
           <input id="playerName" maxlength="12" autocomplete="nickname" placeholder="輸入你的名字" />
         </label>
 
-        <button id="createRoomBtn" class="primary" type="button">建立房間</button>
-
-        <div class="divider"><span>或</span></div>
-
-        <label class="field">
-          <span>房號</span>
-          <input id="roomCodeInput" inputmode="numeric" maxlength="4" placeholder="4位數房號" />
-        </label>
-
-        <button id="joinRoomBtn" class="secondary" type="button">加入房間</button>
+        <button id="joinGameBtn" class="primary" type="button">加入遊戲</button>
+        <p class="room-tip">不用房號、不用密碼，系統會自動加入可用房間。</p>
         <p id="message" class="message" aria-live="polite"></p>
       </div>
 
       <div id="roomPanel" class="panel hidden">
-        <p class="room-label">你的房號</p>
-        <div id="roomCode" class="room-code">----</div>
-        <p class="room-tip">把房號告訴朋友，最多6人。</p>
+        <p class="room-label">等待區</p>
+        <p class="room-tip">系統已自動配對，最多6人。</p>
 
         <div class="players-head">
           <strong>玩家名單</strong>
