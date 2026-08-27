@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/style.css?v=20260827-1410" />
   <link rel="stylesheet" href="/player-status.css?v=20260827-1425" />
   <link rel="stylesheet" href="/action-buttons.css?v=20260827-1455" />
+  <link rel="stylesheet" href="/market-icons.css?v=20260827-1515" />
 </head>
 <body>
   <main class="shell">
@@ -48,9 +49,17 @@
             <span id="stageName" class="stage-name">人生起步</span>
             <span id="roundLabel" class="round-label">第 1 / 30 回合</span>
           </div>
-          <div class="market-strip">
-            <span>📈 股價 <b id="stockPrice">10.00</b></span>
-            <span>🏠 地價 <b id="landPrice">10.00</b></span>
+          <div class="market-strip" aria-label="最新市場價格">
+            <span class="market-item">
+              <img class="market-icon" src="/images/stock.png" alt="股價" />
+              <span class="market-label">股價</span>
+              <b id="stockPrice" class="market-value">10.00</b>
+            </span>
+            <span class="market-item">
+              <img class="market-icon" src="/images/land.png" alt="地價" />
+              <span class="market-label">地價</span>
+              <b id="landPrice" class="market-value">10.00</b>
+            </span>
           </div>
         </div>
 
@@ -110,7 +119,6 @@
               <img class="action-image" src="/images/dream.png" alt="圓夢" />
             </button>
           </div>
-          <p class="action-hint">目前先開放「領薪」，其餘行動下一步接入。</p>
         </section>
 
         <section class="event-box">
@@ -122,7 +130,7 @@
   </main>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260827-1410"></script>
+  <script src="/app.js?v=20260827-1515"></script>
   <script src="/player-status.js?v=20260827-1425"></script>
 </body>
 </html>
