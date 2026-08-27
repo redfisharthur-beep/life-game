@@ -106,7 +106,7 @@ io.on('connection', (socket) => {
     const name = cleanName(payload?.name);
 
     if (!name) {
-      return reply?.({ ok: false, message: '請先輸入暱稱。' });
+      return reply?.({ ok: false, message: '請輸入暱稱' });
     }
 
     leaveCurrentRoom(socket);
@@ -131,6 +131,10 @@ io.on('connection', (socket) => {
 
     if (!room) {
       return reply?.({ ok: false, message: '目前不在房間內。' });
+    }
+
+    if (room.hostId !== socket.id) {
+      return reply?.({ ok: false, message: '只有房主可以啟程。' });
     }
 
     if (room.started) {
