@@ -43,6 +43,21 @@
   line-height: 1.2;
 }
 
+.action-showcase-title:empty {
+  display: none;
+}
+
+.action-showcase.choice-stage-active .action-showcase-kicker {
+  color: #a36f63;
+  font-size: clamp(18px, 4vw, 24px);
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+
+.action-showcase.choice-stage-active .action-showcase-card {
+  gap: 10px;
+}
+
 .action-showcase-image {
   width: min(190px, 46vw);
   height: min(190px, 46vw);
