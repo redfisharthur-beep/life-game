@@ -162,7 +162,7 @@ button {
 
 .player-row {
   display: grid;
-  grid-template-columns: 42px 1fr auto;
+  grid-template-columns: 1fr auto;
   gap: 14px;
   align-items: center;
   text-align: left;
@@ -171,18 +171,6 @@ button {
   border-radius: 18px;
   background: #ddd6cf;
   border: 1px solid #cfc5bc;
-}
-
-.player-number {
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #f4efe9;
-  color: #736b64;
-  font-size: 17px;
-  font-weight: 300;
 }
 
 .player-name {
@@ -253,16 +241,10 @@ button {
   .players { gap: 14px; }
 
   .player-row {
-    grid-template-columns: 46px 1fr auto;
+    grid-template-columns: 1fr auto;
     min-height: 78px;
     padding: 17px 18px;
     border-radius: 20px;
-  }
-
-  .player-number {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
   }
 
   .player-name { font-size: 22px; }
