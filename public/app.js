@@ -4,17 +4,23 @@ const entryPanel = document.getElementById('entryPanel');
 const roomPanel = document.getElementById('roomPanel');
 const playerNameInput = document.getElementById('playerName');
 const joinGameBtn = document.getElementById('joinGameBtn');
+const startGameBtn = document.getElementById('startGameBtn');
 const leaveRoomBtn = document.getElementById('leaveRoomBtn');
 const messageEl = document.getElementById('message');
+const launchMessageEl = document.getElementById('launchMessage');
 const playerCountEl = document.getElementById('playerCount');
 const playerListEl = document.getElementById('playerList');
-const roomNoticeEl = document.getElementById('roomNotice');
 
 let currentRoom = null;
 
 function setMessage(text, type = '') {
   messageEl.textContent = text || '';
   messageEl.className = `message ${type}`.trim();
+}
+
+function setLaunchMessage(text, type = '') {
+  launchMessageEl.textContent = text || '';
+  launchMessageEl.className = `launch-message ${type}`.trim();
 }
 
 function getPlayerName() {
@@ -26,6 +32,7 @@ function showEntry() {
   entryPanel.classList.remove('hidden');
   roomPanel.classList.add('hidden');
   setMessage('');
+  setLaunchMessage('');
 }
 
 function showRoom(room) {
@@ -67,12 +74,14 @@ function renderRoom(room) {
     playerListEl.appendChild(row);
   });
 
-  if (room.players.length < 2) {
-    roomNoticeEl.textContent = '等待其他玩家加入…';
-  } else if (room.players.length < 6) {
-    roomNoticeEl.textContent = '已有玩家加入，等待更多玩家…';
+  const canStart = room.players.length >= 2 && !room.started;
+  startGameBtn.disabled = !canStart;
+  startGameBtn.textContent = room.started ? '已啟程' : '啟程';
+
+  if (room.started) {
+    setLaunchMessage('準備進入下一階段…');
   } else {
-    roomNoticeEl.textContent = '房間已滿6人。';
+    setLaunchMessage('');
   }
 }
 
@@ -80,7 +89,9 @@ function withBusy(button, task) {
   if (button.disabled) return;
   button.disabled = true;
   Promise.resolve(task()).finally(() => {
-    button.disabled = false;
+    if (button !== startGameBtn || !currentRoom?.started) {
+      button.disabled = false;
+    }
   });
 }
 
@@ -89,6 +100,12 @@ socket.on('server:ready', (payload) => {
 });
 
 socket.on('room:update', (room) => {
+  if (currentRoom && room.code === currentRoom.code) {
+    renderRoom(room);
+  }
+});
+
+socket.on('room:started', (room) => {
   if (currentRoom && room.code === currentRoom.code) {
     renderRoom(room);
   }
@@ -107,6 +124,24 @@ joinGameBtn.addEventListener('click', () => {
       }
 
       showRoom(result.room);
+      resolve();
+    });
+  }));
+});
+
+startGameBtn.addEventListener('click', () => {
+  withBusy(startGameBtn, () => new Promise((resolve) => {
+    setLaunchMessage('');
+
+    socket.emit('room:start', (result) => {
+      if (!result?.ok) {
+        setLaunchMessage(result?.message || '目前無法啟程。', 'error');
+        renderRoom(currentRoom);
+        resolve();
+        return;
+      }
+
+      renderRoom(result.room);
       resolve();
     });
   }));
