@@ -54,6 +54,26 @@
     return item;
   }
 
+  function makeHappiness(value) {
+    const item = document.createElement('div');
+    item.className = 'player-status-happiness';
+    item.setAttribute('aria-label', `幸福值 ${Number(value || 0).toFixed(2)}`);
+
+    const icon = document.createElement('img');
+    icon.className = 'player-status-happiness-icon';
+    icon.src = '/images/happiness.png';
+    icon.alt = '';
+    icon.setAttribute('aria-hidden', 'true');
+
+    const number = makeText(
+      'player-status-happiness-value',
+      Number(value || 0).toFixed(2)
+    );
+
+    item.append(icon, number);
+    return item;
+  }
+
   function getDesktopColumns(count) {
     if (count <= 2) return Math.max(1, count);
     if (count === 4) return 2;
@@ -108,7 +128,11 @@
         makeText('player-status-name', player.name)
       );
 
-      identity.append(avatar, identityText);
+      identity.append(
+        avatar,
+        identityText,
+        makeHappiness(player.happiness)
+      );
 
       if (player.id === room.game.currentPlayerId && room.phase === 'game') {
         identity.append(makeText('player-status-turn-badge', '行動中'));
@@ -120,8 +144,7 @@
         makeSummaryItem('總資產', formatInteger(player.totalAssets), 'assets'),
         makeSummaryItem('現金', formatInteger(player.cash)),
         makeSummaryItem('股票', formatUnit(player.stocks)),
-        makeSummaryItem('土地', formatUnit(player.land)),
-        makeSummaryItem('幸福', Number(player.happiness || 0).toFixed(2), 'happiness')
+        makeSummaryItem('土地', formatUnit(player.land))
       );
 
       card.append(identity, summary);
