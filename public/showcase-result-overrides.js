@@ -28,6 +28,22 @@
     effects.innerHTML = `<span class="simple-result-effect">現金 +${salaryIncome}</span>`;
   }
 
+  function syncHelpActorRewards(overlay, event) {
+    if (event.type !== 'help') return;
+
+    const rows = [...overlay.querySelectorAll('.simple-result-row')];
+    const actorRow = rows.at(-1);
+    const effects = actorRow?.querySelector('.simple-result-effects');
+    if (!effects) return;
+
+    const bonus = Number(event.bonus || 0);
+    const helperHappiness = Number(event.helperHappiness || 0);
+    effects.innerHTML = `
+      <span class="simple-result-effect">現金 +${bonus}</span>
+      <span class="simple-result-effect">幸福值 +${helperHappiness}</span>
+    `;
+  }
+
   function applySpecialResultVisual() {
     if (applying) return;
     applying = true;
@@ -40,6 +56,7 @@
       if (!event) return;
 
       simplifyDreamFail(overlay, event);
+      syncHelpActorRewards(overlay, event);
 
       if (!['sabotage', 'help'].includes(event.type)) return;
 
