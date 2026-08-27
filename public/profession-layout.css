@@ -85,33 +85,29 @@
   box-shadow: none !important;
 }
 
-/* 自己已選：完全取消反灰，改成金黃反亮。 */
+/* 自己已選：整個框維持透明，只讓人物圖片本身偏金黃色高亮。 */
 .profession-card.selected {
   opacity: 1;
   filter: none;
   border: 0 !important;
   outline: 0 !important;
-  background: rgba(238, 190, 58, .34) !important;
-  box-shadow:
-    inset 0 0 30px rgba(255, 220, 92, .52),
-    inset 0 0 9px rgba(255, 245, 182, .66),
-    0 0 20px rgba(223, 166, 36, .42) !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .profession-card.selected::after {
-  content: '';
-  position: absolute;
-  inset: 3.5%;
-  pointer-events: none;
-  border-radius: 12px;
-  background: rgba(255, 219, 92, .20);
-  box-shadow:
-    inset 0 0 20px rgba(255, 235, 142, .40),
-    0 0 12px rgba(231, 180, 48, .26);
+  display: none !important;
+  content: none !important;
 }
 
 .profession-card.selected .profession-image {
-  filter: saturate(1.12) brightness(1.08) drop-shadow(0 0 8px rgba(225, 169, 38, .32));
+  filter:
+    sepia(.72)
+    saturate(2.35)
+    hue-rotate(354deg)
+    brightness(1.14)
+    contrast(1.02)
+    drop-shadow(0 0 9px rgba(232, 180, 42, .38));
 }
 
 .profession-visual {
