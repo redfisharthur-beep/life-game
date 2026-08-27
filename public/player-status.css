@@ -10,6 +10,10 @@
   margin-top: 0;
 }
 
+.card.game-mode .me-card {
+  display: none !important;
+}
+
 .player-status-bar {
   display: grid;
   grid-template-columns: repeat(var(--player-columns, 2), minmax(0, 1fr));
