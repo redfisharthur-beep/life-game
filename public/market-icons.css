@@ -1,0 +1,61 @@
+.market-strip .market-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #f4efe9;
+  color: #69615a;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.market-strip .market-icon {
+  display: block;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border: 0;
+  background: transparent;
+  flex: 0 0 auto;
+}
+
+.market-strip .market-label {
+  color: #7f756d;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.market-strip .market-value {
+  color: #514a45;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+@media (max-width: 760px) {
+  .market-strip .market-item {
+    gap: 5px;
+    padding: 6px 8px;
+  }
+
+  .market-strip .market-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .market-strip .market-label {
+    font-size: 11px;
+  }
+
+  .market-strip .market-value {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 390px) {
+  .market-strip .market-item {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
