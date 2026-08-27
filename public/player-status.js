@@ -44,6 +44,11 @@
     });
   }
 
+  function formatHappinessDisplay(value) {
+    const number = Number(value || 0);
+    return String(Math.trunc(number));
+  }
+
   function makeText(className, text) {
     const element = document.createElement('span');
     element.className = className;
@@ -72,6 +77,17 @@
     return item;
   }
 
+  function makeCash(value) {
+    const item = document.createElement('div');
+    item.className = 'player-status-cash';
+    item.setAttribute('aria-label', `現金 ${formatInteger(value)}`);
+    item.append(
+      makeText('player-status-cash-label', '現金'),
+      makeText('player-status-cash-value', formatInteger(value))
+    );
+    return item;
+  }
+
   function makeHappiness(value) {
     const item = document.createElement('div');
     item.className = 'player-status-happiness';
@@ -85,7 +101,7 @@
 
     item.append(
       icon,
-      makeText('player-status-happiness-value', Number(value || 0).toFixed(2))
+      makeText('player-status-happiness-value', formatHappinessDisplay(value))
     );
     return item;
   }
@@ -163,6 +179,7 @@
       topRow.append(
         nameBlock,
         makeTotalAssets(player.totalAssets),
+        makeCash(player.cash),
         makeHappiness(player.happiness)
       );
 
@@ -173,7 +190,6 @@
       const summary = document.createElement('div');
       summary.className = 'player-status-summary';
       summary.append(
-        makeSummaryItem('現金', formatInteger(player.cash), 'cash'),
         makeSummaryItem('股票', formatUnit(player.stocks), 'stocks'),
         makeSummaryItem('土地', formatUnit(player.land), 'land')
       );
