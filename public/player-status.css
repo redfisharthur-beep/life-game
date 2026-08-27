@@ -16,7 +16,7 @@
 .player-status-card {
   position: relative;
   display: grid;
-  grid-template-columns: 70px minmax(0, 1fr);
+  grid-template-columns: 70px minmax(0, 1fr) 70px;
   gap: 9px;
   align-items: center;
   width: 100%;
@@ -57,94 +57,98 @@
   background: transparent;
 }
 
-.player-status-content {
+/* 中間區塊用 4 欄 × 2 列：上排姓名／總資產各占 2 欄；下排現金占 2 欄、股票 1 欄、土地 1 欄。 */
+.player-status-info-grid {
   display: grid;
-  grid-template-rows: auto auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, auto));
   gap: 5px;
   min-width: 0;
 }
 
-.player-status-top-row {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(132px, 1fr) auto auto auto;
-  gap: 10px;
-  align-items: center;
+.player-info-cell {
   min-width: 0;
-}
-
-.player-status-name-block {
-  display: flex;
-  align-items: baseline;
-  gap: .45em;
-  min-width: 0;
-}
-
-.player-status-profession {
-  display: inline-block;
-  margin: 0;
-  color: #8a7f76;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.1;
+  padding: 4px 6px;
+  border-radius: 9px;
+  text-align: center;
   white-space: nowrap;
 }
+
+.player-info-name {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background: transparent;
+  padding-left: 2px;
+}
+
+.player-info-cell.total-assets {
+  grid-column: span 2;
+  background: #ece7e1;
+}
+
+.player-info-cell.cash {
+  grid-column: span 2;
+  background: #dfeae2;
+}
+
+.player-info-cell.stocks { background: #dfe6ef; }
+.player-info-cell.land { background: #eee2d5; }
 
 .player-status-name {
   display: inline-block;
   overflow: hidden;
+  max-width: 100%;
   color: #514a45;
-  font-size: 23px;
+  font-size: 21px;
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.05;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.player-status-total-assets,
-.player-status-cash {
-  display: inline-flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: .35em;
-  min-width: 0;
-  padding: 0;
+.player-info-label,
+.player-info-value {
+  display: inline;
+  line-height: 1;
   white-space: nowrap;
 }
 
-.player-status-total-label,
-.player-status-cash-label {
-  color: #91867d;
-  font-size: 18px;
+.player-info-label {
+  color: #847a72;
+  font-size: 15px;
   font-weight: 700;
-  line-height: 1;
 }
 
-.player-status-total-value,
-.player-status-cash-value {
-  margin: 0;
+.player-info-value {
+  margin-left: .24em;
   color: #5d554f;
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 800;
-  line-height: 1;
 }
 
-.player-status-cash-label,
-.player-status-cash-value {
-  color: #5d7965;
-}
+.player-info-cell.cash .player-info-label,
+.player-info-cell.cash .player-info-value { color: #5d7965; }
+.player-info-cell.stocks .player-info-label,
+.player-info-cell.stocks .player-info-value { color: #5f7390; }
+.player-info-cell.land .player-info-label,
+.player-info-cell.land .player-info-value { color: #8b6f54; }
 
+/* 幸福值獨立在最右側：圖片在上，數字在下。 */
 .player-status-happiness {
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
+  justify-content: center;
+  gap: 1px;
   min-width: 0;
   color: #8b6768;
   white-space: nowrap;
 }
 
 .player-status-happiness-icon {
+  display: block;
   width: 64px;
   height: 64px;
   object-fit: contain;
@@ -152,7 +156,8 @@
 
 .player-status-happiness-value {
   min-width: 2ch;
-  font-size: 22px;
+  margin-top: -5px;
+  font-size: 19px;
   font-weight: 800;
   line-height: 1;
   text-align: center;
@@ -161,7 +166,7 @@
 .player-status-turn-badge {
   position: absolute;
   top: -6px;
-  right: -5px;
+  right: 72px;
   z-index: 2;
   padding: 4px 8px;
   border-radius: 999px;
@@ -179,87 +184,54 @@
   50% { opacity: .45; transform: scale(1.06); }
 }
 
-.player-status-summary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 5px;
-  margin: 0;
-}
-
-.player-summary-item {
-  min-width: 0;
-  padding: 4px 5px;
-  border-radius: 9px;
-  text-align: center;
-}
-
-.player-summary-item.stocks { background: #dfe6ef; }
-.player-summary-item.land { background: #eee2d5; }
-
-.player-summary-label,
-.player-summary-value {
-  display: inline;
-  font-weight: 800;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.player-summary-label { font-size: 17px; }
-.player-summary-value { margin-left: .25em; font-size: 18px; }
-.player-summary-item.stocks .player-summary-label,
-.player-summary-item.stocks .player-summary-value { color: #5f7390; }
-.player-summary-item.land .player-summary-label,
-.player-summary-item.land .player-summary-value { color: #8b6f54; }
-
 @media (prefers-reduced-motion: reduce) {
   .player-status-turn-badge { animation: none; }
 }
 
 @media (max-width: 760px) {
   .player-status-card {
-    grid-template-columns: 60px minmax(0, 1fr);
+    grid-template-columns: 60px minmax(0, 1fr) 60px;
     gap: 7px;
     padding: 5px 7px;
     border-radius: 14px;
   }
 
-  .player-status-avatar { width: 56px; height: 56px; }
-  .player-status-top-row { grid-template-columns: minmax(82px, 1fr) auto auto auto; gap: 6px; }
-  .player-status-name-block { gap: .35em; }
-  .player-status-profession { font-size: 13px; }
-  .player-status-name { font-size: 19px; }
-  .player-status-total-label,
-  .player-status-cash-label { font-size: 15px; }
-  .player-status-total-value,
-  .player-status-cash-value { font-size: 18px; }
-  .player-status-happiness-icon { width: 56px; height: 56px; }
-  .player-status-happiness-value { font-size: 18px; }
-  .player-summary-label { font-size: 15px; }
-  .player-summary-value { font-size: 15px; }
-  .player-status-turn-badge { font-size: 10px; padding: 3px 6px; }
+  .player-status-avatar,
+  .player-status-happiness-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .player-status-info-grid { gap: 4px; }
+  .player-info-cell { padding: 4px 4px; border-radius: 8px; }
+  .player-status-name { font-size: 18px; }
+  .player-info-label { font-size: 13px; }
+  .player-info-value { font-size: 14px; }
+  .player-status-happiness-value { font-size: 17px; margin-top: -4px; }
+  .player-status-turn-badge { right: 61px; font-size: 10px; padding: 3px 6px; }
 }
 
 @media (max-width: 430px) {
   .player-status-bar { gap: 5px; }
+
   .player-status-card {
-    grid-template-columns: 54px minmax(0, 1fr);
-    gap: 6px;
-    padding: 4px 6px;
+    grid-template-columns: 54px minmax(0, 1fr) 54px;
+    gap: 5px;
+    padding: 4px 5px;
   }
 
-  .player-status-avatar { width: 50px; height: 50px; }
-  .player-status-content { gap: 4px; }
-  .player-status-top-row { grid-template-columns: minmax(70px, 1fr) auto auto auto; gap: 4px; }
-  .player-status-profession { font-size: 12px; }
-  .player-status-name { font-size: 18px; }
-  .player-status-total-label,
-  .player-status-cash-label { font-size: 14px; }
-  .player-status-total-value,
-  .player-status-cash-value { font-size: 17px; }
-  .player-status-happiness { gap: 4px; }
-  .player-status-happiness-icon { width: 50px; height: 50px; }
-  .player-status-happiness-value { font-size: 17px; }
-  .player-summary-item { padding: 3px 2px; border-radius: 7px; }
-  .player-summary-label { font-size: 14px; }
-  .player-summary-value { font-size: 14px; }
+  .player-status-avatar,
+  .player-status-happiness-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .player-status-info-grid { gap: 3px; }
+  .player-info-cell { padding: 3px 2px; border-radius: 7px; }
+  .player-info-name { padding-left: 1px; }
+  .player-status-name { font-size: 16px; }
+  .player-info-label { font-size: 11px; }
+  .player-info-value { font-size: 12px; margin-left: .18em; }
+  .player-status-happiness-value { font-size: 15px; margin-top: -3px; }
+  .player-status-turn-badge { right: 55px; }
 }
