@@ -570,7 +570,7 @@ function settleMarketAction(room, playerId, action) {
     event.text = event.success ? `${player.name} 圈地成功` : `${player.name} 圈地失敗`;
   } else if (action === 'sellStock') {
     const salaryIncome = Math.round(total * profession.salary * 5);
-    const units = round2(Math.min(total, player.stocks));
+    const units = round2(Math.min(total * 3, player.stocks));
     const proceeds = Math.round(units * room.game.stockPrice);
     player.cash += salaryIncome + proceeds;
     player.stocks = round2(Math.max(0, player.stocks - units));
@@ -578,7 +578,7 @@ function settleMarketAction(room, playerId, action) {
     event.text = `${player.name} 賣股`;
   } else if (action === 'sellLand') {
     const salaryIncome = Math.round(total * profession.salary * 5);
-    const units = round2(Math.min(total, player.land));
+    const units = round2(Math.min(total * 3, player.land));
     const proceeds = Math.round(units * room.game.landPrice);
     player.cash += salaryIncome + proceeds;
     player.land = round2(Math.max(0, player.land - units));
