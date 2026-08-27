@@ -238,7 +238,10 @@
           makeEffect('幸福', event.happinessGain),
         ]);
       } else {
-        pushResult(rows, actor, playerName, [makeEffect('現金', event.salaryIncome)]);
+        pushResult(rows, actor, playerName, [
+          '圓夢失敗：資金不足',
+          makeEffect('現金', event.salaryIncome),
+        ]);
       }
     } else if (event.type === 'sabotage') {
       if (target) pushResult(rows, target, target.name, [firstSignedEffect(event.text)]);
@@ -286,6 +289,21 @@
     const targetHead = target ? getPlayerHead(target) : null;
     const isDual = (event.type === 'sabotage' || event.type === 'help') && target;
 
+    if (event.type === 'dream' && !event.success) {
+      return `
+        <div class="result-visual result-visual-dream-fail">
+          <div class="result-person">
+            <img class="result-person-head" src="${actorHead}" alt="${escapeHtml(actor?.name || '玩家')}" />
+          </div>
+          <div class="dream-fail-visual" aria-label="圓夢失敗">
+            <span class="dream-fail-icon" aria-hidden="true">😭</span>
+            <strong class="dream-fail-label">圓夢失敗</strong>
+            <span class="dream-fail-reason">資金不足</span>
+          </div>
+        </div>
+      `;
+    }
+
     if (!special) {
       return `
         <div class="result-visual result-visual-single">
@@ -298,8 +316,8 @@
 
     return `
       <div class="result-visual ${isDual ? 'result-visual-dual' : 'result-visual-special'}">
-        <div class="result-person">
-          <img class="result-person-head" src="${actorHead}" alt="${escapeHtml(actor?.name || '玩家')}" />
+        <div class="result-person result-person-special">
+          <img class="result-person-head result-person-head-small" src="${actorHead}" alt="${escapeHtml(actor?.name || '玩家')}" />
           <span class="result-person-name">${escapeHtml(actor?.name || '玩家')}</span>
         </div>
         <div class="result-event-visual">
@@ -307,8 +325,8 @@
           <strong class="result-event-label">${escapeHtml(special.label)}</strong>
         </div>
         ${isDual ? `
-          <div class="result-person">
-            <img class="result-person-head" src="${targetHead}" alt="${escapeHtml(target.name)}" />
+          <div class="result-person result-person-special">
+            <img class="result-person-head result-person-head-small" src="${targetHead}" alt="${escapeHtml(target.name)}" />
             <span class="result-person-name">${escapeHtml(target.name)}</span>
           </div>
         ` : ''}
