@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/player-status.css?v=20260827-1845" />
   <link rel="stylesheet" href="/action-buttons.css?v=20260827-1455" />
   <link rel="stylesheet" href="/market-icons.css?v=20260827-1510" />
-  <link rel="stylesheet" href="/profession-layout.css?v=20260827-1818" />
+  <link rel="stylesheet" href="/profession-layout.css?v=20260827-1735" />
   <link rel="stylesheet" href="/action-showcase.css?v=20260827-1609a" />
   <link rel="stylesheet" href="/game-complete.css?v=20260827-1620" />
   <link rel="stylesheet" href="/logo-display.css?v=20260827-1610" />
@@ -44,7 +44,10 @@
       </div>
 
       <div id="professionPanel" class="panel hidden">
-        <div id="professionGrid" class="profession-grid"></div>
+        <div class="profession-stage">
+          <img class="profession-stage-image" src="/images/select.png?v=20260827-1735" alt="選擇職業" />
+          <div id="professionGrid" class="profession-grid"></div>
+        </div>
         <p id="professionMessage" class="profession-message" aria-live="polite"></p>
       </div>
 
@@ -158,6 +161,6 @@
   <script src="/app.js?v=20260827-1620"></script>
   <script src="/player-status.js?v=20260827-1845"></script>
   <script src="/action-showcase.js?v=20260827-1620"></script>
-  <script src="/logo-visibility.js?v=20260827-1710"></script>
+  <script src="/logo-visibility.js?v=20260827-1735"></script>
 </body>
 </html>
