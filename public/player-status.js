@@ -61,6 +61,17 @@
     return item;
   }
 
+  function makeTotalAssets(value) {
+    const item = document.createElement('div');
+    item.className = 'player-status-total-assets';
+    item.setAttribute('aria-label', `總資產 ${formatAsset(value)}`);
+    item.append(
+      makeText('player-status-total-label', '總資產'),
+      makeText('player-status-total-value', formatAsset(value))
+    );
+    return item;
+  }
+
   function makeHappiness(value) {
     const item = document.createElement('div');
     item.className = 'player-status-happiness';
@@ -120,7 +131,7 @@
 
       const avatar = document.createElement('img');
       avatar.className = 'player-status-avatar';
-      avatar.src = HEAD_IMAGES[professionId] || FALLBACK_IMAGES[professionId] || '/images/Logo.png';
+      avatar.src = HEAD_IMAGES[professionId] || FALLBACK_IMAGES[professionId] || '/images/logo.png';
       avatar.alt = PROFESSION_NAMES[professionId] || '職業';
       avatar.addEventListener('error', () => {
         const fallback = FALLBACK_IMAGES[professionId];
@@ -137,6 +148,7 @@
       identity.append(
         avatar,
         identityText,
+        makeTotalAssets(player.totalAssets),
         makeHappiness(player.happiness)
       );
 
@@ -147,10 +159,9 @@
       const summary = document.createElement('div');
       summary.className = 'player-status-summary';
       summary.append(
-        makeSummaryItem('總資產', formatAsset(player.totalAssets), 'assets'),
-        makeSummaryItem('現金', formatInteger(player.cash)),
-        makeSummaryItem('股票', formatUnit(player.stocks)),
-        makeSummaryItem('土地', formatUnit(player.land))
+        makeSummaryItem('現金', formatInteger(player.cash), 'cash'),
+        makeSummaryItem('股票', formatUnit(player.stocks), 'stocks'),
+        makeSummaryItem('土地', formatUnit(player.land), 'land')
       );
 
       card.append(identity, summary);
