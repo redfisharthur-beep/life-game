@@ -15,6 +15,19 @@
 
   let applying = false;
 
+  function simplifyDreamFail(overlay, event) {
+    if (event.type !== 'dream' || event.success) return;
+
+    const row = overlay.querySelector('.simple-result-row');
+    if (!row) return;
+
+    const effects = row.querySelector('.simple-result-effects');
+    if (!effects) return;
+
+    const salaryIncome = Number(event.salaryIncome || 0);
+    effects.innerHTML = `<span class="simple-result-effect">現金 +${salaryIncome}</span>`;
+  }
+
   function applySpecialResultVisual() {
     if (applying) return;
     applying = true;
@@ -24,7 +37,11 @@
       if (!overlay || typeof currentRoom === 'undefined') return;
 
       const event = currentRoom?.game?.lastEvent;
-      if (!event || !['sabotage', 'help'].includes(event.type)) return;
+      if (!event) return;
+
+      simplifyDreamFail(overlay, event);
+
+      if (!['sabotage', 'help'].includes(event.type)) return;
 
       const visual = overlay.querySelector('.result-visual');
       if (!visual) return;
