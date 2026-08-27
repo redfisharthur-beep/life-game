@@ -1,0 +1,124 @@
+/* 遊戲進行介面：字體稍微放大、統一改為較細字重。 */
+#gamePanel .round-label,
+#gamePanel .topbar-timer strong,
+#gamePanel .market-value,
+#gamePanel .player-status-name,
+#gamePanel .player-status-profession,
+#gamePanel .player-status-total-label,
+#gamePanel .player-status-total-value,
+#gamePanel .player-status-happiness-value,
+#gamePanel .player-status-turn-badge,
+#gamePanel .player-summary-label,
+#gamePanel .player-summary-value,
+#gamePanel .me-name,
+#gamePanel .me-profession,
+#gamePanel .asset-grid,
+#gamePanel .asset-grid b,
+#gamePanel .turn-title,
+#gamePanel .turn-chip,
+#gamePanel .turn-notice,
+#gamePanel .game-results,
+#gamePanel .game-results strong,
+#gamePanel .game-results b,
+#gamePanel .game-results button {
+  font-weight: 400 !important;
+}
+
+#gamePanel .round-label { font-size: 23px !important; }
+#gamePanel .topbar-timer strong { font-size: 26px !important; }
+#gamePanel .market-value { font-size: 23px !important; }
+
+#gamePanel .player-status-profession { font-size: 17px !important; }
+#gamePanel .player-status-name { font-size: 24px !important; }
+#gamePanel .player-status-total-label { font-size: 19px !important; }
+#gamePanel .player-status-total-value { font-size: 23px !important; }
+#gamePanel .player-status-happiness-value { font-size: 23px !important; }
+#gamePanel .player-status-turn-badge { font-size: 13px !important; }
+#gamePanel .player-summary-label { font-size: 18px !important; }
+#gamePanel .player-summary-value { font-size: 19px !important; }
+
+/* 行動展示／結果畫面也使用較細字體。 */
+.action-showcase .action-showcase-kicker,
+.action-showcase .action-showcase-title,
+.action-showcase .result-person-name,
+.action-showcase .result-event-label,
+.action-showcase .dream-fail-label,
+.action-showcase .simple-result-player,
+.action-showcase .simple-result-effect {
+  font-weight: 400 !important;
+}
+
+.action-showcase.choice-stage-active .action-showcase-kicker {
+  font-size: clamp(30px, 6.8vw, 44px) !important;
+}
+
+.action-showcase .result-person-name { font-size: 18px !important; }
+.action-showcase .result-event-label { font-size: 21px !important; }
+.action-showcase .dream-fail-label { font-size: 25px !important; }
+.action-showcase .simple-result-player { font-size: clamp(24px, 5.7vw, 34px) !important; }
+.action-showcase .simple-result-effect { font-size: clamp(20px, 4.8vw, 27px) !important; }
+
+/* 骰子再縮小一級，保留原本較深的陰影。 */
+.action-showcase .dice-result-image {
+  width: min(190px, 42vw) !important;
+  height: min(190px, 42vw) !important;
+}
+
+.action-showcase .dice-result-images.double-dice-total .dice-result-image {
+  width: min(214px, 48vw) !important;
+  height: min(214px, 48vw) !important;
+}
+
+@media (max-width: 760px) {
+  #gamePanel .round-label { font-size: 20px !important; }
+  #gamePanel .topbar-timer strong { font-size: 24px !important; }
+  #gamePanel .market-value { font-size: 19px !important; }
+
+  #gamePanel .player-status-profession { font-size: 14px !important; }
+  #gamePanel .player-status-name { font-size: 20px !important; }
+  #gamePanel .player-status-total-label { font-size: 16px !important; }
+  #gamePanel .player-status-total-value { font-size: 19px !important; }
+  #gamePanel .player-status-happiness-value { font-size: 19px !important; }
+  #gamePanel .player-summary-label { font-size: 16px !important; }
+  #gamePanel .player-summary-value { font-size: 16px !important; }
+}
+
+@media (max-width: 520px) {
+  #gamePanel .round-label { font-size: 18px !important; }
+  #gamePanel .topbar-timer strong { font-size: 22px !important; }
+  #gamePanel .market-value { font-size: 16px !important; }
+
+  #gamePanel .player-status-profession { font-size: 13px !important; }
+  #gamePanel .player-status-name { font-size: 19px !important; }
+  #gamePanel .player-status-total-label { font-size: 15px !important; }
+  #gamePanel .player-status-total-value { font-size: 18px !important; }
+  #gamePanel .player-status-happiness-value { font-size: 18px !important; }
+  #gamePanel .player-summary-label { font-size: 15px !important; }
+  #gamePanel .player-summary-value { font-size: 15px !important; }
+
+  .action-showcase.choice-stage-active .action-showcase-kicker {
+    font-size: clamp(28px, 8.4vw, 38px) !important;
+  }
+
+  .action-showcase .result-person-name { font-size: 15px !important; }
+  .action-showcase .result-event-label { font-size: 18px !important; }
+  .action-showcase .dream-fail-label { font-size: 22px !important; }
+  .action-showcase .simple-result-player { font-size: clamp(23px, 7.2vw, 31px) !important; }
+  .action-showcase .simple-result-effect { font-size: clamp(19px, 5.5vw, 24px) !important; }
+
+  .action-showcase .dice-result-image {
+    width: min(175px, 49vw) !important;
+    height: min(175px, 49vw) !important;
+  }
+
+  .action-showcase .dice-result-images.double-dice-total .dice-result-image {
+    width: min(195px, 55vw) !important;
+    height: min(195px, 55vw) !important;
+  }
+}
+
+@media (max-width: 390px) {
+  #gamePanel .round-label { font-size: 16px !important; }
+  #gamePanel .topbar-timer strong { font-size: 20px !important; }
+  #gamePanel .market-value { font-size: 14px !important; }
+}
