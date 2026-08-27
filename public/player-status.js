@@ -19,11 +19,11 @@
 
   const PROFESSION_NAMES = {
     doctor: '醫師',
-    engineer: '工程師',
-    sales: '超業',
-    office: '白領',
-    athlete: '運動員',
-    rich: '富二代',
+    engineer: '資訊工程師',
+    sales: '超級業務員',
+    office: '白領上班族',
+    athlete: '職棒球員',
+    rich: '企業富二代',
   };
 
   function formatInteger(value) {
