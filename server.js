@@ -598,6 +598,136 @@ function settleHelp(room, playerId) {
   return true;
 }
 
+function findDreamLiquidation(player, game, deficit) {
+  if (deficit <= 0) {
+    return {
+      stocks: 0,
+      land: 0,
+      proceeds: 0,
+      marketValueMetric: 0,
+      surplus: 0,
+    };
+  }
+
+  const maxStockSteps = Math.floor((round2(player.stocks) * 2) + 1e-9);
+  const maxLandSteps = Math.floor((round2(player.land) * 2) + 1e-9);
+  const stockPriceCents = Math.round(game.stockPrice * 100);
+  const landPriceCents = Math.round(game.landPrice * 100);
+
+  let best = null;
+
+  for (let stockSteps = 0; stockSteps <= maxStockSteps; stockSteps += 1) {
+    for (let landSteps = 0; landSteps <= maxLandSteps; landSteps += 1) {
+      if (stockSteps === 0 && landSteps === 0) continue;
+
+      const marketValueMetric = (stockSteps * stockPriceCents) + (landSteps * landPriceCents);
+      const marketValue = marketValueMetric / 200;
+      const proceeds = Math.round(marketValue * 0.8);
+      if (proceeds < deficit) continue;
+
+      const candidate = {
+        stocks: stockSteps / 2,
+        land: landSteps / 2,
+        proceeds,
+        marketValueMetric,
+        surplus: proceeds - deficit,
+        stockSteps,
+      };
+
+      const isBetter = !best
+        || candidate.marketValueMetric < best.marketValueMetric
+        || (
+          candidate.marketValueMetric === best.marketValueMetric
+          && candidate.surplus < best.surplus
+        )
+        || (
+          candidate.marketValueMetric === best.marketValueMetric
+          && candidate.surplus === best.surplus
+          && candidate.stockSteps > best.stockSteps
+        );
+
+      if (isBetter) best = candidate;
+    }
+  }
+
+  return best;
+}
+
+function settleDream(room, playerId) {
+  const player = getActivePlayer(room, playerId);
+  if (!player) return false;
+
+  const profession = PROFESSIONS[player.profession];
+  const { dice, total } = rollDice(room.game.round);
+  const salaryIncome = Math.round(total * profession.salary * 3);
+  const fee = Math.round(total * 500);
+  const cashAfterSalary = player.cash + salaryIncome;
+  const deficit = Math.max(0, fee - cashAfterSalary);
+  const happinessGain = round2(total * profession.dream);
+
+  const event = {
+    type: 'dream',
+    playerId,
+    dice,
+    diceTotal: total,
+    salaryIncome,
+    fee,
+    happinessGain,
+  };
+
+  let liquidation = null;
+
+  if (deficit > 0) {
+    liquidation = findDreamLiquidation(player, room.game, deficit);
+  }
+
+  if (deficit > 0 && !liquidation) {
+    player.cash = cashAfterSalary;
+    event.success = false;
+    event.text = `${player.name} 圓夢失敗：資金不足，保留30%薪資 +${salaryIncome}，股票與土地未出售`;
+    room.game.lastEvent = event;
+    advanceTurn(room);
+    return true;
+  }
+
+  const liquidationProceeds = liquidation?.proceeds || 0;
+  const soldStocks = liquidation?.stocks || 0;
+  const soldLand = liquidation?.land || 0;
+
+  const nextState = {
+    cash: cashAfterSalary + liquidationProceeds - fee,
+    stocks: round2(Math.max(0, player.stocks - soldStocks)),
+    land: round2(Math.max(0, player.land - soldLand)),
+    happiness: round2(player.happiness + happinessGain),
+  };
+
+  player.cash = nextState.cash;
+  player.stocks = nextState.stocks;
+  player.land = nextState.land;
+  player.happiness = nextState.happiness;
+
+  event.success = true;
+  event.liquidation = {
+    stocks: soldStocks,
+    land: soldLand,
+    proceeds: liquidationProceeds,
+    discount: 0.8,
+  };
+
+  if (liquidation) {
+    const soldParts = [];
+    if (soldStocks > 0) soldParts.push(`股票 ${soldStocks}`);
+    if (soldLand > 0) soldParts.push(`土地 ${soldLand}`);
+    event.text = `${player.name} 圓夢成功：30%薪資 +${salaryIncome}，8折變賣${soldParts.join('、')}得 ${liquidationProceeds}，支付 ${fee}，幸福 +${happinessGain}`;
+  } else {
+    event.text = `${player.name} 圓夢成功：30%薪資 +${salaryIncome}，支付 ${fee}，幸福 +${happinessGain}`;
+  }
+
+  room.game.lastEvent = event;
+  advanceTurn(room);
+  return true;
+}
+
 function leaveCurrentRoom(socket) {
   const roomCode = socket.data.roomCode;
   if (!roomCode) return;
@@ -795,6 +925,7 @@ io.on('connection', (socket) => {
       'help',
       'sellStock',
       'sellLand',
+      'dream',
     ]);
 
     if (!availableActions.has(action)) {
@@ -819,6 +950,8 @@ io.on('connection', (socket) => {
         return reply?.({ ok: false, message: '目前沒有可以援助的玩家。' });
       }
       settled = settleHelp(room, socket.id);
+    } else if (action === 'dream') {
+      settled = settleDream(room, socket.id);
     }
 
     if (!settled) {
