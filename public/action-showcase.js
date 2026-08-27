@@ -240,6 +240,7 @@
       } else {
         pushResult(rows, actor, playerName, [
           '圓夢失敗：資金不足',
+          '保留30%薪資',
           makeEffect('現金', event.salaryIncome),
         ]);
       }
@@ -296,9 +297,9 @@
             <img class="result-person-head" src="${actorHead}" alt="${escapeHtml(actor?.name || '玩家')}" />
           </div>
           <div class="dream-fail-visual" aria-label="圓夢失敗">
-            <span class="dream-fail-icon" aria-hidden="true">😭</span>
+            <img class="dream-fail-image" src="/images/cry.png" alt="哭哭" />
             <strong class="dream-fail-label">圓夢失敗</strong>
-            <span class="dream-fail-reason">資金不足</span>
+            <span class="dream-fail-reason">資金不足，無法支付圓夢費用</span>
           </div>
         </div>
       `;
