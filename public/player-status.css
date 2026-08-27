@@ -67,7 +67,7 @@
 .player-status-top-row {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) auto auto;
+  grid-template-columns: minmax(132px, 1fr) auto auto auto;
   gap: 10px;
   align-items: center;
   min-width: 0;
@@ -101,7 +101,8 @@
   white-space: nowrap;
 }
 
-.player-status-total-assets {
+.player-status-total-assets,
+.player-status-cash {
   display: inline-flex;
   align-items: baseline;
   justify-content: center;
@@ -111,19 +112,26 @@
   white-space: nowrap;
 }
 
-.player-status-total-label {
+.player-status-total-label,
+.player-status-cash-label {
   color: #91867d;
   font-size: 18px;
   font-weight: 700;
   line-height: 1;
 }
 
-.player-status-total-value {
+.player-status-total-value,
+.player-status-cash-value {
   margin: 0;
   color: #5d554f;
   font-size: 22px;
   font-weight: 800;
   line-height: 1;
+}
+
+.player-status-cash-label,
+.player-status-cash-value {
+  color: #5d7965;
 }
 
 .player-status-happiness {
@@ -137,15 +145,17 @@
 }
 
 .player-status-happiness-icon {
-  width: 36px;
-  height: 36px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
 }
 
 .player-status-happiness-value {
+  min-width: 2ch;
   font-size: 22px;
   font-weight: 800;
   line-height: 1;
+  text-align: center;
 }
 
 .player-status-turn-badge {
@@ -171,7 +181,7 @@
 
 .player-status-summary {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 5px;
   margin: 0;
 }
@@ -183,7 +193,6 @@
   text-align: center;
 }
 
-.player-summary-item.cash { background: #dfeae2; }
 .player-summary-item.stocks { background: #dfe6ef; }
 .player-summary-item.land { background: #eee2d5; }
 
@@ -197,8 +206,6 @@
 
 .player-summary-label { font-size: 17px; }
 .player-summary-value { margin-left: .25em; font-size: 18px; }
-.player-summary-item.cash .player-summary-label,
-.player-summary-item.cash .player-summary-value { color: #5d7965; }
 .player-summary-item.stocks .player-summary-label,
 .player-summary-item.stocks .player-summary-value { color: #5f7390; }
 .player-summary-item.land .player-summary-label,
@@ -217,13 +224,15 @@
   }
 
   .player-status-avatar { width: 56px; height: 56px; }
-  .player-status-top-row { grid-template-columns: minmax(92px, 1fr) auto auto; gap: 6px; }
+  .player-status-top-row { grid-template-columns: minmax(82px, 1fr) auto auto auto; gap: 6px; }
   .player-status-name-block { gap: .35em; }
   .player-status-profession { font-size: 13px; }
   .player-status-name { font-size: 19px; }
-  .player-status-total-label { font-size: 15px; }
-  .player-status-total-value { font-size: 18px; }
-  .player-status-happiness-icon { width: 29px; height: 29px; }
+  .player-status-total-label,
+  .player-status-cash-label { font-size: 15px; }
+  .player-status-total-value,
+  .player-status-cash-value { font-size: 18px; }
+  .player-status-happiness-icon { width: 56px; height: 56px; }
   .player-status-happiness-value { font-size: 18px; }
   .player-summary-label { font-size: 15px; }
   .player-summary-value { font-size: 15px; }
@@ -240,13 +249,15 @@
 
   .player-status-avatar { width: 50px; height: 50px; }
   .player-status-content { gap: 4px; }
-  .player-status-top-row { grid-template-columns: minmax(82px, 1fr) auto auto; gap: 4px; }
+  .player-status-top-row { grid-template-columns: minmax(70px, 1fr) auto auto auto; gap: 4px; }
   .player-status-profession { font-size: 12px; }
   .player-status-name { font-size: 18px; }
-  .player-status-total-label { font-size: 14px; }
-  .player-status-total-value { font-size: 17px; }
+  .player-status-total-label,
+  .player-status-cash-label { font-size: 14px; }
+  .player-status-total-value,
+  .player-status-cash-value { font-size: 17px; }
   .player-status-happiness { gap: 4px; }
-  .player-status-happiness-icon { width: 28px; height: 28px; }
+  .player-status-happiness-icon { width: 50px; height: 50px; }
   .player-status-happiness-value { font-size: 17px; }
   .player-summary-item { padding: 3px 2px; border-radius: 7px; }
   .player-summary-label { font-size: 14px; }
