@@ -1,4 +1,5 @@
-/* 首頁專用：front page.png 本身就是可操作介面 */
+/* 首頁專用：front page.png 本身就是可操作介面。
+   所有互動區都以圖片本身的百分比座標定位；不再針對手機/桌機改位置。 */
 .home-stage {
   position: relative;
   display: none;
@@ -18,6 +19,7 @@
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 /* 首頁只呈現完整圖片，不另外加卡片底色或邊框。 */
@@ -31,7 +33,11 @@
   overflow: visible;
 }
 
-/* entryPanel 覆蓋整張圖片；真正可操作的是裡面的輸入區與圖片按鈕區。 */
+/*
+  entryPanel 永遠完整覆蓋 front page.png。
+  因為它和圖片使用同一個定位基準，所以圖片等比例縮放時，
+  輸入區與按鈕熱區也會等比例跟著縮放，不會因裝置尺寸而位移。
+*/
 .home-entry-panel {
   position: absolute;
   inset: 0;
@@ -39,40 +45,50 @@
   width: 100%;
   height: 100%;
   margin: 0 !important;
+  padding: 0 !important;
   pointer-events: none;
 }
 
-/* 對齊圖片上方米白色空白框。 */
+/*
+  原圖 705×868：米白輸入框內部約 x=181~518、y=284~381。
+  以下全部換算成圖片百分比座標。
+*/
 .home-entry-panel .field.entry-control {
   position: absolute;
-  left: 25%;
-  top: 32.1%;
-  width: 50%;
-  height: 12.5%;
+  left: 25.7%;
+  top: 32.7%;
+  width: 47.9%;
+  height: 11.2%;
   margin: 0;
+  padding: 0;
   pointer-events: auto;
 }
 
 .home-entry-panel input {
+  display: block;
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: 0 8%;
+  margin: 0;
+  padding: 0 7%;
   border: 0;
   border-radius: 0;
   outline: 0;
   background: transparent;
   box-shadow: none;
   color: #69503e;
-  font-size: clamp(17px, 3.3vw, 30px);
+  font-size: clamp(17px, 3.2vw, 30px);
   font-weight: 700;
   letter-spacing: .06em;
+  line-height: 1;
   text-align: center;
   caret-color: #76553d;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .home-entry-panel input::placeholder {
-  color: rgba(105, 80, 62, .58);
+  color: rgba(105, 80, 62, .52);
   opacity: 1;
   text-align: center;
 }
@@ -80,25 +96,25 @@
 .home-entry-panel input:focus {
   border: 0;
   outline: 0;
-  background: rgba(255, 255, 255, .08);
+  background: rgba(255, 255, 255, .06);
   box-shadow: none;
 }
 
 /*
-  對齊圖片內原本的橘色「迎向新局」。
-  HTML button 本身完全透明，只把圖片上的按鈕變成真正可點擊區域。
+  原圖橘色「迎向新局」外框約 x=172~535、y=414~585。
+  HTML button 只當透明點擊熱區，不重畫任何按鈕。
 */
 .home-entry-panel #joinGameBtn {
   position: absolute;
-  left: 25.4%;
-  top: 47.1%;
-  width: 50.5%;
-  height: 17.6%;
+  left: 24.4%;
+  top: 47.7%;
+  width: 51.5%;
+  height: 19.7%;
   min-height: 0;
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: 999px;
+  border-radius: 22%;
   background: transparent !important;
   box-shadow: none !important;
   color: transparent !important;
@@ -120,17 +136,18 @@
 
 .home-entry-panel #joinGameBtn:focus-visible {
   outline: 3px solid rgba(255, 255, 255, .82);
-  outline-offset: -5px;
+  outline-offset: -6px;
 }
 
-/* 錯誤訊息放在輸入框與圖片按鈕之間，不另做卡片。 */
+/* 訊息獨立定位，不參與輸入框或按鈕排版，因此不會把它們推位。 */
 .home-entry-panel .message {
   position: absolute;
   left: 27%;
-  top: 44.3%;
+  top: 44.2%;
   width: 46%;
   min-height: 0;
   margin: 0;
+  padding: 0;
   color: #72594a;
   font-size: clamp(11px, 1.7vw, 15px);
   font-weight: 700;
@@ -144,6 +161,7 @@
   color: #a34f45;
 }
 
+/* RWD 只改外層留白與字級，不再更改互動區座標。 */
 @media (max-width: 760px) {
   .shell:has(.card.home-mode) {
     padding: 8px;
