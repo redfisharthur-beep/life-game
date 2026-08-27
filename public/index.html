@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>人生｜多人派對遊戲</title>
   <link rel="stylesheet" href="/style.css?v=20260827-1410" />
-  <link rel="stylesheet" href="/player-status.css?v=20260827-1425" />
+  <link rel="stylesheet" href="/player-status.css?v=20260827-1510" />
   <link rel="stylesheet" href="/action-buttons.css?v=20260827-1455" />
-  <link rel="stylesheet" href="/market-icons.css?v=20260827-1515" />
+  <link rel="stylesheet" href="/market-icons.css?v=20260827-1510" />
   <link rel="stylesheet" href="/action-showcase.css?v=20260827-1620" />
 </head>
 <body>
@@ -46,21 +46,27 @@
         <section id="playerStatusBar" class="player-status-bar" aria-label="玩家資訊"></section>
 
         <div class="game-topbar">
-          <div>
+          <div class="stage-block">
             <span id="stageName" class="stage-name">人生起步</span>
             <span id="roundLabel" class="round-label">第 1 / 30 回合</span>
           </div>
-          <div class="market-strip" aria-label="最新市場價格">
-            <span class="market-item">
-              <img class="market-icon" src="/images/stock.png" alt="股價" />
-              <span class="market-label">股價</span>
-              <b id="stockPrice" class="market-value">10.00</b>
-            </span>
-            <span class="market-item">
-              <img class="market-icon" src="/images/land.png" alt="地價" />
-              <span class="market-label">地價</span>
-              <b id="landPrice" class="market-value">10.00</b>
-            </span>
+
+          <div class="game-topbar-right">
+            <div class="timer-box topbar-timer" aria-label="回合剩餘秒數">
+              <strong id="turnTimer">10</strong>
+              <span>秒</span>
+            </div>
+
+            <div class="market-strip" aria-label="最新市場價格">
+              <span class="market-item" title="股市">
+                <img class="market-icon" src="/images/stock.png" alt="股市" />
+                <b id="stockPrice" class="market-value">10.00</b>
+              </span>
+              <span class="market-item" title="地價">
+                <img class="market-icon" src="/images/land.png" alt="地價" />
+                <b id="landPrice" class="market-value">10.00</b>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -69,11 +75,6 @@
             <div>
               <span id="myName" class="me-name">玩家</span>
               <span id="myProfession" class="me-profession">職業</span>
-            </div>
-            <div class="timer-box">
-              <span class="timer-label">剩餘</span>
-              <strong id="turnTimer">10</strong>
-              <span>秒</span>
             </div>
           </div>
           <div class="asset-grid">
@@ -84,7 +85,7 @@
           </div>
         </section>
 
-        <section class="turn-section">
+        <section class="turn-section hidden" aria-hidden="true">
           <div class="turn-title">本輪順序</div>
           <div id="turnOrder" class="turn-order"></div>
           <p id="turnNotice" class="turn-notice">等待回合開始…</p>
@@ -132,7 +133,7 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/app.js?v=20260827-1545"></script>
-  <script src="/player-status.js?v=20260827-1425"></script>
+  <script src="/player-status.js?v=20260827-1510"></script>
   <script src="/action-showcase.js?v=20260827-1620"></script>
 </body>
 </html>
