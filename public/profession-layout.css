@@ -117,7 +117,7 @@
   transform-origin: center;
 }
 
-/* 左欄屬性維持右移 1.2 個字；右欄再多往右 1.5 個字。 */
+/* 左欄屬性維持右移 1.2 個字；右欄由 2.7em 往左 1 個字，改為 1.7em。 */
 .profession-detail {
   display: flex;
   min-width: 0;
@@ -128,7 +128,7 @@
 }
 
 .profession-card:nth-child(even) .profession-detail {
-  transform: translate(2.7em, .5em);
+  transform: translate(1.7em, .5em);
 }
 
 .profession-abilities {
@@ -238,7 +238,7 @@
   }
 
   .profession-card:nth-child(even) .profession-detail {
-    transform: translate(2.7em, .5em);
+    transform: translate(1.7em, .5em);
   }
 
   .profession-abilities {
@@ -302,7 +302,7 @@
   }
 
   .profession-card:nth-child(even) .profession-detail {
-    transform: translate(2.7em, .5em);
+    transform: translate(1.7em, .5em);
   }
 
   .profession-abilities {
