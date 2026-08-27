@@ -30,6 +30,13 @@
     return Math.round(Number(value) || 0).toLocaleString('zh-TW');
   }
 
+  function formatAsset(value) {
+    return Number(value || 0).toLocaleString('zh-TW', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+  }
+
   function formatUnit(value) {
     return Number(value || 0).toLocaleString('zh-TW', {
       minimumFractionDigits: Number(value || 0) % 1 ? 1 : 0,
@@ -104,8 +111,9 @@
       const card = document.createElement('article');
       card.className = 'player-status-card';
 
-      if (player.id === socket.id) card.classList.add('me');
+      if (typeof myPlayerId !== 'undefined' && player.id === myPlayerId) card.classList.add('me');
       if (player.id === room.game.currentPlayerId) card.classList.add('current');
+      if (!player.connected) card.classList.add('offline');
 
       const identity = document.createElement('div');
       identity.className = 'player-status-identity';
@@ -116,16 +124,14 @@
       avatar.alt = PROFESSION_NAMES[professionId] || '職業';
       avatar.addEventListener('error', () => {
         const fallback = FALLBACK_IMAGES[professionId];
-        if (fallback && avatar.src !== fallback) {
-          avatar.src = fallback;
-        }
+        if (fallback && avatar.src !== fallback) avatar.src = fallback;
       }, { once: true });
 
       const identityText = document.createElement('div');
       identityText.className = 'player-status-identity-text';
       identityText.append(
         makeText('player-status-profession', PROFESSION_NAMES[professionId] || '未選職業'),
-        makeText('player-status-name', player.name)
+        makeText('player-status-name', player.connected ? player.name : `${player.name}（離線）`)
       );
 
       identity.append(
@@ -141,7 +147,7 @@
       const summary = document.createElement('div');
       summary.className = 'player-status-summary';
       summary.append(
-        makeSummaryItem('總資產', formatInteger(player.totalAssets), 'assets'),
+        makeSummaryItem('總資產', formatAsset(player.totalAssets), 'assets'),
         makeSummaryItem('現金', formatInteger(player.cash)),
         makeSummaryItem('股票', formatUnit(player.stocks)),
         makeSummaryItem('土地', formatUnit(player.land))
