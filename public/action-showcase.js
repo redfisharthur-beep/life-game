@@ -104,8 +104,10 @@
 
     setChoiceStageMode(false);
     setDiceStageMode(true);
-    kickerEl.textContent = `${playerName} 骰到`;
-    titleEl.textContent = String(total);
+
+    // 骰子階段只顯示結果圖，不顯示玩家名、「骰到」或點數文字。
+    kickerEl.textContent = '';
+    titleEl.textContent = '';
 
     let diceImage = '/images/dice.png';
     let imageAlt = `骰子結果 ${total}`;
