@@ -100,7 +100,7 @@
   transform: translate(.5em, .5em);
 }
 
-/* 右欄三個職業圖片再往右半個字。 */
+/* 右欄三個職業圖片維持目前向右微調的位置。 */
 .profession-card:nth-child(even) .profession-visual {
   transform: translate(1em, .5em);
 }
@@ -120,14 +120,18 @@
   transform-origin: center;
 }
 
-/* 屬性整組從原本右移 2em 改為右移 .5em，等於往左 1.5 個字；並往下半個字。 */
+/* 屬性：左欄向右 .7em、右欄向右 1.2em，兩欄都維持向下半個字。 */
 .profession-detail {
   display: flex;
   min-width: 0;
   height: 96%;
   align-items: center;
   justify-content: center;
-  transform: translate(.5em, .5em);
+  transform: translate(.7em, .5em);
+}
+
+.profession-card:nth-child(even) .profession-detail {
+  transform: translate(1.2em, .5em);
 }
 
 .profession-abilities {
@@ -138,7 +142,7 @@
   justify-items: start;
 }
 
-/* 移除整列米白膠囊，只保留文字＋評級色塊。 */
+/* 移除整列米白膠囊，只保留文字＋評級色塊；字體縮為先前約 80%，並改細體。 */
 .ability-item {
   display: flex;
   align-items: center;
@@ -154,8 +158,8 @@
   background: transparent !important;
   box-shadow: none !important;
   color: #695f55;
-  font-size: clamp(14px, 2.05vw, 21px);
-  font-weight: 800;
+  font-size: clamp(11.2px, 1.64vw, 16.8px);
+  font-weight: 400;
   line-height: 1;
   text-align: left;
   white-space: nowrap;
@@ -172,6 +176,7 @@
   min-width: 0;
   letter-spacing: .01em;
   white-space: nowrap;
+  font-weight: 400;
 }
 
 .ability-grade {
@@ -184,8 +189,8 @@
   margin: 0;
   border-radius: 8px;
   color: #fffaf6;
-  font-size: clamp(14px, 2.1vw, 21px);
-  font-weight: 800;
+  font-size: clamp(11.2px, 1.68vw, 16.8px);
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -233,18 +238,24 @@
   }
 
   .profession-detail {
-    transform: translate(.5em, .5em);
+    transform: translate(.7em, .5em);
+  }
+
+  .profession-card:nth-child(even) .profession-detail {
+    transform: translate(1.2em, .5em);
   }
 
   .ability-item {
     gap: .5em;
-    font-size: clamp(13px, 3.35vw, 18px);
+    font-size: clamp(10.4px, 2.68vw, 14.4px);
+    font-weight: 400;
   }
 
   .ability-grade {
     width: clamp(23px, 5.4vw, 32px);
     height: clamp(21px, 4.8vw, 29px);
-    font-size: clamp(13px, 3.3vw, 18px);
+    font-size: clamp(10.4px, 2.64vw, 14.4px);
+    font-weight: 500;
   }
 }
 
@@ -287,7 +298,11 @@
   }
 
   .profession-detail {
-    transform: translate(.5em, .5em);
+    transform: translate(.7em, .5em);
+  }
+
+  .profession-card:nth-child(even) .profession-detail {
+    transform: translate(1.2em, .5em);
   }
 
   .profession-abilities {
@@ -296,13 +311,15 @@
 
   .ability-item {
     gap: .48em;
-    font-size: clamp(12px, 3.65vw, 16px);
+    font-size: clamp(9.6px, 2.92vw, 12.8px);
+    font-weight: 400;
   }
 
   .ability-grade {
     width: clamp(21px, 5.8vw, 27px);
     height: clamp(20px, 5.2vw, 25px);
     border-radius: 6px;
-    font-size: clamp(12px, 3.6vw, 16px);
+    font-size: clamp(9.6px, 2.88vw, 12.8px);
+    font-weight: 500;
   }
 }
