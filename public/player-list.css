@@ -182,29 +182,9 @@
   display: none;
 }
 
-/* 離開房間：縮小存在感但維持可點擊 */
+/* 等待列表不顯示離開房間按鈕。保留 DOM，避免既有 JS 綁定事件失敗。 */
 .room-mode #leaveRoomBtn {
-  position: absolute;
-  left: 50%;
-  top: 86.2%;
-  width: auto;
-  min-width: 0;
-  min-height: 42px;
-  margin: 0;
-  padding: 7px 17px;
-  transform: translateX(-50%);
-  border: 1px solid rgba(134, 96, 59, .20);
-  border-radius: 999px;
-  background: rgba(255, 248, 231, .68);
-  color: #76553d;
-  box-shadow: 0 2px 5px rgba(115,76,39,.05);
-  font-size: clamp(13px, 1.8vw, 18px);
-  font-weight: 700;
-  pointer-events: auto;
-}
-
-.room-mode #leaveRoomBtn:hover:not(:disabled) {
-  background: rgba(255, 250, 239, .82);
+  display: none !important;
 }
 
 @media (max-width: 760px) {
