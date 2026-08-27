@@ -29,7 +29,6 @@
   white-space: nowrap;
 }
 
-/* 讓倒數與市場直接成為 topbar 的第 2、3 欄，秒數自然靠近「人生起步」。 */
 .game-topbar-right {
   display: contents;
 }
@@ -38,6 +37,7 @@
   grid-column: 2;
   min-width: 58px;
   padding: 5px 7px;
+  margin-left: 14px;
   border-radius: 12px;
   justify-self: start;
 }
@@ -99,6 +99,7 @@
   .topbar-timer {
     min-width: 54px;
     padding: 4px 5px;
+    margin-left: 10px;
   }
 
   .topbar-timer strong { font-size: 23px; }
@@ -136,11 +137,10 @@
   .topbar-timer {
     min-width: 50px;
     padding: 4px;
-    margin-left: 1px;
+    margin-left: 8px;
   }
 
   .topbar-timer strong { font-size: 21px; }
-  .topbar-timer > span:last-child { font-size: 9px; }
 
   .market-strip {
     grid-template-columns: repeat(2, max-content);
@@ -176,6 +176,7 @@
 
   .topbar-timer {
     min-width: 46px;
+    margin-left: 6px;
     border-radius: 9px;
   }
 
