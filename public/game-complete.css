@@ -1,0 +1,233 @@
+/* 完整遊戲流程：離線狀態、20回合提示、30回合結算 */
+.player-row.offline,
+.player-status-card.offline {
+  opacity: .58;
+}
+
+.player-status-card.offline::after {
+  content: "離線";
+  position: absolute;
+  right: 8px;
+  bottom: 7px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #c8c2bf;
+  color: #6e6762;
+  font-size: 11px;
+}
+
+.round-announcement {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  background: rgba(239, 234, 227, .94);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  text-align: center;
+}
+
+.round-announcement strong {
+  font-size: clamp(42px, 9vw, 72px);
+  line-height: 1;
+  color: #7f8f83;
+  letter-spacing: .04em;
+}
+
+.round-announcement span {
+  font-size: clamp(20px, 4.5vw, 30px);
+  color: #625b55;
+  font-weight: 700;
+}
+
+#gamePanel.finished-mode .actions-section,
+#gamePanel.finished-mode .event-box,
+#gamePanel.finished-mode .topbar-timer {
+  display: none !important;
+}
+
+.game-results {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid #c9c0b6;
+  border-radius: 22px;
+  background: #f5f0ea;
+}
+
+.results-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.results-heading > span {
+  font-size: 18px;
+  color: #817970;
+}
+
+.results-heading > strong {
+  font-size: clamp(22px, 4.8vw, 30px);
+  color: #7f8f83;
+}
+
+.ranking-list {
+  display: grid;
+  gap: 9px;
+}
+
+.ranking-card {
+  display: grid;
+  gap: 9px;
+  padding: 13px;
+  border: 1px solid #d2c8be;
+  border-radius: 16px;
+  background: #eee9e2;
+  text-align: left;
+}
+
+.ranking-card.winner {
+  border-color: #c3a05b;
+  box-shadow: 0 0 0 2px rgba(195, 160, 91, .16);
+  background: #fbf6e9;
+}
+
+.ranking-card.me {
+  outline: 2px solid rgba(127, 143, 131, .34);
+  outline-offset: 1px;
+}
+
+.ranking-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ranking-number {
+  flex: 0 0 auto;
+  min-width: 72px;
+  color: #7b6e63;
+  font-size: 18px;
+}
+
+.ranking-card.winner .ranking-number {
+  color: #a57e3e;
+  font-size: 21px;
+}
+
+.ranking-identity {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ranking-identity strong {
+  font-size: 21px;
+  color: #504a46;
+}
+
+.ranking-identity span {
+  color: #8a8179;
+  font-size: 14px;
+}
+
+.ranking-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.ranking-stats > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 5px 8px;
+  border-radius: 10px;
+  background: #e4ddd5;
+  text-align: center;
+}
+
+.ranking-stats small {
+  color: #8a8179;
+  font-size: 12px;
+}
+
+.ranking-stats b {
+  color: #514b46;
+  font-size: 17px;
+}
+
+.ranking-titles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.ranking-titles span {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #d7ddd3;
+  color: #5f6b62;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.results-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.results-actions button {
+  margin: 0;
+}
+
+@media (max-width: 520px) {
+  .game-results {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .results-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .ranking-card {
+    padding: 10px;
+  }
+
+  .ranking-number {
+    min-width: 62px;
+    font-size: 15px;
+  }
+
+  .ranking-identity {
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .ranking-identity strong {
+    font-size: 18px;
+  }
+
+  .ranking-stats > span {
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .results-actions {
+    grid-template-columns: 1fr;
+  }
+}
