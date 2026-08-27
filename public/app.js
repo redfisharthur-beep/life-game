@@ -28,7 +28,16 @@ const turnTimerEl = document.getElementById('turnTimer');
 const turnOrderEl = document.getElementById('turnOrder');
 const turnNoticeEl = document.getElementById('turnNotice');
 const gameEventEl = document.getElementById('gameEvent');
+const actionHintEl = document.querySelector('.action-hint');
 const actionButtons = [...document.querySelectorAll('.action-button')];
+
+const ACTIVE_ACTIONS = new Set([
+  'salary',
+  'buyStock',
+  'buyLand',
+  'sellStock',
+  'sellLand',
+]);
 
 const PROFESSIONS = [
   {
@@ -333,9 +342,13 @@ function renderGame(room) {
   }
 
   actionButtons.forEach((button) => {
-    const isSalary = button.dataset.action === 'salary';
-    button.disabled = !(isSalary && isMyTurn);
+    const available = ACTIVE_ACTIONS.has(button.dataset.action);
+    button.disabled = !(available && isMyTurn);
   });
+
+  if (actionHintEl) {
+    actionHintEl.textContent = '已開放領薪、買股、圈地、賣股、賣地；其餘行動下一步接入。';
+  }
 
   gameEventEl.textContent = game.lastEvent?.text || '人生旅程進行中…';
   updateCountdown();
