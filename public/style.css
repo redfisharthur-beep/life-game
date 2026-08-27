@@ -23,7 +23,7 @@ button:disabled { opacity: .42; cursor: not-allowed; }
 }
 
 .card {
-  width: min(640px, 100%);
+  width: min(760px, 100%);
   background: #eee9e2;
   border: 1px solid #c9c0b6;
   border-radius: 30px;
@@ -34,7 +34,7 @@ button:disabled { opacity: .42; cursor: not-allowed; }
 
 .game-logo {
   display: block;
-  width: min(440px, 82%);
+  width: min(620px, 94%);
   max-height: 240px;
   height: auto;
   object-fit: contain;
@@ -115,7 +115,8 @@ button {
 .ghost:hover:not(:disabled) { background: #cec3ba; }
 
 .message,
-.launch-message {
+.launch-message,
+.profession-message {
   min-height: 28px;
   margin: 14px 0 0;
   font-size: 17px;
@@ -123,7 +124,8 @@ button {
   color: #766e67;
 }
 .message.error,
-.launch-message.error { color: #9a6966; }
+.launch-message.error,
+.profession-message.error { color: #9a6966; }
 
 .players-head.compact {
   display: flex;
@@ -200,6 +202,104 @@ button {
   box-shadow: none;
 }
 
+.profession-title {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 38px);
+  font-weight: 400;
+  color: #655e58;
+  letter-spacing: .08em;
+}
+
+.profession-subtitle {
+  margin: 8px 0 22px;
+  font-size: 16px;
+  color: #8b827b;
+}
+
+.profession-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.profession-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 0;
+  padding: 12px;
+  border: 1px solid #cfc5bc;
+  border-radius: 22px;
+  background: #f5f0ea;
+  color: #514c48;
+  box-shadow: 0 6px 16px rgba(84, 76, 69, .06);
+  overflow: hidden;
+  text-align: center;
+}
+
+.profession-card:hover:not(:disabled) {
+  background: #faf7f2;
+  transform: translateY(-2px);
+}
+
+.profession-card.selected {
+  border: 2px solid #8f9a8d;
+  background: #e4e8e1;
+  box-shadow: 0 7px 18px rgba(100, 116, 102, .12);
+}
+
+.profession-card.taken,
+.profession-card:disabled {
+  opacity: .46;
+  filter: grayscale(.25);
+}
+
+.profession-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  border-radius: 16px;
+  background: #ece6df;
+}
+
+.profession-name {
+  margin-top: 10px;
+  font-size: 22px;
+  color: #5f5852;
+}
+
+.profession-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 8px;
+  margin-top: 9px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #7d746d;
+}
+
+.profession-state {
+  display: block;
+  margin-top: 11px;
+  padding: 7px 8px;
+  border-radius: 999px;
+  background: #ddd5cd;
+  color: #6f665f;
+  font-size: 14px;
+}
+
+.profession-card.selected .profession-state {
+  background: #8f9a8d;
+  color: #fffaf6;
+}
+
+.profession-message {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
 @media (max-width: 760px) {
   .shell {
     padding: 16px;
@@ -209,17 +309,17 @@ button {
   .card {
     width: 100%;
     margin-top: 10px;
-    padding: 34px 22px;
+    padding: 30px 18px;
     border-radius: 26px;
   }
 
   .game-logo {
-    width: min(360px, 88%);
+    width: min(620px, 100%);
     max-height: 210px;
     margin-bottom: 8px;
   }
 
-  .panel { margin-top: 28px; }
+  .panel { margin-top: 26px; }
 
   .entry-control {
     width: clamp(200px, 58%, 290px);
@@ -246,14 +346,32 @@ button {
   #playerCount { font-size: 21px; min-height: 52px; }
   .ghost { width: clamp(200px, 58%, 290px); }
   .start-button { width: clamp(220px, 66%, 320px); min-height: 68px; font-size: 23px; }
+
+  .profession-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .profession-card {
+    padding: 10px;
+    border-radius: 20px;
+  }
+
+  .profession-name { font-size: 21px; }
+  .profession-stats { font-size: 12px; gap: 4px 6px; }
+  .profession-state { font-size: 13px; }
 }
 
 @media (max-width: 390px) {
   .shell { padding: 10px; }
-  .card { padding: 30px 16px; border-radius: 22px; }
-  .game-logo { width: min(300px, 92%); max-height: 180px; }
+  .card { padding: 24px 12px; border-radius: 22px; }
+  .game-logo { width: 100%; max-height: 170px; }
   .entry-control, .ghost { width: min(74vw, 260px); }
   .start-button { width: min(80vw, 285px); }
   .player-row { padding: 16px 14px; gap: 10px; min-height: 80px; }
   .player-name { font-size: 20px; }
+  .profession-grid { gap: 9px; }
+  .profession-card { padding: 8px; border-radius: 17px; }
+  .profession-name { font-size: 19px; }
+  .profession-stats { grid-template-columns: 1fr; font-size: 12px; }
 }
