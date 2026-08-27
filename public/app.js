@@ -40,6 +40,7 @@ const ACTIVE_ACTIONS = new Set([
   'help',
   'sellStock',
   'sellLand',
+  'dream',
 ]);
 
 const PROFESSIONS = [
@@ -356,7 +357,7 @@ function renderGame(room) {
   });
 
   if (actionHintEl) {
-    actionHintEl.textContent = '目前只有圓夢尚未開放。';
+    actionHintEl.textContent = '9 種行動皆已開放。';
   }
 
   gameEventEl.textContent = game.lastEvent?.text || '人生旅程進行中…';
