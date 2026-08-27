@@ -22,6 +22,8 @@ const rooms = new Map();
 const TURN_MS = 10_000;
 const ACTION_SHOWCASE_MS = 9_000;
 const ROUND_ACCELERATION_MS = 3_000;
+const MAJOR_EVENT_MS = 10_000;
+const MAJOR_EVENT_CHANCE = 0.03;
 const DISCONNECT_GRACE_MS = 90_000;
 const ROOM_IDLE_MS = 15 * 60_000;
 const TOTAL_ROUNDS = 30;
@@ -35,6 +37,15 @@ const PROFESSIONS = {
   athlete: { name: '職棒球員', salary: 6, stock: 1.0, land: 1.5, dream: 2.70 },
   rich: { name: '企業富二代', salary: 10, stock: 1.0, land: 2.0, dream: 1.80 },
 };
+
+const MAJOR_EVENTS = [
+  { id: 'financialCrash', title: '金融海嘯', description: '股市重挫，股價立刻打7折' },
+  { id: 'earthquake', title: '大地震', description: '地價重挫，土地價格立刻打8折' },
+  { id: 'inflation', title: '通貨膨脹', description: '現金貶值，每人持有現金立刻打9折' },
+  { id: 'aiBoom', title: 'AI世代爆發', description: '股市爆發，股價立刻 ×1.4' },
+  { id: 'urbanRenewal', title: '都市重劃', description: '地價爆發，土地價格立刻 ×1.3' },
+  { id: 'cashGrant', title: '普發現金', description: '每人持有現金立刻增加 1000 元' },
+];
 
 function cleanName(value) {
   return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 12);
@@ -173,6 +184,8 @@ function publicRoom(room) {
         deadline: room.game.deadline,
         showcaseUntil: room.game.showcaseUntil || null,
         transitionUntil: room.game.transitionUntil || null,
+        majorEvent: room.game.majorEvent || null,
+        majorEventUntil: room.game.majorEventUntil || null,
         roundAnnouncement: room.game.round === 20
           ? '人生加速！從現在開始每回合擲2顆骰子！'
           : null,
@@ -253,6 +266,8 @@ function beginTurn(room) {
   clearTurnTimer(room);
   room.game.showcaseUntil = null;
   room.game.transitionUntil = null;
+  room.game.majorEvent = null;
+  room.game.majorEventUntil = null;
 
   while (room.game.turnIndex < room.game.turnOrder.length) {
     const playerId = room.game.turnOrder[room.game.turnIndex];
@@ -309,6 +324,9 @@ function initializeGame(room) {
     deadline: null,
     showcaseUntil: null,
     transitionUntil: null,
+    majorEvent: null,
+    majorEventUntil: null,
+    triggeredMajorEvents: [],
     lastEvent: {
       type: 'start',
       text: '職業選擇完成，人生啟程！',
@@ -357,6 +375,49 @@ function updateMarket(room) {
   return stockUp ? '股票上漲 10%' : '股票下跌 7%';
 }
 
+function applyMajorEvent(room, event) {
+  if (event.id === 'financialCrash') {
+    room.game.stockPrice = round2(room.game.stockPrice * 0.7);
+  } else if (event.id === 'earthquake') {
+    room.game.landPrice = round2(room.game.landPrice * 0.8);
+  } else if (event.id === 'inflation') {
+    room.players.forEach((player) => {
+      player.cash = Math.round(Number(player.cash || 0) * 0.9);
+    });
+  } else if (event.id === 'aiBoom') {
+    room.game.stockPrice = round2(room.game.stockPrice * 1.4);
+  } else if (event.id === 'urbanRenewal') {
+    room.game.landPrice = round2(room.game.landPrice * 1.3);
+  } else if (event.id === 'cashGrant') {
+    room.players.forEach((player) => {
+      player.cash = Math.round(Number(player.cash || 0)) + 1000;
+    });
+  }
+}
+
+function tryTriggerMajorEvent(room) {
+  const used = new Set(room.game.triggeredMajorEvents || []);
+  const available = MAJOR_EVENTS.filter((event) => !used.has(event.id));
+  if (!available.length || Math.random() >= MAJOR_EVENT_CHANCE) return null;
+
+  const event = randomChoice(available);
+  applyMajorEvent(room, event);
+  room.game.triggeredMajorEvents.push(event.id);
+  room.game.majorEvent = {
+    id: event.id,
+    title: event.title,
+    description: event.description,
+    round: room.game.round,
+  };
+  room.game.majorEventUntil = Date.now() + MAJOR_EVENT_MS;
+  room.game.lastEvent = {
+    type: 'majorEvent',
+    eventId: event.id,
+    text: `重大事件：${event.title}｜${event.description}`,
+  };
+  return room.game.majorEvent;
+}
+
 function finishGame(room, reason = 'rounds') {
   clearTurnTimer(room);
   room.game.finished = true;
@@ -366,6 +427,8 @@ function finishGame(room, reason = 'rounds') {
   room.game.deadline = null;
   room.game.showcaseUntil = null;
   room.game.transitionUntil = null;
+  room.game.majorEvent = null;
+  room.game.majorEventUntil = null;
   room.game.results = calculateResults(room);
   room.game.lastEvent = {
     type: 'finish',
@@ -377,16 +440,17 @@ function finishGame(room, reason = 'rounds') {
   emitRoom(room);
 }
 
-function endRound(room) {
-  if (!room.game) return;
-  clearTurnTimer(room);
+function continueAfterRound(room, completedRound, marketText) {
+  if (!room.game || room.phase !== 'game' || room.game.finished) return;
 
-  if (room.game.round >= TOTAL_ROUNDS) {
+  room.game.majorEvent = null;
+  room.game.majorEventUntil = null;
+
+  if (completedRound >= TOTAL_ROUNDS) {
     finishGame(room, 'rounds');
     return;
   }
 
-  const marketText = updateMarket(room);
   room.game.round += 1;
   room.game.turnOrder = shuffle(room.players.map((player) => player.id));
   room.game.turnIndex = 0;
@@ -414,6 +478,34 @@ function endRound(room) {
   }
 
   beginTurn(room);
+}
+
+function endRound(room) {
+  if (!room.game) return;
+  clearTurnTimer(room);
+
+  const completedRound = room.game.round;
+  const marketText = completedRound < TOTAL_ROUNDS ? updateMarket(room) : null;
+  const majorEvent = tryTriggerMajorEvent(room);
+
+  room.game.currentPlayerId = null;
+  room.game.deadline = null;
+  room.game.showcaseUntil = null;
+  room.game.turnProcessed = true;
+
+  if (majorEvent) {
+    emitRoom(room);
+    const expectedEventId = majorEvent.id;
+    room.turnTimer = setTimeout(() => {
+      const currentRoom = rooms.get(room.code);
+      if (!currentRoom || currentRoom.phase !== 'game' || !currentRoom.game) return;
+      if (currentRoom.game.majorEvent?.id !== expectedEventId) return;
+      continueAfterRound(currentRoom, completedRound, marketText);
+    }, MAJOR_EVENT_MS);
+    return;
+  }
+
+  continueAfterRound(room, completedRound, marketText);
 }
 
 function getActivePlayer(room, playerId) {
