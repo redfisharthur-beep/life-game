@@ -695,7 +695,7 @@ function settleHelp(room, playerId) {
   const { dice, total } = rollDice(room.game.round);
   const effectIndex = Math.floor(Math.random() * 4);
   const bonus = Math.round(40 * total);
-  const helperHappiness = round2(0.5 * total);
+  const helperHappiness = round2(0.3 * total);
   let effectText = '';
 
   if (effectIndex === 0) {
