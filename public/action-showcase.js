@@ -23,8 +23,12 @@
     { label: '人生低潮', image: '/images/Unlucky.png' },
   ];
 
-  const STAGE_MS = 2000;
-  const SHOWCASE_MS = STAGE_MS * 3;
+  // 伺服器目前保留 6 秒展示：前 0.5 秒顯示選擇、接著 0.5 秒骰子，最後結果完整停留 5 秒。
+  const CHOICE_MS = 500;
+  const DICE_MS = 500;
+  const RESULT_MS = 5000;
+  const RESULT_START_MS = CHOICE_MS + DICE_MS;
+  const SHOWCASE_MS = CHOICE_MS + DICE_MS + RESULT_MS;
 
   let lastShowcaseKey = null;
   let stageTimers = [];
@@ -105,7 +109,6 @@
     setChoiceStageMode(false);
     setDiceStageMode(true);
 
-    // 骰子階段只顯示結果圖，不顯示玩家名、「骰到」或點數文字。
     kickerEl.textContent = '';
     titleEl.textContent = '';
 
@@ -201,26 +204,26 @@
     const elapsed = Math.max(0, SHOWCASE_MS - remaining);
 
     overlay.classList.remove('hidden');
-    if (elapsed < STAGE_MS) {
+    if (elapsed < CHOICE_MS) {
       showActionStage(playerName, action);
-    } else if (elapsed < STAGE_MS * 2) {
+    } else if (elapsed < RESULT_START_MS) {
       showDiceStage(playerName, event);
     } else {
       showResultStage(playerName, event);
     }
 
-    if (elapsed < STAGE_MS) {
+    if (elapsed < CHOICE_MS) {
       stageTimers.push(setTimeout(() => {
         lockActionButtons();
         showDiceStage(playerName, event);
-      }, STAGE_MS - elapsed));
+      }, CHOICE_MS - elapsed));
     }
 
-    if (elapsed < STAGE_MS * 2) {
+    if (elapsed < RESULT_START_MS) {
       stageTimers.push(setTimeout(() => {
         lockActionButtons();
         showResultStage(playerName, event);
-      }, (STAGE_MS * 2) - elapsed));
+      }, RESULT_START_MS - elapsed));
     }
 
     stageTimers.push(setTimeout(hideShowcase, remaining));
