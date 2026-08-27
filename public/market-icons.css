@@ -2,41 +2,65 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 15px;
+  min-height: 0;
+}
+
+.stage-block {
+  min-width: 0;
+}
+
+.stage-name {
+  display: block;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.round-label {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.05;
 }
 
 .game-topbar-right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
 }
 
 .topbar-timer {
-  min-width: 70px;
-  padding: 7px 9px;
-  border-radius: 14px;
+  order: 1;
+  min-width: 62px;
+  padding: 6px 8px;
+  border-radius: 13px;
   flex: 0 0 auto;
 }
 
 .topbar-timer strong {
-  font-size: 25px;
+  font-size: 26px;
+  font-weight: 800;
 }
 
 .market-strip {
+  order: 2;
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .market-strip .market-item {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px 9px;
-  border-radius: 999px;
+  gap: 5px;
+  padding: 3px 6px;
+  border-radius: 13px;
   background: #f4efe9;
   color: #69615a;
   white-space: nowrap;
@@ -44,8 +68,8 @@
 
 .market-strip .market-icon {
   display: block;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
   border: 0;
   background: transparent;
@@ -54,101 +78,58 @@
 
 .market-strip .market-value {
   color: #514a45;
-  font-size: 19px;
-  font-weight: 400;
+  font-size: 21px;
+  font-weight: 700;
   line-height: 1;
 }
 
 @media (max-width: 760px) {
   .game-topbar {
-    gap: 8px;
-    padding: 9px 10px;
-  }
-
-  .game-topbar-right {
+    grid-template-columns: minmax(90px, 1fr) auto;
     gap: 5px;
+    padding: 6px 8px;
   }
-
-  .topbar-timer {
-    min-width: 61px;
-    padding: 6px 7px;
-  }
-
-  .topbar-timer strong {
-    font-size: 22px;
-  }
-
-  .market-strip {
-    gap: 5px;
-  }
-
-  .market-strip .market-item {
-    gap: 4px;
-    padding: 4px 6px;
-  }
-
-  .market-strip .market-icon {
-    width: 36px;
-    height: 36px;
-  }
-
-  .market-strip .market-value {
-    font-size: 16px;
-  }
+  .stage-name { font-size: 18px; }
+  .round-label { font-size: 11px; }
+  .game-topbar-right { gap: 4px; }
+  .topbar-timer { min-width: 56px; padding: 5px 6px; }
+  .topbar-timer strong { font-size: 24px; }
+  .market-strip { gap: 4px; }
+  .market-strip .market-item { gap: 3px; padding: 2px 4px; }
+  .market-strip .market-icon { width: 39px; height: 39px; }
+  .market-strip .market-value { font-size: 18px; }
 }
 
 @media (max-width: 520px) {
   .game-topbar {
-    grid-template-columns: minmax(84px, 1fr) auto;
+    grid-template-columns: minmax(82px, 1fr) auto;
   }
-
   .game-topbar-right {
-    gap: 4px;
+    gap: 3px;
+    transform: translateX(-4px);
   }
-
   .topbar-timer {
-    min-width: 55px;
-    padding: 5px 6px;
+    min-width: 52px;
+    padding: 4px 5px;
   }
-
-  .topbar-timer strong {
-    min-width: 22px;
-    font-size: 20px;
-  }
-
+  .topbar-timer strong { font-size: 22px; }
+  .market-strip { gap: 3px; }
   .market-strip .market-item {
     gap: 2px;
-    padding: 3px 4px;
+    padding: 2px 3px;
+    border-radius: 11px;
   }
-
-  .market-strip .market-icon {
-    width: 31px;
-    height: 31px;
-  }
-
-  .market-strip .market-value {
-    font-size: 14px;
-  }
+  .market-strip .market-icon { width: 35px; height: 35px; }
+  .market-strip .market-value { font-size: 16px; }
 }
 
 @media (max-width: 390px) {
-  .stage-name { font-size: 17px; }
-  .round-label { font-size: 11px; }
-
-  .topbar-timer {
-    min-width: 49px;
-    border-radius: 11px;
-  }
-
-  .topbar-timer strong { font-size: 18px; }
+  .stage-name { font-size: 16px; }
+  .round-label { font-size: 10px; }
+  .game-topbar-right { transform: translateX(-6px); }
+  .topbar-timer { min-width: 48px; border-radius: 10px; }
+  .topbar-timer strong { font-size: 20px; }
   .topbar-timer > span:last-child { font-size: 9px; }
-
-  .market-strip .market-icon {
-    width: 28px;
-    height: 28px;
-  }
-
-  .market-strip .market-value {
-    font-size: 12px;
-  }
+  .market-strip .market-icon { width: 32px; height: 32px; }
+  .market-strip .market-value { font-size: 14px; }
 }
