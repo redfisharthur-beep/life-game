@@ -247,12 +247,19 @@ function endRound(room) {
   beginTurn(room);
 }
 
-function settleSalary(room, playerId, auto = false) {
-  if (!room.game || room.phase !== 'game' || room.game.finished) return false;
-  if (room.game.currentPlayerId !== playerId) return false;
+function getActivePlayer(room, playerId) {
+  if (!room.game || room.phase !== 'game' || room.game.finished) return null;
+  if (room.game.currentPlayerId !== playerId) return null;
 
   const player = room.players.find((item) => item.id === playerId);
-  if (!player || !player.profession || !PROFESSIONS[player.profession]) return false;
+  if (!player || !player.profession || !PROFESSIONS[player.profession]) return null;
+
+  return player;
+}
+
+function settleSalary(room, playerId, auto = false) {
+  const player = getActivePlayer(room, playerId);
+  if (!player) return false;
 
   const { dice, total } = rollDice(room.game.round);
   const salary = PROFESSIONS[player.profession].salary;
@@ -269,6 +276,96 @@ function settleSalary(room, playerId, auto = false) {
     text: `${player.name}${auto ? ' 逾時自動' : ''}領薪，現金 +${income}`,
   };
 
+  advanceTurn(room);
+  return true;
+}
+
+function settleMarketAction(room, playerId, action) {
+  const player = getActivePlayer(room, playerId);
+  if (!player) return false;
+
+  const profession = PROFESSIONS[player.profession];
+  const { dice, total } = rollDice(room.game.round);
+  const event = {
+    type: action,
+    playerId,
+    dice,
+    diceTotal: total,
+  };
+
+  if (action === 'buyStock') {
+    const salaryIncome = Math.round(total * profession.salary * 7);
+    const cost = Math.round(total * room.game.stockPrice);
+    const units = round2(total * profession.stock);
+    const availableCash = player.cash + salaryIncome;
+
+    player.cash = availableCash;
+    event.salaryIncome = salaryIncome;
+    event.cost = cost;
+    event.units = units;
+
+    if (availableCash >= cost) {
+      player.cash -= cost;
+      player.stocks = round2(player.stocks + units);
+      event.success = true;
+      event.text = `${player.name} 買股成功：70%薪資 +${salaryIncome}，花費 ${cost}，股票 +${units}`;
+    } else {
+      event.success = false;
+      event.text = `${player.name} 買股失敗：現金不足，保留70%薪資 +${salaryIncome}`;
+    }
+  } else if (action === 'buyLand') {
+    const salaryIncome = Math.round(total * profession.salary * 7);
+    const cost = Math.round(total * room.game.landPrice);
+    const units = round2(total * profession.land);
+    const availableCash = player.cash + salaryIncome;
+
+    player.cash = availableCash;
+    event.salaryIncome = salaryIncome;
+    event.cost = cost;
+    event.units = units;
+
+    if (availableCash >= cost) {
+      player.cash -= cost;
+      player.land = round2(player.land + units);
+      event.success = true;
+      event.text = `${player.name} 圈地成功：70%薪資 +${salaryIncome}，花費 ${cost}，土地 +${units}`;
+    } else {
+      event.success = false;
+      event.text = `${player.name} 圈地失敗：現金不足，保留70%薪資 +${salaryIncome}`;
+    }
+  } else if (action === 'sellStock') {
+    const salaryIncome = Math.round(total * profession.salary * 5);
+    const units = round2(Math.min(total, player.stocks));
+    const proceeds = Math.round(units * room.game.stockPrice);
+
+    player.cash += salaryIncome + proceeds;
+    player.stocks = round2(Math.max(0, player.stocks - units));
+    event.salaryIncome = salaryIncome;
+    event.units = units;
+    event.proceeds = proceeds;
+    event.success = true;
+    event.text = units > 0
+      ? `${player.name} 賣股：50%薪資 +${salaryIncome}，賣出 ${units} 股，現金 +${proceeds}`
+      : `${player.name} 沒有股票可賣，獲得50%薪資 +${salaryIncome}`;
+  } else if (action === 'sellLand') {
+    const salaryIncome = Math.round(total * profession.salary * 5);
+    const units = round2(Math.min(total, player.land));
+    const proceeds = Math.round(units * room.game.landPrice);
+
+    player.cash += salaryIncome + proceeds;
+    player.land = round2(Math.max(0, player.land - units));
+    event.salaryIncome = salaryIncome;
+    event.units = units;
+    event.proceeds = proceeds;
+    event.success = true;
+    event.text = units > 0
+      ? `${player.name} 賣地：50%薪資 +${salaryIncome}，賣出 ${units} 單位土地，現金 +${proceeds}`
+      : `${player.name} 沒有土地可賣，獲得50%薪資 +${salaryIncome}`;
+  } else {
+    return false;
+  }
+
+  room.game.lastEvent = event;
   advanceTurn(room);
   return true;
 }
@@ -461,11 +558,22 @@ io.on('connection', (socket) => {
       return reply?.({ ok: false, message: '本回合時間已到。' });
     }
 
-    if (action !== 'salary') {
+    const availableActions = new Set([
+      'salary',
+      'buyStock',
+      'buyLand',
+      'sellStock',
+      'sellLand',
+    ]);
+
+    if (!availableActions.has(action)) {
       return reply?.({ ok: false, message: '這個行動將在下一階段開放。' });
     }
 
-    const settled = settleSalary(room, socket.id, false);
+    const settled = action === 'salary'
+      ? settleSalary(room, socket.id, false)
+      : settleMarketAction(room, socket.id, action);
+
     if (!settled) {
       return reply?.({ ok: false, message: '目前無法完成這個行動。' });
     }
