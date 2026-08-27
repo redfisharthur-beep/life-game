@@ -1,6 +1,8 @@
-/* Compact profession selection: image + enlarged ability grades only */
+/* 職業選擇：select.png 作為固定座標底圖，6 個職業等比例疊入 2×3 框位 */
 #professionPanel {
-  margin-top: 8px;
+  position: relative;
+  margin: 0;
+  padding: 0;
 }
 
 .profession-title,
@@ -11,158 +13,216 @@
   display: none !important;
 }
 
+.profession-stage {
+  position: relative;
+  width: min(100%, 920px);
+  margin: 0 auto;
+}
+
+.profession-stage-image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/*
+  這個 grid 永遠以 select.png 本身為座標基準。
+  不使用 px、bottom 或不同裝置的獨立座標，因此圖片縮放時 6 個職業會一起縮放、不跑位。
+*/
 .profession-grid {
+  position: absolute;
+  left: 7.5%;
+  top: 17.5%;
+  width: 85%;
+  height: 76%;
+  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  column-gap: 4.5%;
+  row-gap: 3.2%;
+  margin: 0;
 }
 
 .profession-card {
+  position: relative;
+  display: grid;
   grid-template-columns: 48% 52%;
-  gap: 3px;
-  min-height: 164px;
-  padding: 6px;
-  border-radius: 18px;
+  align-items: center;
+  gap: 1.5%;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 2.5%;
+  border: 0;
+  border-radius: 8%;
+  background: transparent;
+  box-shadow: none;
+  color: #514c48;
+  overflow: hidden;
+  text-align: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.profession-card:hover:not(:disabled) {
+  background: rgba(255, 255, 255, .08);
+  transform: none;
+}
+
+.profession-card:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, .9);
+  outline-offset: -4px;
+}
+
+.profession-card.selected {
+  opacity: 1;
+  filter: none;
+  border: 0;
+  background: rgba(255, 248, 221, .12);
+  box-shadow: inset 0 0 0 clamp(2px, .35vw, 4px) rgba(195, 160, 91, .95);
+}
+
+.profession-card.taken,
+.profession-card.taken:disabled {
+  opacity: .28;
+  filter: grayscale(.82);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .profession-visual {
+  display: flex;
   min-width: 0;
+  height: 100%;
+  align-items: center;
   justify-content: center;
   padding: 0;
+  background: transparent;
 }
 
 .profession-image {
+  display: block;
   width: 100%;
-  max-width: 168px;
-  height: 156px;
+  max-width: none;
+  height: 100%;
+  max-height: none;
   aspect-ratio: auto;
   object-fit: contain;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .profession-detail {
-  justify-content: center;
-  align-items: flex-start;
+  display: flex;
   min-width: 0;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
 .profession-abilities {
   display: grid;
-  gap: 4px;
-  width: 120px;
-  justify-items: start;
+  width: 100%;
+  gap: 3.5%;
+  align-content: center;
 }
 
 .ability-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(22px, 3.4vw, 36px);
   align-items: center;
-  justify-content: flex-start;
-  gap: 2em;
-  width: 120px;
-  min-width: 120px;
-  min-height: 34px;
-  padding: 4px 7px 4px 10px;
+  gap: 5%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 3.5% 5%;
+  border: 1px solid rgba(134, 115, 91, .20);
   border-radius: 10px;
-  font-size: 17px;
+  background: rgba(255, 250, 241, .72);
+  color: #695f55;
+  font-size: clamp(10px, 1.7vw, 17px);
   line-height: 1;
+  text-align: left;
 }
 
 .ability-label {
-  flex: 0 0 auto;
-  min-width: 2em;
+  min-width: 0;
   letter-spacing: .03em;
   white-space: nowrap;
 }
 
 .ability-grade {
-  flex: 0 0 34px;
-  width: 34px;
-  height: 28px;
-  margin-left: 0;
-  justify-self: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(22px, 3.4vw, 36px);
+  height: clamp(20px, 2.9vw, 30px);
+  justify-self: end;
   border-radius: 8px;
-  font-size: 18px;
+  color: #fffaf6;
+  font-size: clamp(11px, 1.8vw, 18px);
   font-weight: 700;
+  line-height: 1;
+}
+
+/* 職業底圖模式：讓 select.png 成為整個選擇畫面，不再包原本灰色卡片。 */
+.card.profession-mode {
+  width: min(920px, 100%);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
 }
 
 @media (max-width: 760px) {
-  #professionPanel {
-    margin-top: 4px;
-  }
-
-  .profession-grid {
-    gap: 5px;
+  .shell:has(.card.profession-mode) {
+    padding: 8px;
+    align-items: start;
   }
 
   .profession-card {
-    grid-template-columns: 47% 53%;
-    gap: 2px;
-    min-height: 148px;
-    padding: 5px;
-    border-radius: 15px;
-  }
-
-  .profession-image {
-    max-width: 138px;
-    height: 138px;
-  }
-
-  .profession-abilities {
-    gap: 3px;
-    width: 100px;
+    padding: 2%;
   }
 
   .ability-item {
-    gap: 2em;
-    width: 100px;
-    min-width: 100px;
-    min-height: 30px;
-    padding: 3px 4px 3px 7px;
-    border-radius: 8px;
-    font-size: 14px;
-  }
-
-  .ability-grade {
-    flex-basis: 28px;
-    width: 28px;
-    height: 24px;
     border-radius: 7px;
-    font-size: 16px;
   }
 }
 
-@media (max-width: 390px) {
-  .profession-grid {
-    gap: 4px;
+@media (max-width: 430px) {
+  .shell:has(.card.profession-mode) {
+    padding: 0;
   }
 
-  .profession-card {
-    grid-template-columns: 46% 54%;
-    gap: 1px;
-    min-height: 138px;
-    padding: 4px;
+  .profession-stage,
+  .card.profession-mode {
+    width: 100%;
   }
 
-  .profession-image {
-    max-width: 120px;
-    height: 126px;
-  }
-
-  .profession-abilities {
-    width: 90px;
+  .profession-card:focus-visible {
+    outline-width: 2px;
+    outline-offset: -3px;
   }
 
   .ability-item {
-    gap: 2em;
-    width: 90px;
-    min-width: 90px;
-    min-height: 28px;
-    padding: 2px 3px 2px 5px;
-    font-size: 12.5px;
+    padding: 3% 4%;
+    border-radius: 6px;
+    font-size: clamp(8px, 2.55vw, 11px);
   }
 
   .ability-grade {
-    flex-basis: 26px;
-    width: 26px;
-    height: 22px;
-    font-size: 15px;
+    width: clamp(18px, 5.3vw, 24px);
+    height: clamp(17px, 4.7vw, 22px);
+    border-radius: 6px;
+    font-size: clamp(9px, 2.8vw, 12px);
   }
 }
