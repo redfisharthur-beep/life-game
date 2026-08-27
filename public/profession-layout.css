@@ -117,15 +117,18 @@
   transform-origin: center;
 }
 
-/* 所有屬性與評級統一往右 1.2 個字，並維持往下半個字。 */
-.profession-detail,
-.profession-card:nth-child(even) .profession-detail {
+/* 左欄屬性維持右移 1.2 個字；右欄再多往右 1 個字。 */
+.profession-detail {
   display: flex;
   min-width: 0;
   height: 96%;
   align-items: center;
   justify-content: center;
   transform: translate(1.2em, .5em);
+}
+
+.profession-card:nth-child(even) .profession-detail {
+  transform: translate(2.2em, .5em);
 }
 
 .profession-abilities {
@@ -230,9 +233,12 @@
     transform: scale(1.15);
   }
 
-  .profession-detail,
-  .profession-card:nth-child(even) .profession-detail {
+  .profession-detail {
     transform: translate(1.2em, .5em);
+  }
+
+  .profession-card:nth-child(even) .profession-detail {
+    transform: translate(2.2em, .5em);
   }
 
   .profession-abilities {
@@ -291,9 +297,12 @@
     transform: scale(1.16);
   }
 
-  .profession-detail,
-  .profession-card:nth-child(even) .profession-detail {
+  .profession-detail {
     transform: translate(1.2em, .5em);
+  }
+
+  .profession-card:nth-child(even) .profession-detail {
+    transform: translate(2.2em, .5em);
   }
 
   .profession-abilities {
