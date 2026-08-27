@@ -369,10 +369,11 @@ function advanceTurn(room) {
 
 function updateMarket(room) {
   const stockUp = Math.random() < 0.65;
+  const landUp = Math.random() < 0.90;
   room.game.stockPrice = round2(room.game.stockPrice * (stockUp ? 1.10 : 0.93));
-  room.game.landPrice = round2(room.game.landPrice * 1.03);
+  room.game.landPrice = round2(room.game.landPrice * (landUp ? 1.03 : 0.97));
 
-  return stockUp ? '股票上漲 10%' : '股票下跌 7%';
+  return `${stockUp ? '股票上漲 10%' : '股票下跌 7%'}，${landUp ? '土地上漲 3%' : '土地下跌 3%'}`;
 }
 
 function applyMajorEvent(room, event) {
@@ -462,7 +463,7 @@ function continueAfterRound(room, completedRound, marketText) {
   room.game.transitionUntil = null;
   room.game.lastEvent = {
     type: 'market',
-    text: `${marketText}，土地上漲 3%`,
+    text: marketText,
   };
 
   if (room.game.round === 20) {
