@@ -174,13 +174,7 @@ function renderRoom(room) {
   const canStart = isHost && hasEnoughPlayers && !room.started;
 
   startGameBtn.disabled = !canStart;
-
-  if (!isHost) {
-    startGameBtn.textContent = '等待房主啟程';
-  } else {
-    startGameBtn.textContent = '啟程';
-  }
-
+  startGameBtn.textContent = isHost ? '啟程' : '等待房主啟程';
   setLaunchMessage('');
 }
 
@@ -206,6 +200,9 @@ function renderProfessions(room) {
     if (selectedByMe) button.classList.add('selected');
     if (takenByOther) button.classList.add('taken');
 
+    const visual = document.createElement('span');
+    visual.className = 'profession-visual';
+
     const image = document.createElement('img');
     image.className = 'profession-image';
     image.src = profession.image;
@@ -214,6 +211,11 @@ function renderProfessions(room) {
     const name = document.createElement('span');
     name.className = 'profession-name';
     name.textContent = profession.name;
+
+    visual.append(image, name);
+
+    const detail = document.createElement('span');
+    detail.className = 'profession-detail';
 
     const abilities = document.createElement('span');
     abilities.className = 'profession-abilities';
@@ -232,7 +234,8 @@ function renderProfessions(room) {
       state.textContent = '選擇';
     }
 
-    button.append(image, name, abilities, state);
+    detail.append(abilities, state);
+    button.append(visual, detail);
 
     button.addEventListener('click', () => {
       chooseProfession(profession.id);
