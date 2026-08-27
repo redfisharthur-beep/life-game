@@ -15,10 +15,6 @@ function cleanName(value) {
   return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 12);
 }
 
-function normalizeRoomCode(value) {
-  return String(value || '').replace(/\D/g, '').slice(0, 4);
-}
-
 function createRoomCode() {
   let code;
   do {
@@ -67,6 +63,34 @@ function leaveCurrentRoom(socket) {
   emitRoom(room);
 }
 
+function findJoinableRoom(name) {
+  for (const room of rooms.values()) {
+    if (room.players.length >= 6) continue;
+
+    const duplicateName = room.players.some(
+      (player) => player.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (!duplicateName) return room;
+  }
+
+  return null;
+}
+
+function createRoomFor(socket, name) {
+  const code = createRoomCode();
+  const room = {
+    code,
+    hostId: socket.id,
+    players: [{ id: socket.id, name }],
+  };
+
+  rooms.set(code, room);
+  socket.join(code);
+  socket.data.roomCode = code;
+  return room;
+}
+
 io.on('connection', (socket) => {
   console.log(`Socket connected: ${socket.id}`);
 
@@ -75,7 +99,7 @@ io.on('connection', (socket) => {
     socketId: socket.id,
   });
 
-  socket.on('room:create', (payload, reply) => {
+  socket.on('room:autoJoin', (payload, reply) => {
     const name = cleanName(payload?.name);
 
     if (!name) {
@@ -84,54 +108,15 @@ io.on('connection', (socket) => {
 
     leaveCurrentRoom(socket);
 
-    const code = createRoomCode();
-    const room = {
-      code,
-      hostId: socket.id,
-      players: [{ id: socket.id, name }],
-    };
+    let room = findJoinableRoom(name);
 
-    rooms.set(code, room);
-    socket.join(code);
-    socket.data.roomCode = code;
-
-    reply?.({ ok: true, room: publicRoom(room) });
-    emitRoom(room);
-  });
-
-  socket.on('room:join', (payload, reply) => {
-    const name = cleanName(payload?.name);
-    const code = normalizeRoomCode(payload?.code);
-
-    if (!name) {
-      return reply?.({ ok: false, message: '請先輸入玩家名稱。' });
+    if (room) {
+      room.players.push({ id: socket.id, name });
+      socket.join(room.code);
+      socket.data.roomCode = room.code;
+    } else {
+      room = createRoomFor(socket, name);
     }
-
-    if (code.length !== 4) {
-      return reply?.({ ok: false, message: '請輸入4位數房號。' });
-    }
-
-    const room = rooms.get(code);
-    if (!room) {
-      return reply?.({ ok: false, message: '找不到這個房間，請確認房號。' });
-    }
-
-    if (room.players.length >= 6) {
-      return reply?.({ ok: false, message: '這個房間已滿（最多6人）。' });
-    }
-
-    const duplicateName = room.players.some(
-      (player) => player.name.toLowerCase() === name.toLowerCase()
-    );
-    if (duplicateName) {
-      return reply?.({ ok: false, message: '房間內已有相同名稱，請換一個名字。' });
-    }
-
-    leaveCurrentRoom(socket);
-
-    room.players.push({ id: socket.id, name });
-    socket.join(code);
-    socket.data.roomCode = code;
 
     reply?.({ ok: true, room: publicRoom(room) });
     emitRoom(room);
