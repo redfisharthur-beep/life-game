@@ -1,10 +1,9 @@
-/* 首頁專用：front page.png 本身就是可操作介面。
-   以固定原圖比例 705×868 當唯一座標基準，避免不同裝置因圖片實際高度造成互動區漂移。 */
+/* 首頁：front page.png 自然尺寸就是唯一座標基準。
+   不再強制舊版 705×868 比例，避免手機把底圖拉伸後互動區錯位。 */
 .home-stage {
   position: relative;
   display: none;
   width: min(100%, 920px);
-  aspect-ratio: 705 / 868;
   margin: 0 auto;
 }
 
@@ -13,13 +12,11 @@
 }
 
 .front-page-image {
-  position: absolute;
-  inset: 0;
   display: block;
   width: 100%;
-  height: 100%;
   max-width: 100%;
-  object-fit: fill;
+  height: auto;
+  object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
@@ -35,7 +32,7 @@
   overflow: visible;
 }
 
-/* 互動層與底圖完全共用同一個 705:868 畫布。 */
+/* entryPanel 完整覆蓋「圖片實際渲染後的尺寸」。 */
 .home-entry-panel {
   position: absolute;
   inset: 0;
@@ -47,14 +44,14 @@
   pointer-events: none;
 }
 
-/* 對準原圖中央米白輸入框。 */
+/* 新版底圖：米白名字框約位於圖片 y=49%~59%。 */
 .home-entry-panel .field.entry-control {
   position: absolute;
   display: block;
-  left: 24.3%;
-  top: 32.0%;
-  width: 51.4%;
-  height: 13.4%;
+  left: 24.1%;
+  top: 49.0%;
+  width: 51.8%;
+  height: 10.4%;
   margin: 0;
   padding: 0;
   pointer-events: auto;
@@ -67,13 +64,13 @@
   min-height: 0;
   margin: 0;
   padding: 0 7%;
-  border: 0;
-  border-radius: 0;
-  outline: 0;
-  background: transparent;
-  box-shadow: none;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   color: #69503e;
-  font-size: clamp(17px, 3.2vw, 30px);
+  font-size: clamp(17px, 3.1vw, 30px);
   font-weight: 700;
   letter-spacing: .06em;
   line-height: normal;
@@ -84,33 +81,31 @@
 }
 
 .home-entry-panel input::placeholder {
-  color: rgba(105, 80, 62, .52);
+  color: rgba(105, 80, 62, .50);
   opacity: 1;
   text-align: center;
 }
 
 .home-entry-panel input:focus {
-  border: 0;
-  outline: 0;
-  background: rgba(255, 255, 255, .06);
-  box-shadow: none;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-/*
-  橘色「迎向新局」本身就是視覺按鈕。
-  透明熱區刻意比原按鈕更高、並往下延伸，提升手機點選容錯。
-*/
+/* 新版底圖：橘色「迎向新局」約位於 y=61%~75%。
+   點擊熱區略向外擴大，手機更容易操作，但不改任何外觀。 */
 .home-entry-panel #joinGameBtn {
   position: absolute;
-  left: 22.5%;
-  top: 47.5%;
-  width: 55%;
-  height: 24%;
+  left: 21.5%;
+  top: 59.8%;
+  width: 57%;
+  height: 18.2%;
   min-height: 0;
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: 22%;
+  border-radius: 24%;
   background: transparent !important;
   box-shadow: none !important;
   color: transparent !important;
@@ -131,37 +126,47 @@
 }
 
 .home-entry-panel #joinGameBtn:focus-visible {
-  outline: 3px solid rgba(255, 255, 255, .82);
+  outline: 3px solid rgba(255,255,255,.82);
   outline-offset: -6px;
 }
 
-/* 訊息獨立定位，不參與輸入框或按鈕排版。 */
+/* 系統訊息獨立放在名字框下緣，不推動任何元件。 */
 .home-entry-panel .message {
   position: absolute;
-  left: 27%;
-  top: 45.2%;
-  width: 46%;
+  left: 21%;
+  top: 58.5%;
+  width: 58%;
   min-height: 0;
   margin: 0;
   padding: 0;
   color: #72594a;
-  font-size: clamp(11px, 1.7vw, 15px);
+  font-size: clamp(10px, 1.45vw, 14px);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.1;
   text-align: center;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, .9);
+  text-shadow: 0 1px 2px rgba(255,255,255,.9);
   pointer-events: none;
+}
+
+.home-entry-panel .message:empty {
+  display: none;
 }
 
 .home-entry-panel .message.error {
   color: #a34f45;
 }
 
-/* RWD 只改外層留白與字級，不改任何互動座標。 */
+/* RWD 只改外層留白與字級，不改互動區座標。 */
 @media (max-width: 760px) {
   .shell:has(.card.home-mode) {
-    padding: 8px;
+    padding: 0;
     align-items: start;
+  }
+
+  .home-stage,
+  .card.home-mode {
+    width: 100%;
+    max-width: 100%;
   }
 
   .card.home-mode {
@@ -169,22 +174,13 @@
   }
 
   .home-entry-panel input {
-    font-size: clamp(17px, 4.2vw, 24px);
+    font-size: clamp(18px, 4.5vw, 25px);
   }
 }
 
 @media (max-width: 430px) {
-  .shell:has(.card.home-mode) {
-    padding: 0;
-  }
-
-  .home-stage,
-  .card.home-mode {
-    width: 100%;
-  }
-
   .home-entry-panel input {
-    font-size: clamp(16px, 4.8vw, 21px);
+    font-size: clamp(17px, 5vw, 22px);
   }
 
   .home-entry-panel #joinGameBtn:focus-visible {
