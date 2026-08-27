@@ -2,38 +2,30 @@
   width: min(1180px, 100%);
 }
 
-.card.game-mode .game-logo {
-  display: none;
-}
-
-.card.game-mode #gamePanel {
-  margin-top: 0;
-}
-
-.card.game-mode .me-card {
-  display: none !important;
-}
+.card.game-mode .game-logo { display: none; }
+.card.game-mode #gamePanel { margin-top: 0; }
+.card.game-mode .me-card { display: none !important; }
 
 .player-status-bar {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .player-status-card {
   position: relative;
   display: grid;
-  grid-template-columns: 86px minmax(0, 1fr);
-  gap: 12px;
-  align-items: stretch;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
   width: 100%;
   min-width: 0;
-  padding: 10px 12px;
+  padding: 6px 9px;
   border: 1px solid #cec4bb;
-  border-radius: 18px;
+  border-radius: 16px;
   background: #f7f2ec;
-  box-shadow: 0 4px 12px rgba(84, 76, 69, .06);
+  box-shadow: 0 3px 9px rgba(84, 76, 69, .05);
   text-align: left;
 }
 
@@ -44,96 +36,93 @@
 
 .player-status-card.current {
   border-color: #839487;
-  box-shadow: 0 0 0 2px rgba(131, 148, 135, .16), 0 5px 14px rgba(84, 76, 69, .07);
+  box-shadow: 0 0 0 2px rgba(131, 148, 135, .14);
 }
 
-.player-status-card.me.current {
-  border-color: #c3a05b;
-  box-shadow: 0 0 0 2px rgba(131, 148, 135, .28), 0 5px 14px rgba(84, 76, 69, .07);
-}
-
-.player-status-card.offline {
-  opacity: .58;
-}
+.player-status-card.me.current { border-color: #c3a05b; }
+.player-status-card.offline { opacity: .58; }
 
 .player-status-avatar-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 0;
 }
 
 .player-status-avatar {
   display: block;
-  width: 78px;
-  height: 78px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
   border: 0;
-  border-radius: 0;
   background: transparent;
 }
 
 .player-status-content {
   display: grid;
   grid-template-rows: auto auto;
-  gap: 8px;
+  gap: 5px;
   min-width: 0;
 }
 
 .player-status-top-row {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) minmax(100px, auto) minmax(88px, auto);
-  gap: 12px;
+  grid-template-columns: minmax(150px, 1fr) auto auto;
+  gap: 10px;
   align-items: center;
   min-width: 0;
-  padding-right: 2px;
 }
 
 .player-status-name-block {
+  display: flex;
+  align-items: baseline;
+  gap: .45em;
   min-width: 0;
 }
 
 .player-status-profession {
-  display: block;
-  margin-bottom: 3px;
+  display: inline-block;
+  margin: 0;
   color: #8a7f76;
-  font-size: 12px;
+  font-size: 15px;
+  font-weight: 700;
   line-height: 1.1;
+  white-space: nowrap;
 }
 
 .player-status-name {
-  display: block;
+  display: inline-block;
   overflow: hidden;
   color: #514a45;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.15;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .player-status-total-assets {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: inline-flex;
+  align-items: baseline;
   justify-content: center;
-  min-width: 96px;
-  padding: 0 4px;
+  gap: .35em;
+  min-width: 0;
+  padding: 0;
   white-space: nowrap;
 }
 
 .player-status-total-label {
   color: #91867d;
-  font-size: 10px;
+  font-size: 14px;
+  font-weight: 700;
   line-height: 1;
 }
 
 .player-status-total-value {
-  margin-top: 4px;
+  margin: 0;
   color: #5d554f;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 21px;
+  font-weight: 800;
   line-height: 1;
 }
 
@@ -141,61 +130,56 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
-  min-width: 82px;
-  padding: 0;
-  border: 0;
-  background: transparent;
+  gap: 5px;
+  min-width: 0;
   color: #8b6768;
   white-space: nowrap;
 }
 
 .player-status-happiness-icon {
-  display: block;
   width: 30px;
   height: 30px;
   object-fit: contain;
-  flex: 0 0 auto;
 }
 
 .player-status-happiness-value {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 21px;
+  font-weight: 800;
   line-height: 1;
 }
 
 .player-status-turn-badge {
   position: absolute;
-  top: -9px;
-  right: -7px;
+  top: -6px;
+  right: -5px;
   z-index: 2;
-  padding: 5px 10px;
+  padding: 4px 8px;
   border-radius: 999px;
   background: #839487;
   color: #fffaf6;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.1;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
   white-space: nowrap;
   animation: player-action-blink 1s ease-in-out infinite;
 }
 
 @keyframes player-action-blink {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: .45; transform: scale(1.08); }
+  50% { opacity: .45; transform: scale(1.06); }
 }
 
 .player-status-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 7px;
+  gap: 5px;
   margin: 0;
 }
 
 .player-summary-item {
   min-width: 0;
-  padding: 7px 5px;
-  border-radius: 11px;
+  padding: 4px 5px;
+  border-radius: 9px;
   text-align: center;
 }
 
@@ -203,32 +187,22 @@
 .player-summary-item.stocks { background: #dfe6ef; }
 .player-summary-item.land { background: #eee2d5; }
 
-.player-summary-label {
-  display: block;
-  font-size: 9px;
+.player-summary-label,
+.player-summary-value {
+  display: inline;
+  font-weight: 800;
   line-height: 1;
   white-space: nowrap;
 }
 
+.player-summary-label { font-size: 13px; }
+.player-summary-value { margin-left: .25em; font-size: 17px; }
 .player-summary-item.cash .player-summary-label,
 .player-summary-item.cash .player-summary-value { color: #5d7965; }
-
 .player-summary-item.stocks .player-summary-label,
 .player-summary-item.stocks .player-summary-value { color: #5f7390; }
-
 .player-summary-item.land .player-summary-label,
 .player-summary-item.land .player-summary-value { color: #8b6f54; }
-
-.player-summary-value {
-  display: block;
-  margin-top: 4px;
-  overflow: hidden;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 @media (prefers-reduced-motion: reduce) {
   .player-status-turn-badge { animation: none; }
@@ -236,63 +210,38 @@
 
 @media (max-width: 760px) {
   .player-status-card {
-    grid-template-columns: 72px minmax(0, 1fr);
-    gap: 9px;
-    padding: 8px 9px;
-    border-radius: 15px;
-  }
-
-  .player-status-avatar {
-    width: 66px;
-    height: 66px;
-  }
-
-  .player-status-top-row {
-    grid-template-columns: minmax(92px, 1fr) auto auto;
+    grid-template-columns: 58px minmax(0, 1fr);
     gap: 7px;
+    padding: 5px 7px;
+    border-radius: 14px;
   }
-
-  .player-status-profession { font-size: 10px; }
-  .player-status-name { font-size: 16px; }
-  .player-status-total-assets { min-width: 70px; padding: 0; }
-  .player-status-total-label { font-size: 8px; }
-  .player-status-total-value { font-size: 14px; }
-  .player-status-happiness { min-width: 66px; gap: 4px; }
-  .player-status-happiness-icon { width: 24px; height: 24px; }
-  .player-status-happiness-value { font-size: 14px; }
-  .player-status-summary { gap: 5px; }
-  .player-summary-item { padding: 6px 3px; border-radius: 9px; }
-  .player-summary-label { font-size: 8px; }
-  .player-summary-value { font-size: 12px; }
-  .player-status-turn-badge { font-size: 10px; padding: 4px 6px; }
+  .player-status-avatar { width: 54px; height: 54px; }
+  .player-status-top-row { grid-template-columns: minmax(92px, 1fr) auto auto; gap: 6px; }
+  .player-status-name-block { gap: .35em; }
+  .player-status-profession { font-size: 12px; }
+  .player-status-name { font-size: 18px; }
+  .player-status-total-label { font-size: 11px; }
+  .player-status-total-value { font-size: 17px; }
+  .player-status-happiness-icon { width: 25px; height: 25px; }
+  .player-status-happiness-value { font-size: 17px; }
+  .player-summary-label { font-size: 11px; }
+  .player-summary-value { font-size: 14px; }
+  .player-status-turn-badge { font-size: 10px; padding: 3px 6px; }
 }
 
 @media (max-width: 430px) {
-  .player-status-bar { gap: 6px; }
-
-  .player-status-card {
-    grid-template-columns: 64px minmax(0, 1fr);
-    gap: 7px;
-    padding: 7px;
-  }
-
-  .player-status-avatar {
-    width: 58px;
-    height: 58px;
-  }
-
-  .player-status-content { gap: 6px; }
-  .player-status-top-row { grid-template-columns: minmax(74px, 1fr) auto auto; gap: 5px; }
-  .player-status-profession { font-size: 8.5px; }
-  .player-status-name { font-size: 14px; }
-  .player-status-total-assets { min-width: 58px; }
-  .player-status-total-label { font-size: 7px; }
-  .player-status-total-value { font-size: 12px; }
-  .player-status-happiness { min-width: 54px; gap: 3px; }
-  .player-status-happiness-icon { width: 21px; height: 21px; }
-  .player-status-happiness-value { font-size: 12px; }
-  .player-status-summary { gap: 4px; }
-  .player-summary-item { padding: 5px 2px; }
-  .player-summary-label { font-size: 7px; }
-  .player-summary-value { font-size: 10.5px; }
+  .player-status-bar { gap: 5px; }
+  .player-status-card { grid-template-columns: 52px minmax(0, 1fr); gap: 6px; padding: 4px 6px; }
+  .player-status-avatar { width: 48px; height: 48px; }
+  .player-status-content { gap: 4px; }
+  .player-status-top-row { grid-template-columns: minmax(72px, 1fr) auto auto; gap: 4px; }
+  .player-status-profession { font-size: 10px; }
+  .player-status-name { font-size: 16px; }
+  .player-status-total-label { font-size: 9px; }
+  .player-status-total-value { font-size: 14px; }
+  .player-status-happiness-icon { width: 22px; height: 22px; }
+  .player-status-happiness-value { font-size: 14px; }
+  .player-summary-item { padding: 3px 2px; border-radius: 7px; }
+  .player-summary-label { font-size: 9px; }
+  .player-summary-value { font-size: 12px; }
 }
