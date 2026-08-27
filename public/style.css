@@ -32,21 +32,13 @@ button:disabled { opacity: .42; cursor: not-allowed; }
   text-align: center;
 }
 
-.eyebrow {
-  margin: 0 0 4px;
-  letter-spacing: .18em;
-  font-size: 14px;
-  font-weight: 400;
-  color: #8c837c;
-}
-
-h1 {
-  margin: 8px 0;
-  font-size: clamp(52px, 9vw, 82px);
-  line-height: 1.15;
-  font-weight: 400;
-  letter-spacing: .04em;
-  color: #625c56;
+.game-logo {
+  display: block;
+  width: min(440px, 82%);
+  max-height: 240px;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto 12px;
 }
 
 .panel { margin-top: 30px; }
@@ -221,8 +213,10 @@ button {
     border-radius: 26px;
   }
 
-  h1 {
-    font-size: clamp(56px, 16vw, 78px);
+  .game-logo {
+    width: min(360px, 88%);
+    max-height: 210px;
+    margin-bottom: 8px;
   }
 
   .panel { margin-top: 28px; }
@@ -257,6 +251,7 @@ button {
 @media (max-width: 390px) {
   .shell { padding: 10px; }
   .card { padding: 30px 16px; border-radius: 22px; }
+  .game-logo { width: min(300px, 92%); max-height: 180px; }
   .entry-control, .ghost { width: min(74vw, 260px); }
   .start-button { width: min(80vw, 285px); }
   .player-row { padding: 16px 14px; gap: 10px; min-height: 80px; }
