@@ -72,6 +72,14 @@
     return '/images/dice.png';
   }
 
+  function getDoubleDiceImage(total) {
+    const point = Number(total);
+    if (Number.isInteger(point) && point >= 2 && point <= 12) {
+      return `/images/2-${point}.png`;
+    }
+    return '/images/dice.png';
+  }
+
   function showActionStage(playerName, action) {
     setDiceStageMode(false);
     kickerEl.textContent = `${playerName} 的選擇`;
@@ -88,18 +96,25 @@
     kickerEl.textContent = `${playerName} 骰到`;
     titleEl.textContent = String(total);
 
-    const diceImages = Array.from({ length: diceCount }, (_, index) => {
-      const point = Number(dice[index] || 0);
-      const image = diceCount === 1 ? getSingleDieImage(point) : '/images/dice.png';
-      const alt = diceCount === 1 && point >= 1 && point <= 6
-        ? `${point}`
-        : `第 ${index + 1} 顆骰子`;
-      return `<img class="dice-result-image" src="${image}" alt="${alt}" />`;
-    }).join('');
+    let diceImage = '/images/dice.png';
+    let imageAlt = `骰子結果 ${total}`;
+    let imageClass = 'single-dice';
+
+    if (diceCount === 1) {
+      const point = Number(dice[0] || total || 0);
+      diceImage = getSingleDieImage(point);
+      imageAlt = `${point}`;
+    } else {
+      diceImage = getDoubleDiceImage(total);
+      imageAlt = `雙骰合計 ${total}`;
+      imageClass = 'double-dice-total';
+    }
 
     bodyEl.innerHTML = `
       <div class="dice-result-stage" aria-label="骰子結果 ${total}">
-        <div class="dice-result-images ${diceCount > 1 ? 'two-dice' : ''}">${diceImages}</div>
+        <div class="dice-result-images ${imageClass}">
+          <img class="dice-result-image" src="${diceImage}" alt="${imageAlt}" />
+        </div>
       </div>
     `;
   }
