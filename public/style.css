@@ -270,15 +270,49 @@ button {
   color: #5f5852;
 }
 
-.profession-stats {
+.profession-abilities {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 5px 8px;
-  margin-top: 9px;
-  font-size: 13px;
-  line-height: 1.4;
-  color: #7d746d;
+  gap: 7px;
+  margin-top: 10px;
 }
+
+.ability-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+  padding: 6px 7px;
+  border-radius: 11px;
+  background: #ece6df;
+  color: #756d66;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.ability-label {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.ability-grade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  letter-spacing: 0;
+  color: #fffaf6;
+}
+
+.grade-s { background: #a9828c; }
+.grade-a { background: #87998b; }
+.grade-b { background: #a49587; }
+.grade-c { background: #9a9691; }
 
 .profession-state {
   display: block;
@@ -358,7 +392,8 @@ button {
   }
 
   .profession-name { font-size: 21px; }
-  .profession-stats { font-size: 12px; gap: 4px 6px; }
+  .ability-item { padding: 6px; font-size: 12px; }
+  .ability-grade { width: 23px; height: 23px; flex-basis: 23px; font-size: 14px; }
   .profession-state { font-size: 13px; }
 }
 
@@ -373,5 +408,7 @@ button {
   .profession-grid { gap: 9px; }
   .profession-card { padding: 8px; border-radius: 17px; }
   .profession-name { font-size: 19px; }
-  .profession-stats { grid-template-columns: 1fr; font-size: 12px; }
+  .profession-abilities { grid-template-columns: 1fr 1fr; gap: 5px; }
+  .ability-item { padding: 5px 6px; font-size: 11px; }
+  .ability-grade { width: 21px; height: 21px; flex-basis: 21px; font-size: 13px; border-radius: 7px; }
 }
