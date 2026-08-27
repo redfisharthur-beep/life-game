@@ -1,0 +1,141 @@
+/* 首頁專用：front page.png + 嵌入式暱稱/開始按鈕 */
+.home-stage {
+  position: relative;
+  display: none;
+  width: min(100%, 920px);
+  margin: 0 auto;
+}
+
+.home-stage.home-visible {
+  display: block;
+}
+
+.front-page-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 首頁讓圖片本身成為整個主畫面 */
+.card.home-mode {
+  width: min(920px, 100%);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.home-entry-panel {
+  position: absolute;
+  left: 50%;
+  bottom: 7.5%;
+  z-index: 3;
+  width: clamp(220px, 42%, 360px);
+  margin: 0 !important;
+  transform: translateX(-50%);
+}
+
+.home-entry-panel .entry-control {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.home-entry-panel .field.entry-control {
+  margin-bottom: clamp(8px, 1.2vw, 12px);
+}
+
+.home-entry-panel input {
+  min-height: clamp(48px, 5.3vw, 58px);
+  padding: 10px 16px;
+  border: 1.5px solid rgba(120, 111, 103, .35);
+  border-radius: 999px;
+  background: rgba(255, 252, 247, .91);
+  box-shadow: 0 4px 12px rgba(74, 66, 60, .09);
+  color: #514c48;
+  font-size: clamp(16px, 2vw, 20px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.home-entry-panel input:focus {
+  border-color: rgba(127, 143, 131, .8);
+  box-shadow: 0 0 0 4px rgba(127, 143, 131, .15), 0 4px 12px rgba(74, 66, 60, .08);
+}
+
+.home-entry-panel #joinGameBtn {
+  min-height: clamp(48px, 5.3vw, 58px);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(127, 143, 131, .94);
+  box-shadow: 0 6px 15px rgba(83, 97, 86, .18);
+  color: #fffaf6;
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.home-entry-panel #joinGameBtn:hover:not(:disabled) {
+  background: rgba(115, 131, 121, .98);
+}
+
+.home-entry-panel .message {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 6px);
+  width: min(90vw, 420px);
+  min-height: 0;
+  margin: 0;
+  transform: translateX(-50%);
+  color: #655e58;
+  font-size: clamp(12px, 1.6vw, 15px);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, .75);
+}
+
+.home-entry-panel .message.error {
+  color: #925f5b;
+}
+
+@media (max-width: 760px) {
+  .shell:has(.card.home-mode) {
+    padding: 8px;
+    align-items: start;
+  }
+
+  .card.home-mode {
+    margin-top: 0;
+  }
+
+  .home-entry-panel {
+    bottom: 6.5%;
+    width: clamp(210px, 54%, 330px);
+  }
+}
+
+@media (max-width: 430px) {
+  .shell:has(.card.home-mode) {
+    padding: 0;
+  }
+
+  .home-stage,
+  .card.home-mode {
+    width: 100%;
+  }
+
+  .home-entry-panel {
+    bottom: 5.5%;
+    width: min(72%, 290px);
+  }
+
+  .home-entry-panel input,
+  .home-entry-panel #joinGameBtn {
+    min-height: 46px;
+    font-size: 16px;
+  }
+}
