@@ -35,6 +35,9 @@ const ACTIVE_ACTIONS = new Set([
   'salary',
   'buyStock',
   'buyLand',
+  'fate',
+  'sabotage',
+  'help',
   'sellStock',
   'sellLand',
 ]);
@@ -342,12 +345,18 @@ function renderGame(room) {
   }
 
   actionButtons.forEach((button) => {
-    const available = ACTIVE_ACTIONS.has(button.dataset.action);
+    const action = button.dataset.action;
+    let available = ACTIVE_ACTIONS.has(action);
+
+    if ((action === 'sabotage' || action === 'help') && room.players.length < 2) {
+      available = false;
+    }
+
     button.disabled = !(available && isMyTurn);
   });
 
   if (actionHintEl) {
-    actionHintEl.textContent = '已開放領薪、買股、圈地、賣股、賣地；其餘行動下一步接入。';
+    actionHintEl.textContent = '目前只有圓夢尚未開放。';
   }
 
   gameEventEl.textContent = game.lastEvent?.text || '人生旅程進行中…';
