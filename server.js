@@ -20,6 +20,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
 
 const rooms = new Map();
 const TURN_MS = 10_000;
+const ACTION_SHOWCASE_MS = 6_000;
 const TOTAL_ROUNDS = 30;
 
 const PROFESSIONS = {
@@ -206,9 +207,20 @@ function initializeGame(room) {
 
 function advanceTurn(room) {
   if (!room.game || room.phase !== 'game') return;
+
   clearTurnTimer(room);
-  room.game.turnIndex += 1;
-  beginTurn(room);
+  room.game.deadline = null;
+  emitRoom(room);
+
+  const expectedTurnId = room.game.turnId;
+  room.turnTimer = setTimeout(() => {
+    const currentRoom = rooms.get(room.code);
+    if (!currentRoom || currentRoom.phase !== 'game' || !currentRoom.game) return;
+    if (currentRoom.game.turnId !== expectedTurnId) return;
+
+    currentRoom.game.turnIndex += 1;
+    beginTurn(currentRoom);
+  }, ACTION_SHOWCASE_MS);
 }
 
 function updateMarket(room) {
