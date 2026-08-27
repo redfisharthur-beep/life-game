@@ -4,12 +4,9 @@ const statusEl = document.getElementById('status');
 const entryPanel = document.getElementById('entryPanel');
 const roomPanel = document.getElementById('roomPanel');
 const playerNameInput = document.getElementById('playerName');
-const roomCodeInput = document.getElementById('roomCodeInput');
-const createRoomBtn = document.getElementById('createRoomBtn');
-const joinRoomBtn = document.getElementById('joinRoomBtn');
+const joinGameBtn = document.getElementById('joinGameBtn');
 const leaveRoomBtn = document.getElementById('leaveRoomBtn');
 const messageEl = document.getElementById('message');
-const roomCodeEl = document.getElementById('roomCode');
 const playerCountEl = document.getElementById('playerCount');
 const playerListEl = document.getElementById('playerList');
 const roomNoticeEl = document.getElementById('roomNotice');
@@ -43,7 +40,6 @@ function renderRoom(room) {
   if (!room) return;
 
   currentRoom = room;
-  roomCodeEl.textContent = room.code;
   playerCountEl.textContent = `${room.players.length} / ${room.maxPlayers}`;
 
   playerListEl.innerHTML = '';
@@ -73,9 +69,9 @@ function renderRoom(room) {
   });
 
   if (room.players.length < 2) {
-    roomNoticeEl.textContent = '等待至少1位朋友加入…';
+    roomNoticeEl.textContent = '等待其他玩家加入…';
   } else if (room.players.length < 6) {
-    roomNoticeEl.textContent = '房間已成立，下一階段會加入職業選擇。';
+    roomNoticeEl.textContent = '已有玩家加入，等待更多玩家…';
   } else {
     roomNoticeEl.textContent = '房間已滿6人。';
   }
@@ -109,14 +105,14 @@ socket.on('disconnect', () => {
   statusEl.classList.remove('ok');
 });
 
-createRoomBtn.addEventListener('click', () => {
-  withBusy(createRoomBtn, () => new Promise((resolve) => {
+joinGameBtn.addEventListener('click', () => {
+  withBusy(joinGameBtn, () => new Promise((resolve) => {
     const name = getPlayerName();
     setMessage('');
 
-    socket.emit('room:create', { name }, (result) => {
+    socket.emit('room:autoJoin', { name }, (result) => {
       if (!result?.ok) {
-        setMessage(result?.message || '建立房間失敗。', 'error');
+        setMessage(result?.message || '加入遊戲失敗。', 'error');
         resolve();
         return;
       }
@@ -127,32 +123,14 @@ createRoomBtn.addEventListener('click', () => {
   }));
 });
 
-joinRoomBtn.addEventListener('click', () => {
-  withBusy(joinRoomBtn, () => new Promise((resolve) => {
-    const name = getPlayerName();
-    const code = roomCodeInput.value.replace(/\D/g, '').slice(0, 4);
-    roomCodeInput.value = code;
-    setMessage('');
-
-    socket.emit('room:join', { name, code }, (result) => {
-      if (!result?.ok) {
-        setMessage(result?.message || '加入房間失敗。', 'error');
-        resolve();
-        return;
-      }
-
-      showRoom(result.room);
-      resolve();
-    });
-  }));
+playerNameInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    joinGameBtn.click();
+  }
 });
 
 leaveRoomBtn.addEventListener('click', () => {
   socket.emit('room:leave', () => {
     showEntry();
   });
-});
-
-roomCodeInput.addEventListener('input', () => {
-  roomCodeInput.value = roomCodeInput.value.replace(/\D/g, '').slice(0, 4);
 });
