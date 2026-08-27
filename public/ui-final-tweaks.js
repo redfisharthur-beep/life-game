@@ -6,16 +6,22 @@
     return Math.round(number).toLocaleString('zh-TW');
   }
 
+  function setTextIfChanged(element, text) {
+    if (!element) return;
+    const next = String(text);
+    if (element.textContent !== next) element.textContent = next;
+  }
+
   function updateWaitingRoom() {
     const startButton = document.getElementById('startGameBtn');
     if (startButton && startButton.textContent.trim() === '等待房主啟程') {
-      startButton.textContent = '等待中';
+      setTextIfChanged(startButton, '等待中');
     }
   }
 
   function updatePlayerCards() {
     document.querySelectorAll('.player-info-cell.total-assets .player-info-value').forEach((valueEl) => {
-      valueEl.textContent = roundDisplayedNumber(valueEl.textContent);
+      setTextIfChanged(valueEl, roundDisplayedNumber(valueEl.textContent));
     });
   }
 
@@ -25,32 +31,35 @@
     if (!results || results.classList.contains('hidden')) return;
 
     if (resultWinner) {
-      resultWinner.textContent = '🏆';
-      resultWinner.setAttribute('aria-label', '第一名');
+      setTextIfChanged(resultWinner, '🏆');
+      if (resultWinner.getAttribute('aria-label') !== '第一名') {
+        resultWinner.setAttribute('aria-label', '第一名');
+      }
     }
 
     document.querySelectorAll('.ranking-card').forEach((card) => {
       const rankEl = card.querySelector('.ranking-number');
       if (rankEl) {
-        const match = String(rankEl.textContent || '').match(/(\d+)/);
-        const rank = Number(match?.[1] || 0);
-        if (rank === 1) {
-          rankEl.textContent = '🥇';
-          rankEl.setAttribute('aria-label', '第一名');
-        } else if (rank === 2) {
-          rankEl.textContent = '🥈';
-          rankEl.setAttribute('aria-label', '第二名');
-        } else if (rank === 3) {
-          rankEl.textContent = '🥉';
-          rankEl.setAttribute('aria-label', '第三名');
-        } else if (rank > 0) {
-          rankEl.textContent = `第 ${rank} 名`;
+        const rawRank = Number(rankEl.dataset.rank || String(rankEl.textContent || '').match(/(\d+)/)?.[1] || 0);
+        if (rawRank > 0) rankEl.dataset.rank = String(rawRank);
+
+        if (rawRank === 1) {
+          setTextIfChanged(rankEl, '🥇');
+          if (rankEl.getAttribute('aria-label') !== '第一名') rankEl.setAttribute('aria-label', '第一名');
+        } else if (rawRank === 2) {
+          setTextIfChanged(rankEl, '🥈');
+          if (rankEl.getAttribute('aria-label') !== '第二名') rankEl.setAttribute('aria-label', '第二名');
+        } else if (rawRank === 3) {
+          setTextIfChanged(rankEl, '🥉');
+          if (rankEl.getAttribute('aria-label') !== '第三名') rankEl.setAttribute('aria-label', '第三名');
+        } else if (rawRank > 0) {
+          setTextIfChanged(rankEl, `第 ${rawRank} 名`);
         }
       }
 
       const totalAssetValue = card.querySelector('.ranking-stats > span:nth-child(2) b');
       if (totalAssetValue) {
-        totalAssetValue.textContent = roundDisplayedNumber(totalAssetValue.textContent);
+        setTextIfChanged(totalAssetValue, roundDisplayedNumber(totalAssetValue.textContent));
       }
     });
   }
@@ -61,15 +70,12 @@
     updateResults();
   }
 
-  const observer = new MutationObserver(applyTweaks);
-  observer.observe(document.body, {
-    subtree: true,
-    childList: true,
-    characterData: true,
-  });
-
+  // app.js 的 room:update 會先完成主要畫面渲染；用下一個 task 再套顯示微調，
+  // 避免 MutationObserver 監聽整頁後又修改 DOM，造成無限 mutation 迴圈與瀏覽器卡死。
   socket.on('room:update', () => setTimeout(applyTweaks, 0));
   socket.on('room:started', () => setTimeout(applyTweaks, 0));
-  setInterval(applyTweaks, 600);
+
+  // 低頻備援只處理可能較晚出現的 DOM，不做高頻輪詢。
+  setInterval(applyTweaks, 1500);
   applyTweaks();
 })();
