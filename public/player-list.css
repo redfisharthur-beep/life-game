@@ -29,7 +29,6 @@
   pointer-events: none;
 }
 
-/* 整頁改成底圖模式，不再顯示外層灰白卡片 */
 .card.room-mode {
   width: min(920px, 100%);
   padding: 0;
@@ -40,11 +39,11 @@
   overflow: visible;
 }
 
-/* 玩家數量 */
+/* 玩家數量：維持底圖中央的小膠囊感 */
 .room-mode .players-head.compact {
   position: absolute;
   left: 50%;
-  top: 17%;
+  top: 16.8%;
   width: auto;
   margin: 0;
   transform: translateX(-50%);
@@ -54,30 +53,32 @@
 .room-mode #playerCount {
   min-width: 0;
   min-height: 0;
-  padding: .45em 1em;
+  padding: .38em .95em;
   border: 0;
   border-radius: 999px;
-  background: rgba(255, 250, 239, .72);
-  color: #7d5734;
-  box-shadow: 0 3px 10px rgba(125, 84, 35, .10);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-  font-size: clamp(14px, 2.1vw, 22px);
-  font-weight: 700;
+  background: rgba(255, 248, 232, .82);
+  color: #7b5638;
+  box-shadow: 0 3px 9px rgba(129, 83, 37, .10);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  font-size: clamp(17px, 2.4vw, 25px);
+  font-weight: 800;
+  letter-spacing: .05em;
 }
 
-/* 玩家名單放在底圖主要框內 */
+/* 玩家名單：縮短膠囊寬度，讓它像底圖中的原生名牌 */
 .room-mode #playerList {
   position: absolute;
-  left: 17%;
-  top: 28%;
-  width: 66%;
-  height: 34%;
+  left: 50%;
+  top: 27.2%;
+  width: 58%;
+  height: 37%;
   display: grid;
   align-content: start;
-  gap: clamp(5px, 1vw, 10px);
+  gap: clamp(8px, 1.2vw, 13px);
   margin: 0;
   padding: 0;
+  transform: translateX(-50%);
   overflow: auto;
   scrollbar-width: none;
   pointer-events: auto;
@@ -89,74 +90,87 @@
 
 .room-mode #playerList .player-row {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   min-height: 0;
-  padding: clamp(7px, 1.2vw, 12px) clamp(10px, 1.7vw, 17px);
-  border: 1px solid rgba(180, 137, 79, .24);
+  padding: clamp(8px, 1.25vw, 12px) clamp(14px, 2vw, 20px);
+  border: 1px solid rgba(191, 145, 75, .28);
   border-radius: 999px;
-  background: rgba(255, 251, 242, .74);
-  box-shadow: none;
+  background: rgba(255, 249, 236, .78);
+  box-shadow:
+    0 2px 5px rgba(126, 84, 42, .06),
+    inset 0 1px 0 rgba(255,255,255,.72);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
 
 .room-mode #playerList .player-name {
-  font-size: clamp(14px, 2vw, 21px);
-  font-weight: 700;
-  color: #684c37;
+  font-size: clamp(19px, 2.7vw, 29px);
+  font-weight: 800;
+  color: #6d4b32;
+  letter-spacing: .035em;
+  line-height: 1.1;
+  text-shadow: 0 1px 0 rgba(255,255,255,.65);
 }
 
 .room-mode #playerList .badge {
-  padding: .3em .7em;
-  border-radius: 999px;
-  background: rgba(194, 148, 79, .82);
-  color: #fffaf0;
-  font-size: clamp(10px, 1.35vw, 14px);
-  font-weight: 700;
-}
-
-/* 啟程按鈕：融入底圖，保留實際按鈕狀態 */
-.room-mode #startGameBtn {
-  position: absolute;
-  left: 27%;
-  top: 68%;
-  width: 46%;
-  min-height: 0;
-  height: 10%;
-  margin: 0;
-  padding: 0 5%;
+  padding: .28em .72em;
   border: 0;
   border-radius: 999px;
-  background: rgba(227, 157, 65, .90);
-  color: #fffaf2;
-  box-shadow: 0 6px 15px rgba(143, 93, 35, .18);
-  font-size: clamp(17px, 2.6vw, 28px);
-  font-weight: 700;
-  letter-spacing: .08em;
+  background: linear-gradient(180deg, rgba(210, 167, 91, .96), rgba(185, 137, 67, .96));
+  color: #fffaf0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.30);
+  font-size: clamp(12px, 1.65vw, 17px);
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+/* 啟程：往下移、字體放大，改成奶油金色系融入背景 */
+.room-mode #startGameBtn {
+  position: absolute;
+  left: 50%;
+  top: 72.5%;
+  width: 42%;
+  min-height: 0;
+  height: 9.5%;
+  margin: 0;
+  padding: 0 4%;
+  transform: translateX(-50%);
+  border: 1px solid rgba(181, 126, 48, .34);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(244, 190, 83, .96), rgba(221, 151, 49, .96));
+  color: #fff9ed;
+  box-shadow:
+    0 7px 14px rgba(132, 82, 30, .16),
+    inset 0 2px 0 rgba(255,255,255,.34);
+  font-size: clamp(24px, 3.5vw, 38px);
+  font-weight: 800;
+  letter-spacing: .10em;
+  text-shadow: 0 2px 2px rgba(113, 67, 25, .18);
   pointer-events: auto;
 }
 
 .room-mode #startGameBtn:hover:not(:disabled) {
-  background: rgba(214, 143, 52, .96);
+  background: linear-gradient(180deg, rgba(248, 196, 91, .98), rgba(226, 157, 54, .98));
 }
 
 .room-mode #startGameBtn:disabled {
   opacity: .72;
-  background: rgba(159, 149, 137, .72);
-  color: rgba(255, 250, 242, .92);
-  box-shadow: none;
+  background: linear-gradient(180deg, rgba(209, 193, 165, .88), rgba(184, 164, 132, .88));
+  color: rgba(255, 250, 240, .96);
+  border-color: rgba(150, 127, 92, .18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
 }
 
 .room-mode #launchMessage {
   position: absolute;
   left: 18%;
-  top: 79%;
+  top: 82.2%;
   width: 64%;
   min-height: 0;
   margin: 0;
   color: #765943;
-  font-size: clamp(11px, 1.6vw, 16px);
+  font-size: clamp(12px, 1.7vw, 17px);
   font-weight: 700;
   line-height: 1.2;
   text-align: center;
@@ -164,49 +178,78 @@
   pointer-events: none;
 }
 
-/* 離開房間改成低存在感的融入式文字按鈕 */
+.room-mode #launchMessage:empty {
+  display: none;
+}
+
+/* 離開房間：縮小存在感但維持可點擊 */
 .room-mode #leaveRoomBtn {
   position: absolute;
   left: 50%;
-  top: 84%;
+  top: 86.2%;
   width: auto;
   min-width: 0;
-  min-height: 44px;
+  min-height: 42px;
   margin: 0;
-  padding: 8px 18px;
+  padding: 7px 17px;
   transform: translateX(-50%);
-  border: 1px solid rgba(126, 92, 60, .22);
+  border: 1px solid rgba(134, 96, 59, .20);
   border-radius: 999px;
-  background: rgba(255, 250, 239, .62);
-  color: #72553f;
-  box-shadow: none;
-  font-size: clamp(12px, 1.65vw, 17px);
+  background: rgba(255, 248, 231, .68);
+  color: #76553d;
+  box-shadow: 0 2px 5px rgba(115,76,39,.05);
+  font-size: clamp(13px, 1.8vw, 18px);
   font-weight: 700;
   pointer-events: auto;
 }
 
 .room-mode #leaveRoomBtn:hover:not(:disabled) {
-  background: rgba(255, 250, 239, .78);
+  background: rgba(255, 250, 239, .82);
 }
 
 @media (max-width: 760px) {
   .shell:has(.card.room-mode) {
-    padding: 8px;
+    padding: 0;
     align-items: start;
+  }
+
+  .room-mode #playerList {
+    width: 66%;
+    top: 26.8%;
+  }
+
+  .room-mode #playerList .player-row {
+    padding: 8px 13px;
+  }
+
+  .room-mode #playerList .player-name {
+    font-size: clamp(20px, 4.6vw, 28px);
+  }
+
+  .room-mode #playerList .badge {
+    font-size: clamp(12px, 3vw, 16px);
+  }
+
+  .room-mode #startGameBtn {
+    top: 73.5%;
+    width: 46%;
+    height: 9.2%;
+    font-size: clamp(25px, 6vw, 34px);
   }
 }
 
 @media (max-width: 430px) {
-  .shell:has(.card.room-mode) {
-    padding: 0;
-  }
-
   .player-list-stage,
   .card.room-mode {
     width: 100%;
   }
 
+  .room-mode #playerList {
+    width: 68%;
+    gap: 8px;
+  }
+
   .room-mode #playerList .player-row {
-    padding: 6px 10px;
+    padding: 7px 12px;
   }
 }
