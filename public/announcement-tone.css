@@ -1,0 +1,45 @@
+/* 公告膠囊色系：一般米黃、援助/正向事件淡紅、陷害/負向事件淡灰 */
+.action-showcase .action-showcase-card {
+  background: #f8f0df !important;
+  border-color: rgba(170, 151, 118, .24) !important;
+}
+
+.action-showcase .simple-result-row {
+  background: #f3ead7 !important;
+}
+
+.action-showcase.tone-help .action-showcase-card {
+  background: #f8e5e1 !important;
+  border-color: rgba(185, 122, 112, .22) !important;
+}
+
+.action-showcase.tone-help .simple-result-row {
+  background: #f3dcd7 !important;
+}
+
+.action-showcase.tone-sabotage .action-showcase-card {
+  background: #eceae7 !important;
+  border-color: rgba(112, 107, 102, .20) !important;
+}
+
+.action-showcase.tone-sabotage .simple-result-row {
+  background: #e4e1dd !important;
+}
+
+.major-event-overlay.tone-major-negative .major-event-card {
+  background: #ebe9e6 !important;
+  border-color: rgba(105, 101, 97, .20) !important;
+}
+
+.major-event-overlay.tone-major-negative .major-event-countdown {
+  background: rgba(105, 101, 97, .10) !important;
+}
+
+.major-event-overlay.tone-major-positive .major-event-card {
+  background: #f8e5e1 !important;
+  border-color: rgba(185, 122, 112, .22) !important;
+}
+
+.major-event-overlay.tone-major-positive .major-event-countdown {
+  background: rgba(190, 119, 107, .10) !important;
+}
