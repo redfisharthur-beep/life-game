@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>人生｜多人派對遊戲</title>
   <link rel="stylesheet" href="/style.css?v=20260827-1410" />
+  <link rel="stylesheet" href="/player-status.css?v=20260827-1425" />
 </head>
 <body>
   <main class="shell">
@@ -39,6 +40,8 @@
       </div>
 
       <div id="gamePanel" class="panel hidden">
+        <section id="playerStatusBar" class="player-status-bar" aria-label="玩家資訊"></section>
+
         <div class="game-topbar">
           <div>
             <span id="stageName" class="stage-name">人生起步</span>
@@ -101,5 +104,6 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="/app.js?v=20260827-1410"></script>
+  <script src="/player-status.js?v=20260827-1425"></script>
 </body>
 </html>
