@@ -24,6 +24,7 @@
   ];
 
   const STAGE_MS = 2000;
+  const SHOWCASE_MS = STAGE_MS * 3;
 
   let lastShowcaseKey = null;
   let stageTimers = [];
@@ -54,6 +55,14 @@
     }
   }
 
+  function hideShowcase() {
+    clearStageTimers();
+    overlay.classList.add('hidden');
+    setChoiceStageMode(false);
+    setDiceStageMode(false);
+    restoreCurrentTurnIfReady();
+  }
+
   function lockActionButtons() {
     document.querySelectorAll('.action-button').forEach((button) => {
       button.disabled = true;
@@ -70,17 +79,13 @@
 
   function getSingleDieImage(value) {
     const point = Number(value);
-    if (Number.isInteger(point) && point >= 1 && point <= 6) {
-      return `/images/${point}.png`;
-    }
+    if (Number.isInteger(point) && point >= 1 && point <= 6) return `/images/${point}.png`;
     return '/images/dice.png';
   }
 
   function getDoubleDiceImage(total) {
     const point = Number(total);
-    if (Number.isInteger(point) && point >= 2 && point <= 12) {
-      return `/images/2-${point}.png`;
-    }
+    if (Number.isInteger(point) && point >= 2 && point <= 12) return `/images/2-${point}.png`;
     return '/images/dice.png';
   }
 
@@ -133,14 +138,12 @@
 
     kickerEl.textContent = `${playerName} 抽到命運`;
     titleEl.textContent = fateResult?.label || '命運結果';
-
     bodyEl.innerHTML = `
       <div class="fate-result-wrap">
         ${fateResult ? `<img class="fate-result-image" src="${fateResult.image}" alt="${fateResult.label}" />` : ''}
         <p class="action-showcase-result fate-result-text"></p>
       </div>
     `;
-
     bodyEl.querySelector('.fate-result-text').textContent = event.text || '命運事件完成';
   }
 
@@ -172,9 +175,16 @@
     const game = room?.game;
     const event = game?.lastEvent;
     const action = ACTIONS[event?.type];
+    const showcaseUntil = Number(game?.showcaseUntil || 0);
+    const now = Number(room?.serverTime || Date.now());
+    const remaining = showcaseUntil - now;
 
-    if (!game || !event || !action || !Array.isArray(event.dice) || !game.turnId) return;
-    if (game.deadline !== null) return;
+    if (!game || !event || !action || !Array.isArray(event.dice) || !game.turnId || remaining <= 0) {
+      if (!overlay.classList.contains('hidden') && (!showcaseUntil || remaining <= 0 || game?.deadline)) {
+        hideShowcase();
+      }
+      return;
+    }
 
     const key = `${room.code}:${game.turnId}`;
     if (key === lastShowcaseKey) return;
@@ -186,33 +196,33 @@
 
     const player = room.players.find((item) => item.id === event.playerId);
     const playerName = player?.name || '玩家';
+    const elapsed = Math.max(0, SHOWCASE_MS - remaining);
 
     overlay.classList.remove('hidden');
-    showActionStage(playerName, action);
-
-    stageTimers.push(setTimeout(() => {
-      lockActionButtons();
+    if (elapsed < STAGE_MS) {
+      showActionStage(playerName, action);
+    } else if (elapsed < STAGE_MS * 2) {
       showDiceStage(playerName, event);
-    }, STAGE_MS));
-
-    stageTimers.push(setTimeout(() => {
-      lockActionButtons();
+    } else {
       showResultStage(playerName, event);
-    }, STAGE_MS * 2));
+    }
 
-    stageTimers.push(setTimeout(() => {
-      overlay.classList.add('hidden');
-      setChoiceStageMode(false);
-      setDiceStageMode(false);
-      if (lockTimer) {
-        clearInterval(lockTimer);
-        lockTimer = null;
-      }
-      restoreCurrentTurnIfReady();
-    }, STAGE_MS * 3));
+    if (elapsed < STAGE_MS) {
+      stageTimers.push(setTimeout(() => {
+        lockActionButtons();
+        showDiceStage(playerName, event);
+      }, STAGE_MS - elapsed));
+    }
+
+    if (elapsed < STAGE_MS * 2) {
+      stageTimers.push(setTimeout(() => {
+        lockActionButtons();
+        showResultStage(playerName, event);
+      }, (STAGE_MS * 2) - elapsed));
+    }
+
+    stageTimers.push(setTimeout(hideShowcase, remaining));
   }
 
-  socket.on('room:update', (room) => {
-    playShowcase(room);
-  });
+  socket.on('room:update', playShowcase);
 })();
