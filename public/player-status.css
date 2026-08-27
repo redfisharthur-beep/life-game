@@ -24,7 +24,7 @@
 .player-status-card {
   position: relative;
   min-width: 0;
-  padding: 8px 9px;
+  padding: 9px 10px;
   border: 1px solid #cec4bb;
   border-radius: 16px;
   background: #f7f2ec;
@@ -50,10 +50,11 @@
 .player-status-identity {
   position: relative;
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) minmax(86px, .95fr);
-  gap: 7px;
+  grid-template-columns: 42px minmax(76px, 1fr) auto auto;
+  gap: 8px;
   align-items: center;
   min-width: 0;
+  padding-right: 2px;
 }
 
 .player-status-avatar {
@@ -83,42 +84,68 @@
   overflow: hidden;
   color: #514a45;
   font-size: 15px;
+  font-weight: 700;
   line-height: 1.15;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.player-status-total-assets {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  padding: 0 2px;
+  white-space: nowrap;
+}
+
+.player-status-total-label {
+  color: #91867d;
+  font-size: 8px;
+  line-height: 1;
+}
+
+.player-status-total-value {
+  margin-top: 3px;
+  color: #5d554f;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 .player-status-happiness {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  justify-self: center;
-  gap: 6px;
-  min-width: 78px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: #eee3e3;
+  justify-content: flex-end;
+  gap: 5px;
+  min-width: 64px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: #8b6768;
   white-space: nowrap;
 }
 
 .player-status-happiness-icon {
   display: block;
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
   object-fit: contain;
   flex: 0 0 auto;
 }
 
 .player-status-happiness-value {
   font-size: 16px;
+  font-weight: 700;
   line-height: 1;
 }
 
 .player-status-turn-badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: -6px;
+  right: -6px;
   z-index: 2;
   padding: 5px 10px;
   border-radius: 999px;
@@ -144,37 +171,58 @@
 
 .player-status-summary {
   display: grid;
-  grid-template-columns: 1.25fr repeat(3, 1fr);
-  gap: 4px;
-  margin-top: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 7px;
 }
 
 .player-summary-item {
   min-width: 0;
-  padding: 5px 3px;
-  border-radius: 9px;
-  background: #ece6df;
+  padding: 6px 4px;
+  border-radius: 10px;
   text-align: center;
 }
 
-.player-summary-item.assets {
-  background: #e6e0d9;
+.player-summary-item.cash {
+  background: #dfeae2;
+}
+
+.player-summary-item.stocks {
+  background: #dfe6ef;
+}
+
+.player-summary-item.land {
+  background: #eee2d5;
 }
 
 .player-summary-label {
   display: block;
-  color: #8e847b;
   font-size: 8px;
   line-height: 1;
   white-space: nowrap;
 }
 
+.player-summary-item.cash .player-summary-label,
+.player-summary-item.cash .player-summary-value {
+  color: #5d7965;
+}
+
+.player-summary-item.stocks .player-summary-label,
+.player-summary-item.stocks .player-summary-value {
+  color: #5f7390;
+}
+
+.player-summary-item.land .player-summary-label,
+.player-summary-item.land .player-summary-value {
+  color: #8b6f54;
+}
+
 .player-summary-value {
   display: block;
-  margin-top: 2px;
+  margin-top: 3px;
   overflow: hidden;
-  color: #5c554f;
   font-size: 12px;
+  font-weight: 700;
   line-height: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -208,38 +256,45 @@
   }
 
   .player-status-identity {
-    grid-template-columns: 36px minmax(0, 1fr) minmax(68px, .9fr);
-    gap: 5px;
+    grid-template-columns: 32px minmax(54px, 1fr) auto auto;
+    gap: 4px;
   }
 
   .player-status-avatar {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
   }
 
-  .player-status-profession { font-size: 9px; }
-  .player-status-name { font-size: 13px; }
-  .player-status-happiness { min-width: 64px; gap: 4px; padding: 3px 5px; }
-  .player-status-happiness-icon { width: 20px; height: 20px; }
-  .player-status-happiness-value { font-size: 13px; }
-  .player-status-turn-badge { font-size: 11px; padding: 4px 7px; }
-  .player-status-summary { gap: 2px; margin-top: 5px; }
-  .player-summary-item { padding: 4px 1px; border-radius: 7px; }
-  .player-summary-label { font-size: 7px; }
-  .player-summary-value { font-size: 10px; }
+  .player-status-profession { font-size: 8px; }
+  .player-status-name { font-size: 12px; }
+  .player-status-total-assets { min-width: 48px; padding: 0; }
+  .player-status-total-label { font-size: 6.5px; }
+  .player-status-total-value { margin-top: 2px; font-size: 10px; }
+  .player-status-happiness { min-width: 46px; gap: 3px; }
+  .player-status-happiness-icon { width: 18px; height: 18px; }
+  .player-status-happiness-value { font-size: 11px; }
+  .player-status-turn-badge { font-size: 10px; padding: 4px 6px; }
+  .player-status-summary { gap: 3px; margin-top: 5px; }
+  .player-summary-item { padding: 5px 2px; border-radius: 7px; }
+  .player-summary-label { font-size: 6.5px; }
+  .player-summary-value { font-size: 9.5px; }
 }
 
-@media (max-width: 370px) {
+@media (max-width: 390px) {
   .player-status-bar { gap: 5px; }
   .player-status-card { padding: 6px; }
-  .player-status-identity { grid-template-columns: 32px minmax(0, 1fr) minmax(60px, .9fr); gap: 4px; }
-  .player-status-avatar { width: 32px; height: 32px; }
-  .player-status-name { font-size: 12px; }
-  .player-status-happiness { min-width: 58px; gap: 3px; padding: 3px 4px; }
-  .player-status-happiness-icon { width: 18px; height: 18px; }
-  .player-status-happiness-value { font-size: 12px; }
-  .player-status-turn-badge { font-size: 10px; padding: 4px 6px; }
-  .player-status-summary { gap: 1px; }
-  .player-summary-label { font-size: 6.5px; }
-  .player-summary-value { font-size: 9px; }
+  .player-status-identity { grid-template-columns: 29px minmax(46px, 1fr) auto auto; gap: 3px; }
+  .player-status-avatar { width: 29px; height: 29px; }
+  .player-status-profession { font-size: 7px; }
+  .player-status-name { font-size: 10.5px; }
+  .player-status-total-assets { min-width: 42px; }
+  .player-status-total-label { font-size: 6px; }
+  .player-status-total-value { font-size: 9px; }
+  .player-status-happiness { min-width: 40px; gap: 2px; }
+  .player-status-happiness-icon { width: 16px; height: 16px; }
+  .player-status-happiness-value { font-size: 10px; }
+  .player-status-turn-badge { font-size: 9px; padding: 3px 5px; }
+  .player-status-summary { gap: 2px; }
+  .player-summary-label { font-size: 6px; }
+  .player-summary-value { font-size: 8.5px; }
 }
