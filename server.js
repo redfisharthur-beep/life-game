@@ -420,9 +420,8 @@ function settleSalary(room, playerId, auto = false) {
   const { dice, total } = rollDice(room.game.round);
   const salary = PROFESSIONS[player.profession].salary;
   const income = Math.round(total * salary * 10);
-  const nextCash = player.cash + income;
+  player.cash += income;
 
-  player.cash = nextCash;
   room.game.lastEvent = {
     type: 'salary',
     playerId,
@@ -432,7 +431,6 @@ function settleSalary(room, playerId, auto = false) {
     auto,
     text: `${player.name}${auto ? ' 逾時自動' : ''}領薪，現金 +${income}`,
   };
-
   advanceTurn(room);
   return true;
 }
@@ -440,69 +438,47 @@ function settleSalary(room, playerId, auto = false) {
 function settleMarketAction(room, playerId, action) {
   const player = getActivePlayer(room, playerId);
   if (!player) return false;
-
   const profession = PROFESSIONS[player.profession];
   const { dice, total } = rollDice(room.game.round);
-  const event = {
-    type: action,
-    playerId,
-    dice,
-    diceTotal: total,
-  };
+  const event = { type: action, playerId, dice, diceTotal: total };
 
   if (action === 'buyStock') {
     const salaryIncome = Math.round(total * profession.salary * 7);
     const cost = Math.round(total * room.game.stockPrice);
     const units = round2(total * profession.stock);
     const availableCash = player.cash + salaryIncome;
-    const success = availableCash >= cost;
-
-    player.cash = success ? availableCash - cost : availableCash;
-    if (success) player.stocks = round2(player.stocks + units);
-
-    Object.assign(event, { salaryIncome, cost, units, success });
-    event.text = success
-      ? `${player.name} 買股成功：70%薪資 +${salaryIncome}，花費 ${cost}，股票 +${units}`
-      : `${player.name} 買股失敗：現金不足，保留70%薪資 +${salaryIncome}`;
+    event.salaryIncome = salaryIncome; event.cost = cost; event.units = units;
+    event.success = availableCash >= cost;
+    player.cash = event.success ? availableCash - cost : availableCash;
+    if (event.success) player.stocks = round2(player.stocks + units);
+    event.text = event.success ? `${player.name} 買股成功` : `${player.name} 買股失敗`;
   } else if (action === 'buyLand') {
     const salaryIncome = Math.round(total * profession.salary * 7);
     const cost = Math.round(total * room.game.landPrice);
     const units = round2(total * profession.land);
     const availableCash = player.cash + salaryIncome;
-    const success = availableCash >= cost;
-
-    player.cash = success ? availableCash - cost : availableCash;
-    if (success) player.land = round2(player.land + units);
-
-    Object.assign(event, { salaryIncome, cost, units, success });
-    event.text = success
-      ? `${player.name} 圈地成功：70%薪資 +${salaryIncome}，花費 ${cost}，土地 +${units}`
-      : `${player.name} 圈地失敗：現金不足，保留70%薪資 +${salaryIncome}`;
+    event.salaryIncome = salaryIncome; event.cost = cost; event.units = units;
+    event.success = availableCash >= cost;
+    player.cash = event.success ? availableCash - cost : availableCash;
+    if (event.success) player.land = round2(player.land + units);
+    event.text = event.success ? `${player.name} 圈地成功` : `${player.name} 圈地失敗`;
   } else if (action === 'sellStock') {
     const salaryIncome = Math.round(total * profession.salary * 5);
     const units = round2(Math.min(total, player.stocks));
     const proceeds = Math.round(units * room.game.stockPrice);
-
-    player.cash = player.cash + salaryIncome + proceeds;
+    player.cash += salaryIncome + proceeds;
     player.stocks = round2(Math.max(0, player.stocks - units));
     Object.assign(event, { salaryIncome, units, proceeds, success: true });
-    event.text = units > 0
-      ? `${player.name} 賣股：50%薪資 +${salaryIncome}，賣出 ${units} 股，現金 +${proceeds}`
-      : `${player.name} 沒有股票可賣，獲得50%薪資 +${salaryIncome}`;
+    event.text = `${player.name} 賣股`;
   } else if (action === 'sellLand') {
     const salaryIncome = Math.round(total * profession.salary * 5);
     const units = round2(Math.min(total, player.land));
     const proceeds = Math.round(units * room.game.landPrice);
-
-    player.cash = player.cash + salaryIncome + proceeds;
+    player.cash += salaryIncome + proceeds;
     player.land = round2(Math.max(0, player.land - units));
     Object.assign(event, { salaryIncome, units, proceeds, success: true });
-    event.text = units > 0
-      ? `${player.name} 賣地：50%薪資 +${salaryIncome}，賣出 ${units} 單位土地，現金 +${proceeds}`
-      : `${player.name} 沒有土地可賣，獲得50%薪資 +${salaryIncome}`;
-  } else {
-    return false;
-  }
+    event.text = `${player.name} 賣地`;
+  } else return false;
 
   room.game.lastEvent = event;
   advanceTurn(room);
@@ -512,78 +488,30 @@ function settleMarketAction(room, playerId, action) {
 function settleFate(room, playerId) {
   const player = getActivePlayer(room, playerId);
   if (!player) return false;
-
   const { dice, total } = rollDice(room.game.round);
   const fateIndex = Math.floor(Math.random() * 9);
-  const event = {
-    type: 'fate',
-    playerId,
-    dice,
-    diceTotal: total,
-    fateIndex,
-  };
+  const event = { type: 'fate', playerId, dice, diceTotal: total, fateIndex };
 
   if (fateIndex === 0) {
-    const amount = Math.round(150 * total);
-    player.cash += amount;
-    event.text = `${player.name} 命運：中樂透，現金 +${amount}`;
+    const amount = Math.round(150 * total); player.cash += amount; event.text = `${player.name} 現金 +${amount}`;
   } else if (fateIndex === 1) {
-    const requested = Math.round(80 * total);
-    const before = player.cash;
-    const actual = Math.min(before, requested);
-    player.cash -= actual;
-    const emptyPenalty = before === 0 && actual === 0;
-    if (emptyPenalty) player.happiness = round2(player.happiness - (0.5 * total));
-    event.text = emptyPenalty
-      ? `${player.name} 命運：花錢消災但現金已空，幸福 -${round2(0.5 * total)}`
-      : `${player.name} 命運：花錢消災，現金 -${actual}`;
+    const actual = Math.min(player.cash, Math.round(80 * total)); player.cash -= actual; event.text = `${player.name} 現金 -${actual}`;
   } else if (fateIndex === 2) {
-    const units = round2(5 * total);
-    player.stocks = round2(player.stocks + units);
-    event.text = `${player.name} 命運：股神降臨，股票 +${units}`;
+    const units = round2(5 * total); player.stocks = round2(player.stocks + units); event.text = `${player.name} 股票 +${units}`;
   } else if (fateIndex === 3) {
-    const requested = round2(2 * total);
-    const before = player.stocks;
-    const actual = round2(Math.min(before, requested));
-    player.stocks = round2(Math.max(0, before - actual));
-    const emptyPenalty = before === 0 && actual === 0;
-    if (emptyPenalty) player.happiness = round2(player.happiness - (0.5 * total));
-    event.text = emptyPenalty
-      ? `${player.name} 命運：黑天鵝但股票已空，幸福 -${round2(0.5 * total)}`
-      : `${player.name} 命運：黑天鵝，股票 -${actual}`;
+    const actual = round2(Math.min(player.stocks, 2 * total)); player.stocks = round2(player.stocks - actual); event.text = `${player.name} 股票 -${actual}`;
   } else if (fateIndex === 4) {
-    const units = round2(5 * total);
-    player.land = round2(player.land + units);
-    event.text = `${player.name} 命運：政策利多，土地 +${units}`;
+    const units = round2(5 * total); player.land = round2(player.land + units); event.text = `${player.name} 土地 +${units}`;
   } else if (fateIndex === 5) {
-    const requested = round2(2 * total);
-    const before = player.land;
-    const actual = round2(Math.min(before, requested));
-    player.land = round2(Math.max(0, before - actual));
-    const emptyPenalty = before === 0 && actual === 0;
-    if (emptyPenalty) player.happiness = round2(player.happiness - (0.5 * total));
-    event.text = emptyPenalty
-      ? `${player.name} 命運：土地受創但土地已空，幸福 -${round2(0.5 * total)}`
-      : `${player.name} 命運：土地受創，土地 -${actual}`;
+    const actual = round2(Math.min(player.land, 2 * total)); player.land = round2(player.land - actual); event.text = `${player.name} 土地 -${actual}`;
   } else if (fateIndex === 6) {
-    const perPlayer = Math.round(30 * total);
-    let received = 0;
-    room.players.forEach((other) => {
-      if (other.id === playerId) return;
-      const paid = Math.min(other.cash, perPlayer);
-      other.cash -= paid;
-      received += paid;
-    });
-    player.cash += received;
-    event.text = `${player.name} 命運：社福救濟，其他玩家共支付 ${received}`;
+    let received = 0; const perPlayer = Math.round(30 * total);
+    room.players.forEach((other) => { if (other.id !== playerId) { const paid = Math.min(other.cash, perPlayer); other.cash -= paid; received += paid; } });
+    player.cash += received; event.text = `${player.name} 共支付 ${received}`;
   } else if (fateIndex === 7) {
-    const happiness = round2(total);
-    player.happiness = round2(player.happiness + happiness);
-    event.text = `${player.name} 命運：幸福降臨，幸福 +${happiness}`;
+    const happiness = round2(total); player.happiness = round2(player.happiness + happiness); event.text = `${player.name} 幸福 +${happiness}`;
   } else {
-    const happiness = round2(0.5 * total);
-    player.happiness = round2(player.happiness - happiness);
-    event.text = `${player.name} 命運：人生低潮，幸福 -${happiness}`;
+    const happiness = round2(0.5 * total); player.happiness = round2(player.happiness - happiness); event.text = `${player.name} 幸福 -${happiness}`;
   }
 
   room.game.lastEvent = event;
@@ -595,7 +523,12 @@ function chooseSabotageTarget(room, actorId) {
   const others = room.players.filter((player) => player.id !== actorId);
   if (!others.length) return null;
 
-  const ranked = others.map((player) => ({
+  const highestHappiness = Math.max(...others.map((player) => Number(player.happiness || 0)));
+  const happinessLeaders = others.filter(
+    (player) => Number(player.happiness || 0) === highestHappiness
+  );
+
+  const ranked = happinessLeaders.map((player) => ({
     player,
     assets: playerAssets(player, room.game),
   }));
@@ -610,50 +543,21 @@ function chooseSabotageTarget(room, actorId) {
 function settleSabotage(room, playerId) {
   const player = getActivePlayer(room, playerId);
   if (!player) return false;
-
   const target = chooseSabotageTarget(room, playerId);
   if (!target) return false;
-
   const { dice, total } = rollDice(room.game.round);
   const effectIndex = Math.floor(Math.random() * 4);
   const bonus = Math.round(40 * total);
   let effectText = '';
 
-  if (effectIndex === 0) {
-    const requested = Math.round(80 * total);
-    const actual = Math.min(target.cash, requested);
-    target.cash -= actual;
-    effectText = `${target.name} 現金 -${actual}`;
-  } else if (effectIndex === 1) {
-    const requested = round2(total);
-    const actual = round2(Math.min(target.stocks, requested));
-    target.stocks = round2(Math.max(0, target.stocks - actual));
-    effectText = `${target.name} 股票 -${actual}`;
-  } else if (effectIndex === 2) {
-    const requested = round2(total);
-    const actual = round2(Math.min(target.land, requested));
-    target.land = round2(Math.max(0, target.land - actual));
-    effectText = `${target.name} 土地 -${actual}`;
-  } else {
-    const happiness = round2(0.3 * total);
-    target.happiness = round2(target.happiness - happiness);
-    effectText = `${target.name} 幸福 -${happiness}`;
-  }
+  if (effectIndex === 0) { const actual = Math.min(target.cash, Math.round(80 * total)); target.cash -= actual; effectText = `${target.name} 現金 -${actual}`; }
+  else if (effectIndex === 1) { const actual = round2(Math.min(target.stocks, total)); target.stocks = round2(target.stocks - actual); effectText = `${target.name} 股票 -${actual}`; }
+  else if (effectIndex === 2) { const actual = round2(Math.min(target.land, total)); target.land = round2(target.land - actual); effectText = `${target.name} 土地 -${actual}`; }
+  else { const happiness = round2(0.3 * total); target.happiness = round2(target.happiness - happiness); effectText = `${target.name} 幸福 -${happiness}`; }
 
   player.cash += bonus;
   player.sabotageCount = (player.sabotageCount || 0) + 1;
-
-  room.game.lastEvent = {
-    type: 'sabotage',
-    playerId,
-    targetId: target.id,
-    dice,
-    diceTotal: total,
-    effectIndex,
-    bonus,
-    text: `${player.name} 陷害 ${target.name}：${effectText}；自己現金 +${bonus}`,
-  };
-
+  room.game.lastEvent = { type: 'sabotage', playerId, targetId: target.id, dice, diceTotal: total, effectIndex, bonus, text: `${player.name} 陷害 ${target.name}：${effectText}；自己現金 +${bonus}` };
   advanceTurn(room);
   return true;
 }
@@ -661,140 +565,64 @@ function settleSabotage(room, playerId) {
 function getHelpCandidates(room, actorId) {
   const others = room.players.filter((player) => player.id !== actorId);
   if (!others.length) return [];
-
   const happinessValues = others.map((player) => Number(player.happiness || 0));
   const maxHappiness = Math.max(...happinessValues);
   const minHappiness = Math.min(...happinessValues);
-  const eligible = maxHappiness === minHappiness
-    ? others
-    : others.filter((player) => Number(player.happiness || 0) < maxHappiness);
-
-  if (!eligible.length) return [];
-
-  const ranked = eligible.map((player) => ({
-    player,
-    assets: playerAssets(player, room.game),
-  }));
+  const eligible = maxHappiness === minHappiness ? others : others.filter((player) => Number(player.happiness || 0) < maxHappiness);
+  const ranked = eligible.map((player) => ({ player, assets: playerAssets(player, room.game) }));
   const lowestAssets = Math.min(...ranked.map((item) => item.assets));
-  return ranked
-    .filter((item) => item.assets === lowestAssets)
-    .map((item) => item.player);
+  return ranked.filter((item) => item.assets === lowestAssets).map((item) => item.player);
 }
 
-function chooseHelpTarget(room, actorId) {
-  return randomChoice(getHelpCandidates(room, actorId));
-}
+function chooseHelpTarget(room, actorId) { return randomChoice(getHelpCandidates(room, actorId)); }
 
 function settleHelp(room, playerId) {
   const player = getActivePlayer(room, playerId);
   if (!player) return false;
-
   const target = chooseHelpTarget(room, playerId);
   if (!target) return false;
-
   const { dice, total } = rollDice(room.game.round);
   const effectIndex = Math.floor(Math.random() * 4);
   const bonus = Math.round(40 * total);
   const helperHappiness = round2(0.3 * total);
   let effectText = '';
 
-  if (effectIndex === 0) {
-    const amount = Math.round(100 * total);
-    target.cash += amount;
-    effectText = `${target.name} 現金 +${amount}`;
-  } else if (effectIndex === 1) {
-    const units = round2(3 * total);
-    target.stocks = round2(target.stocks + units);
-    effectText = `${target.name} 股票 +${units}`;
-  } else if (effectIndex === 2) {
-    const units = round2(3 * total);
-    target.land = round2(target.land + units);
-    effectText = `${target.name} 土地 +${units}`;
-  } else {
-    const happiness = round2(0.75 * total);
-    target.happiness = round2(target.happiness + happiness);
-    effectText = `${target.name} 幸福 +${happiness}`;
-  }
+  if (effectIndex === 0) { const amount = Math.round(100 * total); target.cash += amount; effectText = `${target.name} 現金 +${amount}`; }
+  else if (effectIndex === 1) { const units = round2(3 * total); target.stocks = round2(target.stocks + units); effectText = `${target.name} 股票 +${units}`; }
+  else if (effectIndex === 2) { const units = round2(3 * total); target.land = round2(target.land + units); effectText = `${target.name} 土地 +${units}`; }
+  else { const happiness = round2(0.75 * total); target.happiness = round2(target.happiness + happiness); effectText = `${target.name} 幸福 +${happiness}`; }
 
   player.cash += bonus;
   player.happiness = round2(player.happiness + helperHappiness);
   player.helpCount = (player.helpCount || 0) + 1;
-
-  room.game.lastEvent = {
-    type: 'help',
-    playerId,
-    targetId: target.id,
-    dice,
-    diceTotal: total,
-    effectIndex,
-    bonus,
-    helperHappiness,
-    text: `${player.name} 援助 ${target.name}：${effectText}；自己現金 +${bonus}、幸福 +${helperHappiness}`,
-  };
-
+  room.game.lastEvent = { type: 'help', playerId, targetId: target.id, dice, diceTotal: total, effectIndex, bonus, helperHappiness, text: `${player.name} 援助 ${target.name}：${effectText}；自己現金 +${bonus}、幸福 +${helperHappiness}` };
   advanceTurn(room);
   return true;
 }
 
 function findDreamLiquidation(player, game, deficit) {
-  if (deficit <= 0) {
-    return {
-      stocks: 0,
-      land: 0,
-      proceeds: 0,
-      marketValueMetric: 0,
-      surplus: 0,
-    };
-  }
-
-  const maxStockSteps = Math.floor((round2(player.stocks) * 2) + 1e-9);
-  const maxLandSteps = Math.floor((round2(player.land) * 2) + 1e-9);
+  if (deficit <= 0) return { stocks: 0, land: 0, proceeds: 0, marketValueMetric: 0, surplus: 0 };
+  const maxStockSteps = Math.floor(round2(player.stocks) * 2 + 1e-9);
+  const maxLandSteps = Math.floor(round2(player.land) * 2 + 1e-9);
   const stockPriceCents = Math.round(game.stockPrice * 100);
   const landPriceCents = Math.round(game.landPrice * 100);
-
   let best = null;
-
   for (let stockSteps = 0; stockSteps <= maxStockSteps; stockSteps += 1) {
     for (let landSteps = 0; landSteps <= maxLandSteps; landSteps += 1) {
-      if (stockSteps === 0 && landSteps === 0) continue;
-
-      const marketValueMetric = (stockSteps * stockPriceCents) + (landSteps * landPriceCents);
-      const marketValue = marketValueMetric / 200;
-      const proceeds = Math.round(marketValue * 0.8);
+      if (!stockSteps && !landSteps) continue;
+      const marketValueMetric = stockSteps * stockPriceCents + landSteps * landPriceCents;
+      const proceeds = Math.round((marketValueMetric / 200) * 0.8);
       if (proceeds < deficit) continue;
-
-      const candidate = {
-        stocks: stockSteps / 2,
-        land: landSteps / 2,
-        proceeds,
-        marketValueMetric,
-        surplus: proceeds - deficit,
-        stockSteps,
-      };
-
-      const isBetter = !best
-        || candidate.marketValueMetric < best.marketValueMetric
-        || (
-          candidate.marketValueMetric === best.marketValueMetric
-          && candidate.surplus < best.surplus
-        )
-        || (
-          candidate.marketValueMetric === best.marketValueMetric
-          && candidate.surplus === best.surplus
-          && candidate.stockSteps > best.stockSteps
-        );
-
-      if (isBetter) best = candidate;
+      const candidate = { stocks: stockSteps / 2, land: landSteps / 2, proceeds, marketValueMetric, surplus: proceeds - deficit, stockSteps };
+      if (!best || candidate.marketValueMetric < best.marketValueMetric || (candidate.marketValueMetric === best.marketValueMetric && candidate.surplus < best.surplus) || (candidate.marketValueMetric === best.marketValueMetric && candidate.surplus === best.surplus && candidate.stockSteps > best.stockSteps)) best = candidate;
     }
   }
-
   return best;
 }
 
 function settleDream(room, playerId) {
   const player = getActivePlayer(room, playerId);
   if (!player) return false;
-
   const profession = PROFESSIONS[player.profession];
   const { dice, total } = rollDice(room.game.round);
   const salaryIncome = Math.round(total * profession.salary * 3);
@@ -802,113 +630,46 @@ function settleDream(room, playerId) {
   const cashAfterSalary = player.cash + salaryIncome;
   const deficit = Math.max(0, fee - cashAfterSalary);
   const happinessGain = round2(total * profession.dream);
-
-  const event = {
-    type: 'dream',
-    playerId,
-    dice,
-    diceTotal: total,
-    salaryIncome,
-    fee,
-    happinessGain,
-  };
-
-  let liquidation = null;
-  if (deficit > 0) liquidation = findDreamLiquidation(player, room.game, deficit);
-
+  const event = { type: 'dream', playerId, dice, diceTotal: total, salaryIncome, fee, happinessGain };
+  const liquidation = deficit > 0 ? findDreamLiquidation(player, room.game, deficit) : null;
   if (deficit > 0 && !liquidation) {
     player.cash = cashAfterSalary;
     event.success = false;
-    event.text = `${player.name} 圓夢失敗：資金不足，保留30%薪資 +${salaryIncome}，股票與土地未出售`;
+    event.text = `${player.name} 圓夢失敗：資金不足，保留30%薪資 +${salaryIncome}`;
     room.game.lastEvent = event;
     advanceTurn(room);
     return true;
   }
-
-  const liquidationProceeds = liquidation?.proceeds || 0;
+  const proceeds = liquidation?.proceeds || 0;
   const soldStocks = liquidation?.stocks || 0;
   const soldLand = liquidation?.land || 0;
-  const nextState = {
-    cash: cashAfterSalary + liquidationProceeds - fee,
-    stocks: round2(Math.max(0, player.stocks - soldStocks)),
-    land: round2(Math.max(0, player.land - soldLand)),
-    happiness: round2(player.happiness + happinessGain),
-  };
-
-  player.cash = nextState.cash;
-  player.stocks = nextState.stocks;
-  player.land = nextState.land;
-  player.happiness = nextState.happiness;
-
+  player.cash = cashAfterSalary + proceeds - fee;
+  player.stocks = round2(Math.max(0, player.stocks - soldStocks));
+  player.land = round2(Math.max(0, player.land - soldLand));
+  player.happiness = round2(player.happiness + happinessGain);
   event.success = true;
-  event.liquidation = {
-    stocks: soldStocks,
-    land: soldLand,
-    proceeds: liquidationProceeds,
-    discount: 0.8,
-  };
-
-  if (liquidation) {
-    const soldParts = [];
-    if (soldStocks > 0) soldParts.push(`股票 ${soldStocks}`);
-    if (soldLand > 0) soldParts.push(`土地 ${soldLand}`);
-    event.text = `${player.name} 圓夢成功：30%薪資 +${salaryIncome}，8折變賣${soldParts.join('、')}得 ${liquidationProceeds}，支付 ${fee}，幸福 +${happinessGain}`;
-  } else {
-    event.text = `${player.name} 圓夢成功：30%薪資 +${salaryIncome}，支付 ${fee}，幸福 +${happinessGain}`;
-  }
-
+  event.liquidation = { stocks: soldStocks, land: soldLand, proceeds, discount: 0.8 };
+  event.text = `${player.name} 圓夢成功`;
   room.game.lastEvent = event;
   advanceTurn(room);
   return true;
 }
 
 function clearPlayerDisconnectTimer(player) {
-  if (player.disconnectTimer) {
-    clearTimeout(player.disconnectTimer);
-    player.disconnectTimer = null;
-  }
+  if (player.disconnectTimer) { clearTimeout(player.disconnectTimer); player.disconnectTimer = null; }
 }
 
 function removePlayerById(room, playerId) {
   const player = room.players.find((item) => item.id === playerId);
   if (!player) return;
-
   clearPlayerDisconnectTimer(player);
   const wasCurrentPlayer = room.game?.currentPlayerId === playerId;
   room.players = room.players.filter((item) => item.id !== playerId);
-
-  if (!room.players.length) {
-    clearTurnTimer(room);
-    clearIdleTimer(room);
-    rooms.delete(room.code);
-    return;
-  }
-
+  if (!room.players.length) { clearTurnTimer(room); clearIdleTimer(room); rooms.delete(room.code); return; }
   if (room.hostId === playerId) room.hostId = room.players[0].id;
-
-  if (room.phase === 'game' && room.game && wasCurrentPlayer) {
-    clearTurnTimer(room);
-    room.game.turnProcessed = true;
-    room.game.deadline = null;
-    room.game.showcaseUntil = null;
-    room.game.turnIndex += 1;
-    beginTurn(room);
-    return;
-  }
-
-  if (room.phase === 'profession') {
-    const allReady = room.players.length >= 2
-      && room.players.every((item) => Boolean(item.profession));
-    if (allReady) {
-      initializeGame(room);
-      return;
-    }
-  }
-
-  if (room.phase === 'finished' && room.game) {
-    room.game.results = calculateResults(room);
-  }
-
+  if (room.phase === 'game' && room.game && wasCurrentPlayer) { clearTurnTimer(room); room.game.turnProcessed = true; room.game.deadline = null; room.game.showcaseUntil = null; room.game.turnIndex += 1; beginTurn(room); return; }
+  if (room.phase === 'profession' && room.players.length >= 2 && room.players.every((item) => Boolean(item.profession))) { initializeGame(room); return; }
+  if (room.phase === 'finished' && room.game) room.game.results = calculateResults(room);
   emitRoom(room);
 }
 
@@ -916,26 +677,14 @@ function leaveCurrentRoom(socket, explicit = true) {
   const roomCode = socket.data.roomCode;
   const playerId = socket.data.playerId;
   if (!roomCode || !playerId) return;
-
   const room = rooms.get(roomCode);
   socket.leave(roomCode);
-  delete socket.data.roomCode;
-  delete socket.data.playerId;
-
+  delete socket.data.roomCode; delete socket.data.playerId;
   if (!room) return;
-
-  if (explicit) {
-    removePlayerById(room, playerId);
-    return;
-  }
-
+  if (explicit) { removePlayerById(room, playerId); return; }
   const player = room.players.find((item) => item.id === playerId);
   if (!player || player.socketId !== socket.id) return;
-
-  player.connected = false;
-  player.socketId = null;
-  clearPlayerDisconnectTimer(player);
-
+  player.connected = false; player.socketId = null; clearPlayerDisconnectTimer(player);
   if (room.phase === 'lobby' || room.phase === 'profession') {
     player.disconnectTimer = setTimeout(() => {
       const currentRoom = rooms.get(room.code);
@@ -944,350 +693,106 @@ function leaveCurrentRoom(socket, explicit = true) {
       removePlayerById(currentRoom, playerId);
     }, DISCONNECT_GRACE_MS);
   }
-
-  scheduleRoomIdleCleanup(room);
-  emitRoom(room);
+  scheduleRoomIdleCleanup(room); emitRoom(room);
 }
 
 function findJoinableRoom(name) {
   for (const room of rooms.values()) {
-    if (room.started) continue;
-    if (room.players.length >= 6) continue;
-
-    const duplicateName = room.players.some(
-      (player) => player.name.toLowerCase() === name.toLowerCase()
-    );
-
-    if (!duplicateName) return room;
+    if (room.started || room.players.length >= 6) continue;
+    if (!room.players.some((player) => player.name.toLowerCase() === name.toLowerCase())) return room;
   }
-
   return null;
 }
 
 function createPlayer(socket, name) {
-  return {
-    id: crypto.randomUUID(),
-    reconnectToken: createReconnectToken(),
-    socketId: socket.id,
-    connected: true,
-    disconnectTimer: null,
-    name,
-    profession: null,
-    cash: 0,
-    stocks: 0,
-    land: 0,
-    happiness: 0,
-    helpCount: 0,
-    sabotageCount: 0,
-  };
+  return { id: crypto.randomUUID(), reconnectToken: createReconnectToken(), socketId: socket.id, connected: true, disconnectTimer: null, name, profession: null, cash: 0, stocks: 0, land: 0, happiness: 0, helpCount: 0, sabotageCount: 0 };
 }
 
 function attachPlayerSocket(room, player, socket) {
-  clearIdleTimer(room);
-  clearPlayerDisconnectTimer(player);
-
+  clearIdleTimer(room); clearPlayerDisconnectTimer(player);
   if (player.socketId && player.socketId !== socket.id) {
     const oldSocket = io.sockets.sockets.get(player.socketId);
-    if (oldSocket) {
-      oldSocket.leave(room.code);
-      delete oldSocket.data.roomCode;
-      delete oldSocket.data.playerId;
-    }
+    if (oldSocket) { oldSocket.leave(room.code); delete oldSocket.data.roomCode; delete oldSocket.data.playerId; }
   }
-
-  player.socketId = socket.id;
-  player.connected = true;
-  socket.join(room.code);
-  socket.data.roomCode = room.code;
-  socket.data.playerId = player.id;
+  player.socketId = socket.id; player.connected = true; socket.join(room.code); socket.data.roomCode = room.code; socket.data.playerId = player.id;
 }
 
 function createRoomFor(socket, name) {
   const code = createRoomCode();
   const player = createPlayer(socket, name);
-  const room = {
-    code,
-    hostId: player.id,
-    players: [player],
-    started: false,
-    phase: 'lobby',
-    game: null,
-    turnTimer: null,
-    idleTimer: null,
-  };
-
-  rooms.set(code, room);
-  attachPlayerSocket(room, player, socket);
-  return { room, player };
+  const room = { code, hostId: player.id, players: [player], started: false, phase: 'lobby', game: null, turnTimer: null, idleTimer: null };
+  rooms.set(code, room); attachPlayerSocket(room, player, socket); return { room, player };
 }
 
-function sessionPayload(room, player) {
-  return {
-    roomCode: room.code,
-    playerId: player.id,
-    reconnectToken: player.reconnectToken,
-    name: player.name,
-  };
-}
+function sessionPayload(room, player) { return { roomCode: room.code, playerId: player.id, reconnectToken: player.reconnectToken, name: player.name }; }
 
 io.on('connection', (socket) => {
-  console.log(`Socket connected: ${socket.id}`);
-
-  socket.emit('server:ready', {
-    message: '《人生》伺服器連線成功',
-    socketId: socket.id,
-  });
-
+  socket.emit('server:ready', { message: '《人生》伺服器連線成功', socketId: socket.id });
   socket.on('room:resume', (payload, reply) => {
-    const roomCode = String(payload?.roomCode || '');
-    const playerId = String(payload?.playerId || '');
-    const reconnectToken = String(payload?.reconnectToken || '');
-    const room = rooms.get(roomCode);
-    const player = room?.players.find((item) => (
-      item.id === playerId && item.reconnectToken === reconnectToken
-    ));
-
-    if (!room || !player) {
-      return reply?.({ ok: false, message: '上一局已結束或無法恢復。' });
-    }
-
-    attachPlayerSocket(room, player, socket);
-    const snapshot = publicRoom(room);
-    reply?.({ ok: true, room: snapshot, session: sessionPayload(room, player) });
-    emitRoom(room);
+    const room = rooms.get(String(payload?.roomCode || ''));
+    const player = room?.players.find((item) => item.id === String(payload?.playerId || '') && item.reconnectToken === String(payload?.reconnectToken || ''));
+    if (!room || !player) return reply?.({ ok: false, message: '上一局已結束或無法恢復。' });
+    attachPlayerSocket(room, player, socket); const snapshot = publicRoom(room); reply?.({ ok: true, room: snapshot, session: sessionPayload(room, player) }); emitRoom(room);
   });
-
   socket.on('room:autoJoin', (payload, reply) => {
-    const name = cleanName(payload?.name);
-
-    if (!name) {
-      return reply?.({ ok: false, message: '請輸入暱稱' });
-    }
-
-    leaveCurrentRoom(socket, true);
-
-    let room = findJoinableRoom(name);
-    let player;
-
-    if (room) {
-      player = createPlayer(socket, name);
-      room.players.push(player);
-      attachPlayerSocket(room, player, socket);
-    } else {
-      ({ room, player } = createRoomFor(socket, name));
-    }
-
-    reply?.({
-      ok: true,
-      room: publicRoom(room),
-      session: sessionPayload(room, player),
-    });
-    emitRoom(room);
+    const name = cleanName(payload?.name); if (!name) return reply?.({ ok: false, message: '請輸入暱稱' }); leaveCurrentRoom(socket, true);
+    let room = findJoinableRoom(name); let player;
+    if (room) { player = createPlayer(socket, name); room.players.push(player); attachPlayerSocket(room, player, socket); } else ({ room, player } = createRoomFor(socket, name));
+    reply?.({ ok: true, room: publicRoom(room), session: sessionPayload(room, player) }); emitRoom(room);
   });
-
   socket.on('room:start', (reply) => {
-    const roomCode = socket.data.roomCode;
-    const playerId = socket.data.playerId;
-    const room = rooms.get(roomCode);
-
-    if (!room || !playerId) {
-      return reply?.({ ok: false, message: '目前不在房間內。' });
-    }
-
-    if (room.hostId !== playerId) {
-      return reply?.({ ok: false, message: '只有房主可以啟程。' });
-    }
-
-    if (room.started) {
-      return reply?.({ ok: true, room: publicRoom(room) });
-    }
-
-    if (room.players.length < 2) {
-      return reply?.({ ok: false, message: '至少需要2位玩家才能啟程。' });
-    }
-
-    room.started = true;
-    room.phase = 'profession';
-    room.players.forEach((player) => {
-      player.profession = null;
-    });
-
-    const snapshot = publicRoom(room);
-    reply?.({ ok: true, room: snapshot });
-    io.to(room.code).emit('room:started', snapshot);
+    const room = rooms.get(socket.data.roomCode); const playerId = socket.data.playerId;
+    if (!room || !playerId) return reply?.({ ok: false, message: '目前不在房間內。' });
+    if (room.hostId !== playerId) return reply?.({ ok: false, message: '只有房主可以啟程。' });
+    if (room.started) return reply?.({ ok: true, room: publicRoom(room) });
+    if (room.players.length < 2) return reply?.({ ok: false, message: '至少需要2位玩家才能啟程。' });
+    room.started = true; room.phase = 'profession'; room.players.forEach((player) => { player.profession = null; });
+    const snapshot = publicRoom(room); reply?.({ ok: true, room: snapshot }); io.to(room.code).emit('room:started', snapshot);
   });
-
   socket.on('room:chooseProfession', (payload, reply) => {
-    const roomCode = socket.data.roomCode;
-    const playerId = socket.data.playerId;
-    const room = rooms.get(roomCode);
-    const professionId = String(payload?.profession || '');
-
-    if (!room || !playerId || room.phase !== 'profession') {
-      return reply?.({ ok: false, message: '目前還不能選擇職業。' });
-    }
-
-    if (!PROFESSIONS[professionId]) {
-      return reply?.({ ok: false, message: '這個職業不存在。' });
-    }
-
-    const player = room.players.find((item) => item.id === playerId);
-    if (!player) {
-      return reply?.({ ok: false, message: '找不到玩家資料。' });
-    }
-
-    const occupied = room.players.some(
-      (item) => item.id !== playerId && item.profession === professionId
-    );
-
-    if (occupied) {
-      return reply?.({ ok: false, message: '這個職業已被其他玩家選走。' });
-    }
-
+    const room = rooms.get(socket.data.roomCode); const playerId = socket.data.playerId; const professionId = String(payload?.profession || '');
+    if (!room || !playerId || room.phase !== 'profession') return reply?.({ ok: false, message: '目前還不能選擇職業。' });
+    if (!PROFESSIONS[professionId]) return reply?.({ ok: false, message: '這個職業不存在。' });
+    const player = room.players.find((item) => item.id === playerId); if (!player) return reply?.({ ok: false, message: '找不到玩家資料。' });
+    if (room.players.some((item) => item.id !== playerId && item.profession === professionId)) return reply?.({ ok: false, message: '這個職業已被其他玩家選走。' });
     player.profession = professionId;
-
-    const allReady = room.players.length >= 2
-      && room.players.every((item) => Boolean(item.profession));
-
-    if (allReady) initializeGame(room);
-
-    const snapshot = publicRoom(room);
-    reply?.({ ok: true, room: snapshot });
-    emitRoom(room);
+    if (room.players.length >= 2 && room.players.every((item) => Boolean(item.profession))) initializeGame(room);
+    const snapshot = publicRoom(room); reply?.({ ok: true, room: snapshot }); emitRoom(room);
   });
-
   socket.on('game:action', (payload, reply) => {
-    const roomCode = socket.data.roomCode;
-    const playerId = socket.data.playerId;
-    const room = rooms.get(roomCode);
-    const action = String(payload?.action || '');
-    const turnId = String(payload?.turnId || '');
-
-    if (!room || !playerId || room.phase !== 'game' || !room.game || room.game.finished) {
-      return reply?.({ ok: false, message: '目前不在遊戲回合中。' });
-    }
-
-    if (room.game.currentPlayerId !== playerId) {
-      return reply?.({ ok: false, message: '還沒輪到你。' });
-    }
-
-    if (room.game.turnId !== turnId) {
-      return reply?.({ ok: false, message: '這個回合已經結束。' });
-    }
-
-    if (room.game.turnProcessed) {
-      return reply?.({ ok: false, message: '這個回合已經結算。' });
-    }
-
-    if (Date.now() >= room.game.deadline) {
-      if (claimTurn(room, playerId, turnId)) settleSalary(room, playerId, true);
-      return reply?.({ ok: false, message: '本回合時間已到，已自動領薪。' });
-    }
-
-    const availableActions = new Set([
-      'salary',
-      'buyStock',
-      'buyLand',
-      'fate',
-      'sabotage',
-      'help',
-      'sellStock',
-      'sellLand',
-      'dream',
-    ]);
-
-    if (!availableActions.has(action)) {
-      return reply?.({ ok: false, message: '這個行動尚未開放。' });
-    }
-
-    if (action === 'sabotage' && room.players.length < 2) {
-      return reply?.({ ok: false, message: '目前沒有可以陷害的玩家。' });
-    }
-
-    if (action === 'help' && getHelpCandidates(room, playerId).length === 0) {
-      return reply?.({ ok: false, message: '目前沒有可以援助的玩家。' });
-    }
-
-    if (!claimTurn(room, playerId, turnId)) {
-      return reply?.({ ok: false, message: '這個回合已經結算。' });
-    }
-
+    const room = rooms.get(socket.data.roomCode); const playerId = socket.data.playerId; const action = String(payload?.action || ''); const turnId = String(payload?.turnId || '');
+    if (!room || !playerId || room.phase !== 'game' || !room.game || room.game.finished) return reply?.({ ok: false, message: '目前不在遊戲回合中。' });
+    if (room.game.currentPlayerId !== playerId) return reply?.({ ok: false, message: '還沒輪到你。' });
+    if (room.game.turnId !== turnId || room.game.turnProcessed) return reply?.({ ok: false, message: '這個回合已經結算。' });
+    if (Date.now() >= room.game.deadline) { if (claimTurn(room, playerId, turnId)) settleSalary(room, playerId, true); return reply?.({ ok: false, message: '本回合時間已到，已自動領薪。' }); }
+    const availableActions = new Set(['salary','buyStock','buyLand','fate','sabotage','help','sellStock','sellLand','dream']);
+    if (!availableActions.has(action)) return reply?.({ ok: false, message: '這個行動尚未開放。' });
+    if (action === 'sabotage' && room.players.length < 2) return reply?.({ ok: false, message: '目前沒有可以陷害的玩家。' });
+    if (action === 'help' && getHelpCandidates(room, playerId).length === 0) return reply?.({ ok: false, message: '目前沒有可以援助的玩家。' });
+    if (!claimTurn(room, playerId, turnId)) return reply?.({ ok: false, message: '這個回合已經結算。' });
     let settled = false;
-    if (action === 'salary') {
-      settled = settleSalary(room, playerId, false);
-    } else if (['buyStock', 'buyLand', 'sellStock', 'sellLand'].includes(action)) {
-      settled = settleMarketAction(room, playerId, action);
-    } else if (action === 'fate') {
-      settled = settleFate(room, playerId);
-    } else if (action === 'sabotage') {
-      settled = settleSabotage(room, playerId);
-    } else if (action === 'help') {
-      settled = settleHelp(room, playerId);
-    } else if (action === 'dream') {
-      settled = settleDream(room, playerId);
-    }
-
-    if (!settled) {
-      room.game.turnProcessed = false;
-      return reply?.({ ok: false, message: '目前無法完成這個行動。' });
-    }
-
+    if (action === 'salary') settled = settleSalary(room, playerId, false);
+    else if (['buyStock','buyLand','sellStock','sellLand'].includes(action)) settled = settleMarketAction(room, playerId, action);
+    else if (action === 'fate') settled = settleFate(room, playerId);
+    else if (action === 'sabotage') settled = settleSabotage(room, playerId);
+    else if (action === 'help') settled = settleHelp(room, playerId);
+    else if (action === 'dream') settled = settleDream(room, playerId);
+    if (!settled) { room.game.turnProcessed = false; return reply?.({ ok: false, message: '目前無法完成這個行動。' }); }
     reply?.({ ok: true, room: publicRoom(room) });
   });
-
   socket.on('game:restart', (reply) => {
-    const roomCode = socket.data.roomCode;
-    const playerId = socket.data.playerId;
-    const room = rooms.get(roomCode);
-
-    if (!room || !playerId || room.phase !== 'finished') {
-      return reply?.({ ok: false, message: '目前無法重新開始。' });
-    }
-
-    if (room.hostId !== playerId) {
-      return reply?.({ ok: false, message: '只有房主可以開啟下一局。' });
-    }
-
-    room.players = room.players.filter((player) => player.connected);
-    if (room.players.length < 2) {
-      return reply?.({ ok: false, message: '至少需要2位在線玩家才能再來一局。' });
-    }
-
-    if (!room.players.some((player) => player.id === room.hostId)) {
-      room.hostId = room.players[0].id;
-    }
-
-    clearTurnTimer(room);
-    room.started = true;
-    room.phase = 'profession';
-    room.game = null;
-    room.players.forEach((player) => {
-      player.profession = null;
-      player.cash = 0;
-      player.stocks = 0;
-      player.land = 0;
-      player.happiness = 0;
-      player.helpCount = 0;
-      player.sabotageCount = 0;
-    });
-
-    const snapshot = publicRoom(room);
-    reply?.({ ok: true, room: snapshot });
-    io.to(room.code).emit('room:started', snapshot);
+    const room = rooms.get(socket.data.roomCode); const playerId = socket.data.playerId;
+    if (!room || !playerId || room.phase !== 'finished') return reply?.({ ok: false, message: '目前無法重新開始。' });
+    if (room.hostId !== playerId) return reply?.({ ok: false, message: '只有房主可以開啟下一局。' });
+    room.players = room.players.filter((player) => player.connected); if (room.players.length < 2) return reply?.({ ok: false, message: '至少需要2位在線玩家才能再來一局。' });
+    if (!room.players.some((player) => player.id === room.hostId)) room.hostId = room.players[0].id;
+    clearTurnTimer(room); room.started = true; room.phase = 'profession'; room.game = null;
+    room.players.forEach((player) => { player.profession = null; player.cash = 0; player.stocks = 0; player.land = 0; player.happiness = 0; player.helpCount = 0; player.sabotageCount = 0; });
+    const snapshot = publicRoom(room); reply?.({ ok: true, room: snapshot }); io.to(room.code).emit('room:started', snapshot);
   });
-
-  socket.on('room:leave', (reply) => {
-    leaveCurrentRoom(socket, true);
-    reply?.({ ok: true });
-  });
-
-  socket.on('disconnect', () => {
-    console.log(`Socket disconnected: ${socket.id}`);
-    leaveCurrentRoom(socket, false);
-  });
+  socket.on('room:leave', (reply) => { leaveCurrentRoom(socket, true); reply?.({ ok: true }); });
+  socket.on('disconnect', () => leaveCurrentRoom(socket, false));
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Life Game server listening on port ${PORT}`);
-});
+server.listen(PORT, '0.0.0.0', () => console.log(`Life Game server listening on port ${PORT}`));
