@@ -30,106 +30,93 @@
   pointer-events: none;
 }
 
-/*
-  依實際手機截圖重新量測 select.png 的 6 個框：
-  - 左右框幾乎貼近底圖兩側，不能再用原本 7.5% 的大留白。
-  - 三排之間的實際間距很小，不能使用原本 3.2% 的 row-gap。
-  所有值仍然是底圖百分比，所以手機 / 平板 / 桌機會一起等比例縮放。
-*/
 .profession-grid {
   position: absolute;
   left: 1.9%;
   top: 16.6%;
-  width: 94.0%;
+  width: 94%;
   height: 69.5%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(3, minmax(0, 1fr));
   column-gap: .8%;
-  row-gap: 1.0%;
+  row-gap: 1%;
   margin: 0;
   padding: 0;
 }
 
-.profession-card {
+/* 卡片本身完全透明：不再疊第二層灰色／金色外框。 */
+.profession-card,
+.profession-card:hover:not(:disabled),
+.profession-card.selected,
+.profession-card:focus,
+.profession-card:focus-visible {
   position: relative;
   display: grid;
-  grid-template-columns: 48% 52%;
+  grid-template-columns: 47% 53%;
   align-items: center;
-  gap: 1.5%;
+  gap: 0;
   width: 100%;
   height: 100%;
   min-width: 0;
   min-height: 0;
   margin: 0;
-  padding: 3.2% 7%;
-  border: 0;
-  border-radius: 9%;
-  background: transparent;
-  box-shadow: none;
+  padding: 2.4% 4.6%;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
   color: #514c48;
   overflow: hidden;
   text-align: center;
+  transform: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
-.profession-card:hover:not(:disabled) {
-  background: rgba(255, 255, 255, .06);
-  transform: none;
-}
-
-.profession-card:focus-visible {
-  outline: 3px solid rgba(255, 255, 255, .88);
-  outline-offset: -7px;
-}
-
-/* 自己選到：外框直接貼著底圖職業框，不再出現窄長錯位框。 */
-.profession-card.selected {
-  opacity: 1;
-  filter: none;
-  border: 0;
-  background: rgba(255, 248, 221, .08);
-  box-shadow: inset 0 0 0 clamp(2px, .28vw, 4px) rgba(195, 160, 91, .9);
-}
-
-/* 別人已選：只反灰人物與能力內容，底圖本身不移位。 */
+/* 別人已選：只反灰內容，不畫外框。 */
 .profession-card.taken,
 .profession-card.taken:disabled {
   opacity: .28;
   filter: grayscale(.86);
-  border: 0;
-  background: transparent;
-  box-shadow: none;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .profession-visual {
   display: flex;
   min-width: 0;
-  height: 92%;
+  height: 100%;
   align-items: center;
   justify-content: center;
   padding: 0;
   background: transparent;
+  overflow: visible;
 }
 
+/* 六職業圖片放大，但仍以各自底圖框為界。 */
 .profession-image {
   display: block;
-  width: 100%;
+  width: 108%;
   max-width: none;
-  height: 100%;
+  height: 108%;
   max-height: none;
   aspect-ratio: auto;
   object-fit: contain;
   border: 0;
   border-radius: 0;
   background: transparent;
+  transform: scale(1.12);
+  transform-origin: center;
 }
 
 .profession-detail {
   display: flex;
   min-width: 0;
-  height: 92%;
+  height: 96%;
   align-items: center;
   justify-content: center;
 }
@@ -137,49 +124,53 @@
 .profession-abilities {
   display: grid;
   width: 100%;
-  gap: 3.2%;
+  gap: 3.4%;
   align-content: center;
 }
 
+/* 能力列仍保留柔和小框，但文字與評級只隔半個字寬。 */
 .ability-item {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(22px, 3.4vw, 36px);
+  display: flex;
   align-items: center;
-  gap: 5%;
+  justify-content: center;
+  gap: .5em;
   width: 100%;
   min-width: 0;
   min-height: 0;
-  padding: 3.4% 5%;
-  border: 1px solid rgba(134, 115, 91, .18);
+  padding: 3.2% 3.8%;
+  border: 1px solid rgba(134, 115, 91, .15);
   border-radius: 10px;
-  background: rgba(255, 250, 241, .70);
+  background: rgba(255, 250, 241, .72);
   color: #695f55;
-  font-size: clamp(10px, 1.65vw, 17px);
+  font-size: clamp(13px, 2vw, 20px);
+  font-weight: 700;
   line-height: 1;
-  text-align: left;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .ability-label {
+  flex: 0 0 auto;
   min-width: 0;
-  letter-spacing: .03em;
+  letter-spacing: .01em;
   white-space: nowrap;
 }
 
 .ability-grade {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: clamp(22px, 3.4vw, 36px);
-  height: clamp(20px, 2.9vw, 30px);
-  justify-self: end;
+  width: clamp(25px, 3.8vw, 40px);
+  height: clamp(23px, 3.25vw, 34px);
+  margin: 0;
   border-radius: 8px;
   color: #fffaf6;
-  font-size: clamp(11px, 1.8vw, 18px);
-  font-weight: 700;
+  font-size: clamp(14px, 2.1vw, 21px);
+  font-weight: 800;
   line-height: 1;
 }
 
-/* 職業底圖模式：select.png 本身就是整個職業選擇介面。 */
 .card.profession-mode {
   width: min(920px, 100%);
   padding: 0;
@@ -196,12 +187,31 @@
     align-items: start;
   }
 
-  .profession-card {
-    padding: 3% 6.5%;
+  .profession-card,
+  .profession-card:hover:not(:disabled),
+  .profession-card.selected,
+  .profession-card:focus,
+  .profession-card:focus-visible {
+    padding: 2.2% 4.1%;
+  }
+
+  .profession-image {
+    width: 112%;
+    height: 112%;
+    transform: scale(1.14);
   }
 
   .ability-item {
+    gap: .5em;
+    padding: 3% 3.2%;
     border-radius: 7px;
+    font-size: clamp(12px, 3.2vw, 17px);
+  }
+
+  .ability-grade {
+    width: clamp(23px, 5.4vw, 32px);
+    height: clamp(21px, 4.8vw, 29px);
+    font-size: clamp(13px, 3.3vw, 18px);
   }
 }
 
@@ -215,25 +225,36 @@
     width: 100%;
   }
 
-  .profession-card {
-    padding: 3% 6.5%;
+  .profession-card,
+  .profession-card:hover:not(:disabled),
+  .profession-card.selected,
+  .profession-card:focus,
+  .profession-card:focus-visible {
+    grid-template-columns: 47% 53%;
+    padding: 2% 3.8%;
   }
 
-  .profession-card:focus-visible {
-    outline-width: 2px;
-    outline-offset: -5px;
+  .profession-image {
+    width: 116%;
+    height: 116%;
+    transform: scale(1.16);
+  }
+
+  .profession-abilities {
+    gap: 3%;
   }
 
   .ability-item {
-    padding: 3% 4%;
+    gap: .48em;
+    padding: 2.8% 2.6%;
     border-radius: 6px;
-    font-size: clamp(8px, 2.55vw, 11px);
+    font-size: clamp(11px, 3.45vw, 15px);
   }
 
   .ability-grade {
-    width: clamp(18px, 5.3vw, 24px);
-    height: clamp(17px, 4.7vw, 22px);
+    width: clamp(21px, 5.8vw, 27px);
+    height: clamp(20px, 5.2vw, 25px);
     border-radius: 6px;
-    font-size: clamp(9px, 2.8vw, 12px);
+    font-size: clamp(12px, 3.6vw, 16px);
   }
 }
