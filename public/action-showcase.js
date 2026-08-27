@@ -78,6 +78,16 @@
     bodyEl.querySelector('.action-showcase-result').textContent = event.text || '行動完成';
   }
 
+  function restoreCurrentTurnIfReady() {
+    if (
+      typeof currentRoom !== 'undefined'
+      && currentRoom?.game?.deadline
+      && typeof renderGame === 'function'
+    ) {
+      renderGame(currentRoom);
+    }
+  }
+
   function playShowcase(room) {
     const game = room?.game;
     const event = game?.lastEvent;
@@ -116,6 +126,7 @@
         clearInterval(lockTimer);
         lockTimer = null;
       }
+      restoreCurrentTurnIfReady();
     }, STAGE_MS * 3));
   }
 
