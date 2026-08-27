@@ -30,11 +30,12 @@
   pointer-events: none;
 }
 
+/* 依手機實測畫面再往右微調；仍完全以 select.png 百分比座標定位。 */
 .profession-grid {
   position: absolute;
-  left: 1.9%;
+  left: 3.1%;
   top: 16.6%;
-  width: 94%;
+  width: 92.8%;
   height: 69.5%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -45,7 +46,7 @@
   padding: 0;
 }
 
-/* 卡片本身完全透明：不再疊第二層灰色／金色外框。 */
+/* 卡片本身完全透明：底圖原框就是唯一可見框線。 */
 .profession-card,
 .profession-card:hover:not(:disabled),
 .profession-card.selected,
@@ -61,7 +62,7 @@
   min-width: 0;
   min-height: 0;
   margin: 0;
-  padding: 2.4% 4.6%;
+  padding: 2.4% 4.2%;
   border: 0 !important;
   outline: 0 !important;
   border-radius: 0;
@@ -97,19 +98,19 @@
   overflow: visible;
 }
 
-/* 六職業圖片放大，但仍以各自底圖框為界。 */
+/* 六職業圖片維持放大顯示。 */
 .profession-image {
   display: block;
-  width: 108%;
+  width: 112%;
   max-width: none;
-  height: 108%;
+  height: 112%;
   max-height: none;
   aspect-ratio: auto;
   object-fit: contain;
   border: 0;
   border-radius: 0;
   background: transparent;
-  transform: scale(1.12);
+  transform: scale(1.13);
   transform-origin: center;
 }
 
@@ -124,29 +125,38 @@
 .profession-abilities {
   display: grid;
   width: 100%;
-  gap: 3.4%;
+  gap: 4.5%;
   align-content: center;
+  justify-items: start;
 }
 
-/* 能力列仍保留柔和小框，但文字與評級只隔半個字寬。 */
+/* 移除整列米白膠囊，只保留文字＋評級色塊。 */
 .ability-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: .5em;
-  width: 100%;
+  width: auto;
   min-width: 0;
   min-height: 0;
-  padding: 3.2% 3.8%;
-  border: 1px solid rgba(134, 115, 91, .15);
-  border-radius: 10px;
-  background: rgba(255, 250, 241, .72);
+  margin: 0;
+  padding: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   color: #695f55;
-  font-size: clamp(13px, 2vw, 20px);
-  font-weight: 700;
+  font-size: clamp(14px, 2.05vw, 21px);
+  font-weight: 800;
   line-height: 1;
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
+}
+
+.ability-item::before,
+.ability-item::after {
+  display: none !important;
+  content: none !important;
 }
 
 .ability-label {
@@ -187,25 +197,28 @@
     align-items: start;
   }
 
+  .profession-grid {
+    left: 3.2%;
+    width: 92.7%;
+  }
+
   .profession-card,
   .profession-card:hover:not(:disabled),
   .profession-card.selected,
   .profession-card:focus,
   .profession-card:focus-visible {
-    padding: 2.2% 4.1%;
+    padding: 2.2% 3.8%;
   }
 
   .profession-image {
-    width: 112%;
-    height: 112%;
-    transform: scale(1.14);
+    width: 116%;
+    height: 116%;
+    transform: scale(1.15);
   }
 
   .ability-item {
     gap: .5em;
-    padding: 3% 3.2%;
-    border-radius: 7px;
-    font-size: clamp(12px, 3.2vw, 17px);
+    font-size: clamp(13px, 3.35vw, 18px);
   }
 
   .ability-grade {
@@ -225,30 +238,33 @@
     width: 100%;
   }
 
+  .profession-grid {
+    left: 3.3%;
+    width: 92.6%;
+  }
+
   .profession-card,
   .profession-card:hover:not(:disabled),
   .profession-card.selected,
   .profession-card:focus,
   .profession-card:focus-visible {
     grid-template-columns: 47% 53%;
-    padding: 2% 3.8%;
+    padding: 2% 3.5%;
   }
 
   .profession-image {
-    width: 116%;
-    height: 116%;
+    width: 120%;
+    height: 120%;
     transform: scale(1.16);
   }
 
   .profession-abilities {
-    gap: 3%;
+    gap: 4.6%;
   }
 
   .ability-item {
     gap: .48em;
-    padding: 2.8% 2.6%;
-    border-radius: 6px;
-    font-size: clamp(11px, 3.45vw, 15px);
+    font-size: clamp(12px, 3.65vw, 16px);
   }
 
   .ability-grade {
