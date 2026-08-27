@@ -157,7 +157,6 @@
       const nameBlock = document.createElement('div');
       nameBlock.className = 'player-status-name-block';
       nameBlock.append(
-        makeText('player-status-profession', PROFESSION_NAMES[professionId] || '未選職業'),
         makeText('player-status-name', player.connected ? player.name : `${player.name}（離線）`)
       );
 
