@@ -1,4 +1,4 @@
-/* 首頁專用：front page.png + 嵌入式暱稱/開始按鈕 */
+/* 首頁專用：front page.png 本身就是可操作介面 */
 .home-stage {
   position: relative;
   display: none;
@@ -13,14 +13,14 @@
 .front-page-image {
   display: block;
   width: 100%;
-  height: auto;
   max-width: 100%;
+  height: auto;
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
 }
 
-/* 首頁讓圖片本身成為整個主畫面 */
+/* 首頁只呈現完整圖片，不另外加卡片底色或邊框。 */
 .card.home-mode {
   width: min(920px, 100%);
   padding: 0;
@@ -31,75 +31,117 @@
   overflow: visible;
 }
 
+/* entryPanel 覆蓋整張圖片；真正可操作的是裡面的輸入區與圖片按鈕區。 */
 .home-entry-panel {
   position: absolute;
-  left: 50%;
-  bottom: 7.5%;
+  inset: 0;
   z-index: 3;
-  width: clamp(220px, 42%, 360px);
-  margin: 0 !important;
-  transform: translateX(-50%);
-}
-
-.home-entry-panel .entry-control {
   width: 100%;
-  margin-left: 0;
-  margin-right: 0;
+  height: 100%;
+  margin: 0 !important;
+  pointer-events: none;
 }
 
+/* 對齊圖片上方米白色空白框。 */
 .home-entry-panel .field.entry-control {
-  margin-bottom: clamp(8px, 1.2vw, 12px);
+  position: absolute;
+  left: 25%;
+  top: 32.1%;
+  width: 50%;
+  height: 12.5%;
+  margin: 0;
+  pointer-events: auto;
 }
 
 .home-entry-panel input {
-  min-height: clamp(48px, 5.3vw, 58px);
-  padding: 10px 16px;
-  border: 1.5px solid rgba(120, 111, 103, .35);
-  border-radius: 999px;
-  background: rgba(255, 252, 247, .91);
-  box-shadow: 0 4px 12px rgba(74, 66, 60, .09);
-  color: #514c48;
-  font-size: clamp(16px, 2vw, 20px);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0 8%;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #69503e;
+  font-size: clamp(17px, 3.3vw, 30px);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-align: center;
+  caret-color: #76553d;
+}
+
+.home-entry-panel input::placeholder {
+  color: rgba(105, 80, 62, .58);
+  opacity: 1;
+  text-align: center;
 }
 
 .home-entry-panel input:focus {
-  border-color: rgba(127, 143, 131, .8);
-  box-shadow: 0 0 0 4px rgba(127, 143, 131, .15), 0 4px 12px rgba(74, 66, 60, .08);
+  border: 0;
+  outline: 0;
+  background: rgba(255, 255, 255, .08);
+  box-shadow: none;
 }
 
+/*
+  對齊圖片內原本的橘色「迎向新局」。
+  HTML button 本身完全透明，只把圖片上的按鈕變成真正可點擊區域。
+*/
 .home-entry-panel #joinGameBtn {
-  min-height: clamp(48px, 5.3vw, 58px);
-  padding: 10px 16px;
-  border-radius: 999px;
-  background: rgba(127, 143, 131, .94);
-  box-shadow: 0 6px 15px rgba(83, 97, 86, .18);
-  color: #fffaf6;
-  font-size: clamp(16px, 2vw, 20px);
-  font-weight: 700;
-  letter-spacing: .08em;
-}
-
-.home-entry-panel #joinGameBtn:hover:not(:disabled) {
-  background: rgba(115, 131, 121, .98);
-}
-
-.home-entry-panel .message {
   position: absolute;
-  left: 50%;
-  top: calc(100% + 6px);
-  width: min(90vw, 420px);
+  left: 25.4%;
+  top: 47.1%;
+  width: 50.5%;
+  height: 17.6%;
   min-height: 0;
   margin: 0;
-  transform: translateX(-50%);
-  color: #655e58;
-  font-size: clamp(12px, 1.6vw, 15px);
-  text-shadow: 0 1px 2px rgba(255, 255, 255, .75);
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  font-size: 0;
+  line-height: 0;
+  opacity: 1 !important;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.home-entry-panel #joinGameBtn:hover:not(:disabled),
+.home-entry-panel #joinGameBtn:active:not(:disabled) {
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none;
+}
+
+.home-entry-panel #joinGameBtn:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, .82);
+  outline-offset: -5px;
+}
+
+/* 錯誤訊息放在輸入框與圖片按鈕之間，不另做卡片。 */
+.home-entry-panel .message {
+  position: absolute;
+  left: 27%;
+  top: 44.3%;
+  width: 46%;
+  min-height: 0;
+  margin: 0;
+  color: #72594a;
+  font-size: clamp(11px, 1.7vw, 15px);
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, .9);
+  pointer-events: none;
 }
 
 .home-entry-panel .message.error {
-  color: #925f5b;
+  color: #a34f45;
 }
 
 @media (max-width: 760px) {
@@ -112,9 +154,8 @@
     margin-top: 0;
   }
 
-  .home-entry-panel {
-    bottom: 6.5%;
-    width: clamp(210px, 54%, 330px);
+  .home-entry-panel input {
+    font-size: clamp(17px, 4.2vw, 24px);
   }
 }
 
@@ -128,14 +169,12 @@
     width: 100%;
   }
 
-  .home-entry-panel {
-    bottom: 5.5%;
-    width: min(72%, 290px);
+  .home-entry-panel input {
+    font-size: clamp(16px, 4.8vw, 21px);
   }
 
-  .home-entry-panel input,
-  .home-entry-panel #joinGameBtn {
-    min-height: 46px;
-    font-size: 16px;
+  .home-entry-panel #joinGameBtn:focus-visible {
+    outline-width: 2px;
+    outline-offset: -3px;
   }
 }
