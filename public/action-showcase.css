@@ -108,18 +108,18 @@
 
 .dice-result-image {
   display: block;
-  width: min(300px, 62vw);
-  height: min(300px, 62vw);
+  width: min(255px, 54vw);
+  height: min(255px, 54vw);
   object-fit: contain;
   border: 0;
   background: transparent;
-  filter: drop-shadow(0 16px 24px rgba(52, 45, 40, .34));
+  filter: drop-shadow(0 19px 30px rgba(38, 31, 27, .58));
   transform: translateZ(0);
 }
 
 .dice-result-images.double-dice-total .dice-result-image {
-  width: min(330px, 68vw);
-  height: min(330px, 68vw);
+  width: min(282px, 60vw);
+  height: min(282px, 60vw);
 }
 
 /* 結果階段：人物頭像＋特殊事件圖＋極簡資產變動。 */
@@ -165,75 +165,107 @@
   filter: drop-shadow(0 8px 12px rgba(71, 62, 55, .18));
 }
 
-/* 命運／陷害／援助：人物頭像小，事件圖為視覺主角。 */
+/* 特殊結果的人物頭像恢復與一般結果同尺寸。 */
 .result-person-head-small {
-  width: 40px;
-  height: 40px;
+  width: 92px;
+  height: 92px;
 }
 
 .result-person-special {
-  min-width: 54px;
+  min-width: 92px;
 }
 
 .result-person-name {
-  max-width: 92px;
+  max-width: 110px;
   overflow: hidden;
   color: #5b514a;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 800;
   line-height: 1.05;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 命運：人物在上、事件大圖在下。 */
+.result-visual-special {
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 陷害／援助：兩位玩家並排在上方，事件大圖置中在下方。 */
+.result-visual-dual {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  justify-items: center;
+  align-items: start;
+  gap: 8px 24px;
+  width: 100%;
+}
+
+.result-visual-dual .result-person:first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.result-visual-dual .result-person:last-child {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.result-visual-dual .result-event-visual {
+  grid-column: 1 / -1;
+  grid-row: 2;
 }
 
 .result-event-visual {
   display: grid;
   justify-items: center;
-  gap: 5px;
-  min-width: 146px;
+  gap: 6px;
+  min-width: 180px;
 }
 
 .result-event-image {
   display: block;
-  width: 150px;
-  height: 150px;
+  width: 210px;
+  height: 210px;
   object-fit: contain;
   background: transparent;
   border: 0;
-  filter: drop-shadow(0 11px 18px rgba(71, 62, 55, .24));
+  filter: drop-shadow(0 12px 20px rgba(71, 62, 55, .26));
 }
 
 .result-event-label {
-  max-width: 160px;
+  max-width: 210px;
   overflow: hidden;
   color: #8b665d;
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 800;
   line-height: 1.05;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* 圓夢失敗：人物＋cry.png＋原因。 */
+/* 圓夢失敗：人物在上、cry.png 大圖在下。 */
 .result-visual-dream-fail {
-  gap: 22px;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .dream-fail-visual {
   display: grid;
   justify-items: center;
   gap: 5px;
-  max-width: 240px;
+  max-width: 280px;
 }
 
 .dream-fail-image {
   display: block;
-  width: 104px;
-  height: 104px;
+  width: 190px;
+  height: 190px;
   object-fit: contain;
   background: transparent;
   border: 0;
-  filter: drop-shadow(0 8px 14px rgba(71, 62, 55, .18));
+  filter: drop-shadow(0 10px 18px rgba(71, 62, 55, .20));
 }
 
 .dream-fail-label {
@@ -310,14 +342,14 @@
   }
 
   .dice-result-image {
-    width: min(280px, 74vw);
-    height: min(280px, 74vw);
-    filter: drop-shadow(0 14px 22px rgba(52, 45, 40, .36));
+    width: min(230px, 64vw);
+    height: min(230px, 64vw);
+    filter: drop-shadow(0 18px 28px rgba(38, 31, 27, .62));
   }
 
   .dice-result-images.double-dice-total .dice-result-image {
-    width: min(300px, 80vw);
-    height: min(300px, 80vw);
+    width: min(252px, 70vw);
+    height: min(252px, 70vw);
   }
 
   .action-showcase.result-stage-active .action-showcase-card {
@@ -336,49 +368,49 @@
   }
 
   .result-person {
-    min-width: 58px;
+    min-width: 76px;
   }
 
-  .result-person-head {
+  .result-person-head,
+  .result-person-head-small {
     width: 76px;
     height: 76px;
   }
 
-  .result-person-head-small {
-    width: 32px;
-    height: 32px;
+  .result-person-special {
+    min-width: 76px;
   }
 
-  .result-person-special {
-    min-width: 46px;
+  .result-visual-dual {
+    gap: 7px 16px;
   }
 
   .result-event-visual {
-    min-width: 118px;
+    min-width: 160px;
   }
 
   .result-event-image {
-    width: 120px;
-    height: 120px;
+    width: 174px;
+    height: 174px;
   }
 
   .result-person-name {
-    max-width: 72px;
-    font-size: 12px;
+    max-width: 88px;
+    font-size: 14px;
   }
 
   .result-event-label {
-    max-width: 130px;
-    font-size: 16px;
+    max-width: 178px;
+    font-size: 17px;
   }
 
   .result-visual-dream-fail {
-    gap: 14px;
+    gap: 8px;
   }
 
   .dream-fail-image {
-    width: 86px;
-    height: 86px;
+    width: 160px;
+    height: 160px;
   }
 
   .dream-fail-label {
