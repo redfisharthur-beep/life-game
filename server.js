@@ -694,7 +694,8 @@ function settleHelp(room, playerId) {
 
   const { dice, total } = rollDice(room.game.round);
   const effectIndex = Math.floor(Math.random() * 4);
-  const bonus = Math.round(60 * total);
+  const bonus = Math.round(40 * total);
+  const helperHappiness = round2(0.5 * total);
   let effectText = '';
 
   if (effectIndex === 0) {
@@ -716,6 +717,7 @@ function settleHelp(room, playerId) {
   }
 
   player.cash += bonus;
+  player.happiness = round2(player.happiness + helperHappiness);
   player.helpCount = (player.helpCount || 0) + 1;
 
   room.game.lastEvent = {
@@ -726,7 +728,8 @@ function settleHelp(room, playerId) {
     diceTotal: total,
     effectIndex,
     bonus,
-    text: `${player.name} 援助 ${target.name}：${effectText}；自己現金 +${bonus}`,
+    helperHappiness,
+    text: `${player.name} 援助 ${target.name}：${effectText}；自己現金 +${bonus}、幸福 +${helperHappiness}`,
   };
 
   advanceTurn(room);
