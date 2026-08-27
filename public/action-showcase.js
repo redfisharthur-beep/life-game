@@ -11,6 +11,36 @@
     dream: { label: '圓夢', image: '/images/dream.png' },
   };
 
+  const HEAD_IMAGES = {
+    doctor: '/images/doctorhead.png',
+    engineer: '/images/engineerhead.png',
+    sales: '/images/saleshead.png',
+    office: '/images/officehead.png',
+    athlete: '/images/athleteghead.png',
+    rich: '/images/richghead.png',
+  };
+
+  const FALLBACK_IMAGES = {
+    doctor: '/images/doctor.png',
+    engineer: '/images/engineer.png',
+    sales: '/images/sales.png',
+    office: '/images/office.png',
+    athlete: '/images/athlete.png',
+    rich: '/images/rich.png',
+  };
+
+  const FATE_RESULTS = [
+    { label: '中樂透', image: '/images/Lotto.png' },
+    { label: '花錢消災', image: '/images/Spendmoney.png' },
+    { label: '股神降臨', image: '/images/Investment%20Guru.png' },
+    { label: '黑天鵝', image: '/images/Black%20Swan.png' },
+    { label: '政策利多', image: '/images/Favorable%20policies.png' },
+    { label: '打房政策', image: '/images/measures%20to%20curb%20the%20property%20market.png' },
+    { label: '社福救濟', image: '/images/Social%20welfare.png' },
+    { label: '幸福降臨', image: '/images/Unbelievable.png' },
+    { label: '人生低潮', image: '/images/Unlucky.png' },
+  ];
+
   const CHOICE_MS = 2000;
   const DICE_MS = 2000;
   const RESULT_MS = 5000;
@@ -36,6 +66,15 @@
   const kickerEl = document.getElementById('actionShowcaseKicker');
   const titleEl = document.getElementById('actionShowcaseTitle');
   const bodyEl = document.getElementById('actionShowcaseBody');
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
 
   function clearStageTimers() {
     stageTimers.forEach((timer) => clearTimeout(timer));
@@ -67,6 +106,13 @@
 
   function setChoiceStageMode(enabled) {
     overlay.classList.toggle('choice-stage-active', Boolean(enabled));
+  }
+
+  function getPlayerHead(player) {
+    if (!player) return '/images/logo.png';
+    return HEAD_IMAGES[player.profession]
+      || FALLBACK_IMAGES[player.profession]
+      || '/images/logo.png';
   }
 
   function getSingleDieImage(value) {
@@ -142,82 +188,132 @@
     return makeEffect(match[1], value);
   }
 
-  function pushResult(rows, name, effects) {
+  function pushResult(rows, player, fallbackName, effects) {
     const cleanEffects = effects.filter(Boolean).filter((item) => !item.endsWith(' 0'));
     if (!cleanEffects.length) cleanEffects.push('無資產變動');
-    rows.push({ name, effects: cleanEffects });
+    rows.push({
+      player,
+      name: player?.name || fallbackName || '玩家',
+      effects: cleanEffects,
+    });
   }
 
-  function buildResultRows(room, event, playerName) {
+  function buildResultRows(room, event, actor) {
     const rows = [];
     const target = room.players.find((item) => item.id === event.targetId);
     const total = Number(event.diceTotal || 0);
+    const playerName = actor?.name || '玩家';
 
     if (event.type === 'salary') {
-      pushResult(rows, playerName, [makeEffect('現金', event.amount)]);
+      pushResult(rows, actor, playerName, [makeEffect('現金', event.amount)]);
     } else if (event.type === 'buyStock') {
       const cash = Number(event.salaryIncome || 0) - (event.success ? Number(event.cost || 0) : 0);
-      pushResult(rows, playerName, [
+      pushResult(rows, actor, playerName, [
         makeEffect('現金', cash),
         event.success ? makeEffect('股票', event.units) : null,
       ]);
     } else if (event.type === 'buyLand') {
       const cash = Number(event.salaryIncome || 0) - (event.success ? Number(event.cost || 0) : 0);
-      pushResult(rows, playerName, [
+      pushResult(rows, actor, playerName, [
         makeEffect('現金', cash),
         event.success ? makeEffect('土地', event.units) : null,
       ]);
     } else if (event.type === 'sellStock') {
-      pushResult(rows, playerName, [
+      pushResult(rows, actor, playerName, [
         makeEffect('現金', Number(event.salaryIncome || 0) + Number(event.proceeds || 0)),
         Number(event.units || 0) ? makeEffect('股票', -Number(event.units || 0)) : null,
       ]);
     } else if (event.type === 'sellLand') {
-      pushResult(rows, playerName, [
+      pushResult(rows, actor, playerName, [
         makeEffect('現金', Number(event.salaryIncome || 0) + Number(event.proceeds || 0)),
         Number(event.units || 0) ? makeEffect('土地', -Number(event.units || 0)) : null,
       ]);
     } else if (event.type === 'dream') {
       if (event.success) {
         const liquidation = event.liquidation || {};
-        pushResult(rows, playerName, [
+        pushResult(rows, actor, playerName, [
           makeEffect('現金', Number(event.salaryIncome || 0) + Number(liquidation.proceeds || 0) - Number(event.fee || 0)),
           Number(liquidation.stocks || 0) ? makeEffect('股票', -Number(liquidation.stocks || 0)) : null,
           Number(liquidation.land || 0) ? makeEffect('土地', -Number(liquidation.land || 0)) : null,
           makeEffect('幸福', event.happinessGain),
         ]);
       } else {
-        pushResult(rows, playerName, [makeEffect('現金', event.salaryIncome)]);
+        pushResult(rows, actor, playerName, [makeEffect('現金', event.salaryIncome)]);
       }
     } else if (event.type === 'sabotage') {
-      if (target) pushResult(rows, target.name, [firstSignedEffect(event.text)]);
-      pushResult(rows, playerName, [makeEffect('現金', event.bonus)]);
+      if (target) pushResult(rows, target, target.name, [firstSignedEffect(event.text)]);
+      pushResult(rows, actor, playerName, [makeEffect('現金', event.bonus)]);
     } else if (event.type === 'help') {
-      if (target) pushResult(rows, target.name, [firstSignedEffect(event.text)]);
-      pushResult(rows, playerName, [makeEffect('現金', event.bonus)]);
+      if (target) pushResult(rows, target, target.name, [firstSignedEffect(event.text)]);
+      pushResult(rows, actor, playerName, [makeEffect('現金', event.bonus)]);
     } else if (event.type === 'fate') {
       const fateIndex = Number(event.fateIndex);
       if (fateIndex === 0) {
-        pushResult(rows, playerName, [makeEffect('現金', 150 * total)]);
+        pushResult(rows, actor, playerName, [makeEffect('現金', 150 * total)]);
       } else if (fateIndex === 2) {
-        pushResult(rows, playerName, [makeEffect('股票', 5 * total)]);
+        pushResult(rows, actor, playerName, [makeEffect('股票', 5 * total)]);
       } else if (fateIndex === 4) {
-        pushResult(rows, playerName, [makeEffect('土地', 5 * total)]);
+        pushResult(rows, actor, playerName, [makeEffect('土地', 5 * total)]);
       } else if (fateIndex === 6) {
         const received = Number(String(event.text || '').match(/共支付\s*(\d+(?:\.\d+)?)/)?.[1] || 0);
-        pushResult(rows, playerName, [makeEffect('現金', received)]);
+        pushResult(rows, actor, playerName, [makeEffect('現金', received)]);
       } else if (fateIndex === 7) {
-        pushResult(rows, playerName, [makeEffect('幸福', total)]);
+        pushResult(rows, actor, playerName, [makeEffect('幸福', total)]);
       } else if (fateIndex === 8) {
-        pushResult(rows, playerName, [makeEffect('幸福', -(0.5 * total))]);
+        pushResult(rows, actor, playerName, [makeEffect('幸福', -(0.5 * total))]);
       } else {
-        pushResult(rows, playerName, [firstSignedEffect(event.text)]);
+        pushResult(rows, actor, playerName, [firstSignedEffect(event.text)]);
       }
     } else {
-      pushResult(rows, playerName, [firstSignedEffect(event.text)]);
+      pushResult(rows, actor, playerName, [firstSignedEffect(event.text)]);
     }
 
     return rows;
+  }
+
+  function getSpecialResultImage(event) {
+    if (event.type === 'fate') {
+      return FATE_RESULTS[Number(event.fateIndex)] || ACTIONS.fate;
+    }
+    if (event.type === 'sabotage') return ACTIONS.sabotage;
+    if (event.type === 'help') return ACTIONS.help;
+    return null;
+  }
+
+  function renderResultVisual(actor, target, event) {
+    const actorHead = getPlayerHead(actor);
+    const special = getSpecialResultImage(event);
+    const targetHead = target ? getPlayerHead(target) : null;
+    const isDual = (event.type === 'sabotage' || event.type === 'help') && target;
+
+    if (!special) {
+      return `
+        <div class="result-visual result-visual-single">
+          <div class="result-person">
+            <img class="result-person-head" src="${actorHead}" alt="${escapeHtml(actor?.name || '玩家')}" />
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="result-visual ${isDual ? 'result-visual-dual' : 'result-visual-special'}">
+        <div class="result-person">
+          <img class="result-person-head" src="${actorHead}" alt="${escapeHtml(actor?.name || '玩家')}" />
+          <span class="result-person-name">${escapeHtml(actor?.name || '玩家')}</span>
+        </div>
+        <div class="result-event-visual">
+          <img class="result-event-image" src="${special.image}" alt="${escapeHtml(special.label)}" />
+          <strong class="result-event-label">${escapeHtml(special.label)}</strong>
+        </div>
+        ${isDual ? `
+          <div class="result-person">
+            <img class="result-person-head" src="${targetHead}" alt="${escapeHtml(target.name)}" />
+            <span class="result-person-name">${escapeHtml(target.name)}</span>
+          </div>
+        ` : ''}
+      </div>
+    `;
   }
 
   function showResultStage(room, playerName, event) {
@@ -227,17 +323,23 @@
     kickerEl.textContent = '';
     titleEl.textContent = '';
 
-    const rows = buildResultRows(room, event, playerName);
+    const actor = room.players.find((item) => item.id === event.playerId);
+    const target = room.players.find((item) => item.id === event.targetId);
+    const rows = buildResultRows(room, event, actor || { name: playerName });
+
     bodyEl.innerHTML = `
       <div class="simple-result">
-        ${rows.map((row) => `
-          <div class="simple-result-row">
-            <strong class="simple-result-player">${row.name}</strong>
-            <div class="simple-result-effects">
-              ${row.effects.map((effect) => `<span class="simple-result-effect">${effect}</span>`).join('')}
+        ${renderResultVisual(actor || { name: playerName }, target, event)}
+        <div class="simple-result-list">
+          ${rows.map((row) => `
+            <div class="simple-result-row">
+              <strong class="simple-result-player">${escapeHtml(row.name)}</strong>
+              <div class="simple-result-effects">
+                ${row.effects.map((effect) => `<span class="simple-result-effect">${escapeHtml(effect)}</span>`).join('')}
+              </div>
             </div>
-          </div>
-        `).join('')}
+          `).join('')}
+        </div>
       </div>
     `;
   }
