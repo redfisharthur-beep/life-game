@@ -459,7 +459,7 @@ function renderGame(room) {
 
   gamePanel.classList.toggle('finished-mode', finished);
   stageNameEl.textContent = game.stageName;
-  roundLabelEl.textContent = `第 ${game.round} / ${game.totalRounds} 回合`;
+  roundLabelEl.textContent = `${game.round}/${game.totalRounds}`;
   stockPriceEl.textContent = Number(game.stockPrice).toFixed(2);
   landPriceEl.textContent = Number(game.landPrice).toFixed(2);
 
