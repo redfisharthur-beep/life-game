@@ -31,10 +31,7 @@
   }
 
   function formatAsset(value) {
-    return Number(value || 0).toLocaleString('zh-TW', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
+    return Math.round(Number(value) || 0).toLocaleString('zh-TW');
   }
 
   function formatUnit(value) {
