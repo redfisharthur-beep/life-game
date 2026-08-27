@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="/game-complete.css?v=20260827-1620" />
   <link rel="stylesheet" href="/logo-display.css?v=20260827-1610" />
   <link rel="stylesheet" href="/front-page.css?v=20260827-1845" />
+  <link rel="stylesheet" href="/player-list.css?v=20260827-1905" />
 </head>
 <body>
   <main class="shell">
@@ -33,14 +34,19 @@
       </div>
 
       <div id="roomPanel" class="panel hidden">
-        <div class="players-head compact">
-          <span id="playerCount">0 / 6</span>
-        </div>
-        <div id="playerList" class="players"></div>
+        <div class="player-list-stage">
+          <img class="player-list-bg" src="/images/Player%20List.png?v=20260827-1905" alt="玩家等待畫面" />
+          <div class="player-list-overlay">
+            <div class="players-head compact">
+              <span id="playerCount">0 / 6</span>
+            </div>
+            <div id="playerList" class="players"></div>
 
-        <button id="startGameBtn" class="start-button" type="button" disabled>啟程</button>
-        <p id="launchMessage" class="launch-message" aria-live="polite"></p>
-        <button id="leaveRoomBtn" class="ghost" type="button">離開房間</button>
+            <button id="startGameBtn" class="start-button" type="button" disabled>啟程</button>
+            <p id="launchMessage" class="launch-message" aria-live="polite"></p>
+            <button id="leaveRoomBtn" class="ghost" type="button">離開房間</button>
+          </div>
+        </div>
       </div>
 
       <div id="professionPanel" class="panel hidden">
@@ -161,6 +167,6 @@
   <script src="/app.js?v=20260827-1620"></script>
   <script src="/player-status.js?v=20260827-1845"></script>
   <script src="/action-showcase.js?v=20260827-1620"></script>
-  <script src="/logo-visibility.js?v=20260827-1735"></script>
+  <script src="/logo-visibility.js?v=20260827-1905"></script>
 </body>
 </html>
