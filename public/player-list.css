@@ -1,0 +1,212 @@
+/* 等待玩家頁：Player List.png 為完整底圖，所有 UI 疊在同一張圖片上 */
+#roomPanel {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.player-list-stage {
+  position: relative;
+  width: min(100%, 920px);
+  margin: 0 auto;
+}
+
+.player-list-bg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.player-list-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* 整頁改成底圖模式，不再顯示外層灰白卡片 */
+.card.room-mode {
+  width: min(920px, 100%);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+/* 玩家數量 */
+.room-mode .players-head.compact {
+  position: absolute;
+  left: 50%;
+  top: 17%;
+  width: auto;
+  margin: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.room-mode #playerCount {
+  min-width: 0;
+  min-height: 0;
+  padding: .45em 1em;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 250, 239, .72);
+  color: #7d5734;
+  box-shadow: 0 3px 10px rgba(125, 84, 35, .10);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  font-size: clamp(14px, 2.1vw, 22px);
+  font-weight: 700;
+}
+
+/* 玩家名單放在底圖主要框內 */
+.room-mode #playerList {
+  position: absolute;
+  left: 17%;
+  top: 28%;
+  width: 66%;
+  height: 34%;
+  display: grid;
+  align-content: start;
+  gap: clamp(5px, 1vw, 10px);
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  scrollbar-width: none;
+  pointer-events: auto;
+}
+
+.room-mode #playerList::-webkit-scrollbar {
+  display: none;
+}
+
+.room-mode #playerList .player-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  min-height: 0;
+  padding: clamp(7px, 1.2vw, 12px) clamp(10px, 1.7vw, 17px);
+  border: 1px solid rgba(180, 137, 79, .24);
+  border-radius: 999px;
+  background: rgba(255, 251, 242, .74);
+  box-shadow: none;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.room-mode #playerList .player-name {
+  font-size: clamp(14px, 2vw, 21px);
+  font-weight: 700;
+  color: #684c37;
+}
+
+.room-mode #playerList .badge {
+  padding: .3em .7em;
+  border-radius: 999px;
+  background: rgba(194, 148, 79, .82);
+  color: #fffaf0;
+  font-size: clamp(10px, 1.35vw, 14px);
+  font-weight: 700;
+}
+
+/* 啟程按鈕：融入底圖，保留實際按鈕狀態 */
+.room-mode #startGameBtn {
+  position: absolute;
+  left: 27%;
+  top: 68%;
+  width: 46%;
+  min-height: 0;
+  height: 10%;
+  margin: 0;
+  padding: 0 5%;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(227, 157, 65, .90);
+  color: #fffaf2;
+  box-shadow: 0 6px 15px rgba(143, 93, 35, .18);
+  font-size: clamp(17px, 2.6vw, 28px);
+  font-weight: 700;
+  letter-spacing: .08em;
+  pointer-events: auto;
+}
+
+.room-mode #startGameBtn:hover:not(:disabled) {
+  background: rgba(214, 143, 52, .96);
+}
+
+.room-mode #startGameBtn:disabled {
+  opacity: .72;
+  background: rgba(159, 149, 137, .72);
+  color: rgba(255, 250, 242, .92);
+  box-shadow: none;
+}
+
+.room-mode #launchMessage {
+  position: absolute;
+  left: 18%;
+  top: 79%;
+  width: 64%;
+  min-height: 0;
+  margin: 0;
+  color: #765943;
+  font-size: clamp(11px, 1.6vw, 16px);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(255,255,255,.8);
+  pointer-events: none;
+}
+
+/* 離開房間改成低存在感的融入式文字按鈕 */
+.room-mode #leaveRoomBtn {
+  position: absolute;
+  left: 50%;
+  top: 84%;
+  width: auto;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 18px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(126, 92, 60, .22);
+  border-radius: 999px;
+  background: rgba(255, 250, 239, .62);
+  color: #72553f;
+  box-shadow: none;
+  font-size: clamp(12px, 1.65vw, 17px);
+  font-weight: 700;
+  pointer-events: auto;
+}
+
+.room-mode #leaveRoomBtn:hover:not(:disabled) {
+  background: rgba(255, 250, 239, .78);
+}
+
+@media (max-width: 760px) {
+  .shell:has(.card.room-mode) {
+    padding: 8px;
+    align-items: start;
+  }
+}
+
+@media (max-width: 430px) {
+  .shell:has(.card.room-mode) {
+    padding: 0;
+  }
+
+  .player-list-stage,
+  .card.room-mode {
+    width: 100%;
+  }
+
+  .room-mode #playerList .player-row {
+    padding: 6px 10px;
+  }
+}
