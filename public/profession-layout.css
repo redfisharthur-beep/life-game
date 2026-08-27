@@ -74,16 +74,37 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 別人已選、自己已選都反灰，不再畫額外外框。 */
+/* 別人已選維持反灰。 */
 .profession-card.taken,
-.profession-card.taken:disabled,
-.profession-card.selected {
+.profession-card.taken:disabled {
   opacity: .28;
   filter: grayscale(.86);
   border: 0 !important;
   outline: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
+}
+
+/* 自己已選改成淡淡螢光黃反亮，不改原本排版。 */
+.profession-card.selected {
+  opacity: 1;
+  filter: sepia(.08) saturate(1.18) brightness(1.08);
+  border: 0 !important;
+  outline: 0 !important;
+  background: rgba(255, 247, 143, .24) !important;
+  box-shadow:
+    inset 0 0 26px rgba(255, 244, 102, .26),
+    0 0 18px rgba(255, 239, 90, .18) !important;
+}
+
+.profession-card.selected::after {
+  content: '';
+  position: absolute;
+  inset: 4%;
+  pointer-events: none;
+  border-radius: 12px;
+  background: rgba(255, 249, 160, .10);
+  box-shadow: inset 0 0 18px rgba(255, 247, 120, .18);
 }
 
 .profession-visual {
