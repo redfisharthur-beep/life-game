@@ -83,19 +83,28 @@
     icon.alt = '';
     icon.setAttribute('aria-hidden', 'true');
 
-    const number = makeText(
-      'player-status-happiness-value',
-      Number(value || 0).toFixed(2)
+    item.append(
+      icon,
+      makeText('player-status-happiness-value', Number(value || 0).toFixed(2))
     );
-
-    item.append(icon, number);
     return item;
   }
 
-  function getDesktopColumns(count) {
-    if (count <= 2) return Math.max(1, count);
-    if (count === 4) return 2;
-    return 3;
+  function sortPlayers(players) {
+    const mine = typeof myPlayerId !== 'undefined' ? myPlayerId : null;
+    return [...players].sort((a, b) => {
+      const aIsMe = mine && a.id === mine;
+      const bIsMe = mine && b.id === mine;
+      if (aIsMe !== bIsMe) return aIsMe ? -1 : 1;
+
+      const happinessDiff = Number(b.happiness || 0) - Number(a.happiness || 0);
+      if (Math.abs(happinessDiff) > 0.000001) return happinessDiff;
+
+      const assetDiff = Number(b.totalAssets || 0) - Number(a.totalAssets || 0);
+      if (Math.abs(assetDiff) > 0.000001) return assetDiff;
+
+      return String(a.name || '').localeCompare(String(b.name || ''), 'zh-Hant');
+    });
   }
 
   function renderPlayerStatus(room) {
@@ -114,20 +123,20 @@
       return;
     }
 
-    bar.style.setProperty('--player-columns', String(getDesktopColumns(room.players.length)));
     bar.innerHTML = '';
 
-    room.players.forEach((player) => {
+    sortPlayers(room.players || []).forEach((player) => {
       const professionId = player.profession || '';
       const card = document.createElement('article');
       card.className = 'player-status-card';
 
-      if (typeof myPlayerId !== 'undefined' && player.id === myPlayerId) card.classList.add('me');
+      const isMe = typeof myPlayerId !== 'undefined' && player.id === myPlayerId;
+      if (isMe) card.classList.add('me');
       if (player.id === room.game.currentPlayerId) card.classList.add('current');
       if (!player.connected) card.classList.add('offline');
 
-      const identity = document.createElement('div');
-      identity.className = 'player-status-identity';
+      const avatarWrap = document.createElement('div');
+      avatarWrap.className = 'player-status-avatar-wrap';
 
       const avatar = document.createElement('img');
       avatar.className = 'player-status-avatar';
@@ -137,23 +146,29 @@
         const fallback = FALLBACK_IMAGES[professionId];
         if (fallback && avatar.src !== fallback) avatar.src = fallback;
       }, { once: true });
+      avatarWrap.appendChild(avatar);
 
-      const identityText = document.createElement('div');
-      identityText.className = 'player-status-identity-text';
-      identityText.append(
+      const content = document.createElement('div');
+      content.className = 'player-status-content';
+
+      const topRow = document.createElement('div');
+      topRow.className = 'player-status-top-row';
+
+      const nameBlock = document.createElement('div');
+      nameBlock.className = 'player-status-name-block';
+      nameBlock.append(
         makeText('player-status-profession', PROFESSION_NAMES[professionId] || '未選職業'),
         makeText('player-status-name', player.connected ? player.name : `${player.name}（離線）`)
       );
 
-      identity.append(
-        avatar,
-        identityText,
+      topRow.append(
+        nameBlock,
         makeTotalAssets(player.totalAssets),
         makeHappiness(player.happiness)
       );
 
       if (player.id === room.game.currentPlayerId && room.phase === 'game') {
-        identity.append(makeText('player-status-turn-badge', '行動中'));
+        topRow.append(makeText('player-status-turn-badge', '行動中'));
       }
 
       const summary = document.createElement('div');
@@ -164,7 +179,8 @@
         makeSummaryItem('土地', formatUnit(player.land), 'land')
       );
 
-      card.append(identity, summary);
+      content.append(topRow, summary);
+      card.append(avatarWrap, content);
       bar.appendChild(card);
     });
   }
