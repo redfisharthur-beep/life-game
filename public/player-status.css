@@ -1,0 +1,229 @@
+.card.game-mode {
+  width: min(1180px, 100%);
+}
+
+.card.game-mode .game-logo {
+  width: min(520px, 72%);
+  max-height: 150px;
+  margin-bottom: 4px;
+}
+
+.player-status-bar {
+  display: grid;
+  grid-template-columns: repeat(var(--player-count, 2), minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.player-status-card {
+  position: relative;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid #cec4bb;
+  border-radius: 16px;
+  background: #f7f2ec;
+  box-shadow: 0 4px 12px rgba(84, 76, 69, .06);
+  text-align: left;
+}
+
+.player-status-card.me {
+  border: 2px solid #c3a05b;
+  background: #fbf6e9;
+}
+
+.player-status-card.current {
+  border-color: #839487;
+  box-shadow: 0 0 0 2px rgba(131, 148, 135, .16), 0 5px 14px rgba(84, 76, 69, .07);
+}
+
+.player-status-card.me.current {
+  border-color: #c3a05b;
+  box-shadow: 0 0 0 2px rgba(131, 148, 135, .28), 0 5px 14px rgba(84, 76, 69, .07);
+}
+
+.player-status-identity {
+  position: relative;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+  min-width: 0;
+}
+
+.player-status-avatar {
+  display: block;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.player-status-identity-text {
+  min-width: 0;
+}
+
+.player-status-profession {
+  display: block;
+  margin-bottom: 2px;
+  color: #8a7f76;
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.player-status-name {
+  display: block;
+  overflow: hidden;
+  color: #514a45;
+  font-size: 16px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-status-turn-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: #839487;
+  color: #fffaf6;
+  font-size: 9px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.player-status-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.player-status-metric {
+  min-width: 0;
+  padding: 6px 5px;
+  border-radius: 10px;
+  background: #e9e2db;
+  text-align: center;
+}
+
+.player-status-metric.happiness {
+  background: #eee3e3;
+}
+
+.player-status-metric-label {
+  display: block;
+  color: #877d75;
+  font-size: 9px;
+  line-height: 1.1;
+}
+
+.player-status-metric-value {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: #554e49;
+  font-size: 16px;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-status-metric.happiness .player-status-metric-value {
+  color: #8b6768;
+}
+
+.player-holdings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+  margin-top: 5px;
+}
+
+.player-holding {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 2px;
+  border-radius: 8px;
+  background: #efe9e3;
+  text-align: center;
+}
+
+.player-holding-label {
+  color: #978d84;
+  font-size: 8px;
+  line-height: 1;
+}
+
+.player-holding-value {
+  display: block;
+  max-width: 100%;
+  margin-top: 2px;
+  overflow: hidden;
+  color: #6d655e;
+  font-size: 11px;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 920px) {
+  .card.game-mode {
+    width: min(820px, 100%);
+  }
+
+  .player-status-bar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .card.game-mode .game-logo {
+    width: min(420px, 88%);
+    max-height: 120px;
+  }
+
+  .player-status-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .player-status-card {
+    padding: 7px;
+    border-radius: 14px;
+  }
+
+  .player-status-identity {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .player-status-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .player-status-profession { font-size: 10px; }
+  .player-status-name { font-size: 14px; }
+  .player-status-metric-value { font-size: 14px; }
+  .player-holding-value { font-size: 10px; }
+}
+
+@media (max-width: 370px) {
+  .player-status-bar { gap: 5px; }
+  .player-status-card { padding: 6px; }
+  .player-status-identity { grid-template-columns: 34px minmax(0, 1fr); gap: 4px; }
+  .player-status-avatar { width: 34px; height: 34px; }
+  .player-status-name { font-size: 13px; }
+  .player-status-metrics { gap: 3px; }
+  .player-status-metric { padding: 5px 3px; }
+  .player-status-metric-value { font-size: 13px; }
+  .player-holdings { gap: 2px; }
+  .player-holding-label { font-size: 7px; }
+  .player-holding-value { font-size: 9px; }
+}
