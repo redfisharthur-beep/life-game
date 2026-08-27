@@ -113,7 +113,7 @@
 
 .player-status-total-label {
   color: #91867d;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1;
 }
@@ -195,7 +195,7 @@
   white-space: nowrap;
 }
 
-.player-summary-label { font-size: 14px; }
+.player-summary-label { font-size: 17px; }
 .player-summary-value { margin-left: .25em; font-size: 18px; }
 .player-summary-item.cash .player-summary-label,
 .player-summary-item.cash .player-summary-value { color: #5d7965; }
@@ -221,11 +221,11 @@
   .player-status-name-block { gap: .35em; }
   .player-status-profession { font-size: 13px; }
   .player-status-name { font-size: 19px; }
-  .player-status-total-label { font-size: 12px; }
+  .player-status-total-label { font-size: 15px; }
   .player-status-total-value { font-size: 18px; }
   .player-status-happiness-icon { width: 29px; height: 29px; }
   .player-status-happiness-value { font-size: 18px; }
-  .player-summary-label { font-size: 12px; }
+  .player-summary-label { font-size: 15px; }
   .player-summary-value { font-size: 15px; }
   .player-status-turn-badge { font-size: 10px; padding: 3px 6px; }
 }
@@ -243,12 +243,12 @@
   .player-status-top-row { grid-template-columns: minmax(82px, 1fr) auto auto; gap: 4px; }
   .player-status-profession { font-size: 12px; }
   .player-status-name { font-size: 18px; }
-  .player-status-total-label { font-size: 11px; }
+  .player-status-total-label { font-size: 14px; }
   .player-status-total-value { font-size: 17px; }
   .player-status-happiness { gap: 4px; }
   .player-status-happiness-icon { width: 28px; height: 28px; }
   .player-status-happiness-value { font-size: 17px; }
   .player-summary-item { padding: 3px 2px; border-radius: 7px; }
-  .player-summary-label { font-size: 11px; }
+  .player-summary-label { font-size: 14px; }
   .player-summary-value { font-size: 14px; }
 }
