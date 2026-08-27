@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>人生｜多人派對遊戲</title>
-  <link rel="stylesheet" href="/style.css?v=20260827-1401" />
+  <link rel="stylesheet" href="/style.css?v=20260827-1410" />
 </head>
 <body>
   <main class="shell">
@@ -37,10 +37,69 @@
         <div id="professionGrid" class="profession-grid"></div>
         <p id="professionMessage" class="profession-message" aria-live="polite"></p>
       </div>
+
+      <div id="gamePanel" class="panel hidden">
+        <div class="game-topbar">
+          <div>
+            <span id="stageName" class="stage-name">人生起步</span>
+            <span id="roundLabel" class="round-label">第 1 / 30 回合</span>
+          </div>
+          <div class="market-strip">
+            <span>📈 股價 <b id="stockPrice">10.00</b></span>
+            <span>🏠 地價 <b id="landPrice">10.00</b></span>
+          </div>
+        </div>
+
+        <section class="me-card">
+          <div class="me-head">
+            <div>
+              <span id="myName" class="me-name">玩家</span>
+              <span id="myProfession" class="me-profession">職業</span>
+            </div>
+            <div class="timer-box">
+              <span class="timer-label">剩餘</span>
+              <strong id="turnTimer">10</strong>
+              <span>秒</span>
+            </div>
+          </div>
+          <div class="asset-grid">
+            <span>現金 <b id="myCash">0</b></span>
+            <span>股票 <b id="myStocks">0</b></span>
+            <span>土地 <b id="myLand">0</b></span>
+            <span>幸福 <b id="myHappiness">0.00</b></span>
+          </div>
+        </section>
+
+        <section class="turn-section">
+          <div class="turn-title">本輪順序</div>
+          <div id="turnOrder" class="turn-order"></div>
+          <p id="turnNotice" class="turn-notice">等待回合開始…</p>
+        </section>
+
+        <section class="actions-section">
+          <div id="actionGrid" class="action-grid">
+            <button class="action-button" data-action="salary" type="button">💵<span>領薪</span></button>
+            <button class="action-button" data-action="buyStock" type="button" disabled>📈<span>買股</span></button>
+            <button class="action-button" data-action="buyLand" type="button" disabled>🏠<span>圈地</span></button>
+            <button class="action-button" data-action="fate" type="button" disabled>🎰<span>命運</span></button>
+            <button class="action-button" data-action="sabotage" type="button" disabled>😈<span>陷害</span></button>
+            <button class="action-button" data-action="help" type="button" disabled>🤝<span>援助</span></button>
+            <button class="action-button" data-action="sellStock" type="button" disabled>💹<span>賣股</span></button>
+            <button class="action-button" data-action="sellLand" type="button" disabled>🏘️<span>賣地</span></button>
+            <button class="action-button" data-action="dream" type="button" disabled>🌈<span>圓夢</span></button>
+          </div>
+          <p class="action-hint">目前先開放「領薪」，其餘行動下一步接入。</p>
+        </section>
+
+        <section class="event-box">
+          <span class="event-label">最新事件</span>
+          <p id="gameEvent">職業選擇完成，人生啟程！</p>
+        </section>
+      </div>
     </section>
   </main>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260827-1401"></script>
+  <script src="/app.js?v=20260827-1410"></script>
 </body>
 </html>
