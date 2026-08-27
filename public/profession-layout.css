@@ -30,7 +30,7 @@
   pointer-events: none;
 }
 
-/* 依手機實測畫面再往右微調；仍完全以 select.png 百分比座標定位。 */
+/* 仍以 select.png 百分比座標定位，卡片格本身不再移動。 */
 .profession-grid {
   position: absolute;
   left: 3.1%;
@@ -87,6 +87,7 @@
   box-shadow: none !important;
 }
 
+/* 職業圖片整體往右、往下約半個字。 */
 .profession-visual {
   display: flex;
   min-width: 0;
@@ -96,9 +97,9 @@
   padding: 0;
   background: transparent;
   overflow: visible;
+  transform: translate(.5em, .5em);
 }
 
-/* 六職業圖片維持放大顯示。 */
 .profession-image {
   display: block;
   width: 112%;
@@ -114,12 +115,14 @@
   transform-origin: center;
 }
 
+/* 能力文字整組往右約兩個中文字寬。 */
 .profession-detail {
   display: flex;
   min-width: 0;
   height: 96%;
   align-items: center;
   justify-content: center;
+  transform: translateX(2em);
 }
 
 .profession-abilities {
@@ -210,10 +213,18 @@
     padding: 2.2% 3.8%;
   }
 
+  .profession-visual {
+    transform: translate(.5em, .5em);
+  }
+
   .profession-image {
     width: 116%;
     height: 116%;
     transform: scale(1.15);
+  }
+
+  .profession-detail {
+    transform: translateX(2em);
   }
 
   .ability-item {
@@ -252,10 +263,18 @@
     padding: 2% 3.5%;
   }
 
+  .profession-visual {
+    transform: translate(.5em, .5em);
+  }
+
   .profession-image {
     width: 120%;
     height: 120%;
     transform: scale(1.16);
+  }
+
+  .profession-detail {
+    transform: translateX(2em);
   }
 
   .profession-abilities {
