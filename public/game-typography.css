@@ -1,17 +1,12 @@
-/* 遊戲進行介面：字體稍微放大、統一改為較細字重。 */
+/* 遊戲進行介面：統一使用較細字重。 */
 #gamePanel .round-label,
 #gamePanel .topbar-timer strong,
 #gamePanel .market-value,
 #gamePanel .player-status-name,
-#gamePanel .player-status-profession,
-#gamePanel .player-status-total-label,
-#gamePanel .player-status-total-value,
-#gamePanel .player-status-cash-label,
-#gamePanel .player-status-cash-value,
+#gamePanel .player-info-label,
+#gamePanel .player-info-value,
 #gamePanel .player-status-happiness-value,
 #gamePanel .player-status-turn-badge,
-#gamePanel .player-summary-label,
-#gamePanel .player-summary-value,
 #gamePanel .me-name,
 #gamePanel .me-profession,
 #gamePanel .asset-grid,
@@ -30,18 +25,13 @@
 #gamePanel .topbar-timer strong { font-size: 26px !important; }
 #gamePanel .market-value { font-size: 23px !important; }
 
-#gamePanel .player-status-profession { font-size: 17px !important; }
-#gamePanel .player-status-name { font-size: 24px !important; }
-#gamePanel .player-status-total-label,
-#gamePanel .player-status-cash-label { font-size: 19px !important; }
-#gamePanel .player-status-total-value,
-#gamePanel .player-status-cash-value { font-size: 23px !important; }
-#gamePanel .player-status-happiness-value { font-size: 23px !important; }
-#gamePanel .player-status-turn-badge { font-size: 13px !important; }
-#gamePanel .player-summary-label { font-size: 18px !important; }
-#gamePanel .player-summary-value { font-size: 19px !important; }
+/* 玩家名片改成較精簡字級，讓中間六格資訊更清楚。 */
+#gamePanel .player-status-name { font-size: 21px !important; }
+#gamePanel .player-info-label { font-size: 15px !important; }
+#gamePanel .player-info-value { font-size: 16px !important; }
+#gamePanel .player-status-happiness-value { font-size: 19px !important; }
+#gamePanel .player-status-turn-badge { font-size: 12px !important; }
 
-/* 行動展示／結果畫面也使用較細字體。 */
 .action-showcase .action-showcase-kicker,
 .action-showcase .action-showcase-title,
 .action-showcase .result-person-name,
@@ -62,7 +52,6 @@
 .action-showcase .simple-result-player { font-size: clamp(24px, 5.7vw, 34px) !important; }
 .action-showcase .simple-result-effect { font-size: clamp(20px, 4.8vw, 27px) !important; }
 
-/* 骰子再縮小一級，保留原本較深的陰影。 */
 .action-showcase .dice-result-image {
   width: min(190px, 42vw) !important;
   height: min(190px, 42vw) !important;
@@ -78,15 +67,10 @@
   #gamePanel .topbar-timer strong { font-size: 24px !important; }
   #gamePanel .market-value { font-size: 19px !important; }
 
-  #gamePanel .player-status-profession { font-size: 14px !important; }
-  #gamePanel .player-status-name { font-size: 20px !important; }
-  #gamePanel .player-status-total-label,
-  #gamePanel .player-status-cash-label { font-size: 16px !important; }
-  #gamePanel .player-status-total-value,
-  #gamePanel .player-status-cash-value { font-size: 19px !important; }
-  #gamePanel .player-status-happiness-value { font-size: 19px !important; }
-  #gamePanel .player-summary-label { font-size: 16px !important; }
-  #gamePanel .player-summary-value { font-size: 16px !important; }
+  #gamePanel .player-status-name { font-size: 18px !important; }
+  #gamePanel .player-info-label { font-size: 13px !important; }
+  #gamePanel .player-info-value { font-size: 14px !important; }
+  #gamePanel .player-status-happiness-value { font-size: 17px !important; }
 }
 
 @media (max-width: 520px) {
@@ -94,15 +78,10 @@
   #gamePanel .topbar-timer strong { font-size: 22px !important; }
   #gamePanel .market-value { font-size: 16px !important; }
 
-  #gamePanel .player-status-profession { font-size: 13px !important; }
-  #gamePanel .player-status-name { font-size: 19px !important; }
-  #gamePanel .player-status-total-label,
-  #gamePanel .player-status-cash-label { font-size: 15px !important; }
-  #gamePanel .player-status-total-value,
-  #gamePanel .player-status-cash-value { font-size: 18px !important; }
-  #gamePanel .player-status-happiness-value { font-size: 18px !important; }
-  #gamePanel .player-summary-label { font-size: 15px !important; }
-  #gamePanel .player-summary-value { font-size: 15px !important; }
+  #gamePanel .player-status-name { font-size: 17px !important; }
+  #gamePanel .player-info-label { font-size: 12px !important; }
+  #gamePanel .player-info-value { font-size: 13px !important; }
+  #gamePanel .player-status-happiness-value { font-size: 16px !important; }
 
   .action-showcase.choice-stage-active .action-showcase-kicker {
     font-size: clamp(28px, 8.4vw, 38px) !important;
@@ -129,4 +108,9 @@
   #gamePanel .round-label { font-size: 16px !important; }
   #gamePanel .topbar-timer strong { font-size: 20px !important; }
   #gamePanel .market-value { font-size: 14px !important; }
+
+  #gamePanel .player-status-name { font-size: 16px !important; }
+  #gamePanel .player-info-label { font-size: 11px !important; }
+  #gamePanel .player-info-value { font-size: 12px !important; }
+  #gamePanel .player-status-happiness-value { font-size: 15px !important; }
 }
