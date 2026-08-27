@@ -44,24 +44,20 @@
     return element;
   }
 
-  function makeMetric(label, value, className = '') {
-    const metric = document.createElement('div');
-    metric.className = `player-status-metric ${className}`.trim();
-    metric.append(
-      makeText('player-status-metric-label', label),
-      makeText('player-status-metric-value', value)
-    );
-    return metric;
-  }
-
-  function makeHolding(label, value) {
+  function makeSummaryItem(label, value, className = '') {
     const item = document.createElement('span');
-    item.className = 'player-holding';
+    item.className = `player-summary-item ${className}`.trim();
     item.append(
-      makeText('player-holding-label', label),
-      makeText('player-holding-value', value)
+      makeText('player-summary-label', label),
+      makeText('player-summary-value', value)
     );
     return item;
+  }
+
+  function getDesktopColumns(count) {
+    if (count <= 2) return Math.max(1, count);
+    if (count === 4) return 2;
+    return 3;
   }
 
   function renderPlayerStatus(room) {
@@ -80,7 +76,7 @@
       return;
     }
 
-    bar.style.setProperty('--player-count', String(Math.min(room.players.length, 6)));
+    bar.style.setProperty('--player-columns', String(getDesktopColumns(room.players.length)));
     bar.innerHTML = '';
 
     room.players.forEach((player) => {
@@ -118,22 +114,17 @@
         identity.append(makeText('player-status-turn-badge', '行動中'));
       }
 
-      const metrics = document.createElement('div');
-      metrics.className = 'player-status-metrics';
-      metrics.append(
-        makeMetric('總資產', formatInteger(player.totalAssets), 'assets'),
-        makeMetric('幸福值', Number(player.happiness || 0).toFixed(2), 'happiness')
+      const summary = document.createElement('div');
+      summary.className = 'player-status-summary';
+      summary.append(
+        makeSummaryItem('總資產', formatInteger(player.totalAssets), 'assets'),
+        makeSummaryItem('現金', formatInteger(player.cash)),
+        makeSummaryItem('股票', formatUnit(player.stocks)),
+        makeSummaryItem('土地', formatUnit(player.land)),
+        makeSummaryItem('幸福', Number(player.happiness || 0).toFixed(2), 'happiness')
       );
 
-      const holdings = document.createElement('div');
-      holdings.className = 'player-holdings';
-      holdings.append(
-        makeHolding('現金', formatInteger(player.cash)),
-        makeHolding('股票', formatUnit(player.stocks)),
-        makeHolding('土地', formatUnit(player.land))
-      );
-
-      card.append(identity, metrics, holdings);
+      card.append(identity, summary);
       bar.appendChild(card);
     });
   }
