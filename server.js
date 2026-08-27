@@ -56,6 +56,11 @@ function shuffle(values) {
   return items;
 }
 
+function randomChoice(values) {
+  if (!values.length) return null;
+  return values[Math.floor(Math.random() * values.length)];
+}
+
 function stageName(round) {
   if (round <= 9) return '人生起步';
   if (round <= 19) return '人生發展';
@@ -370,6 +375,229 @@ function settleMarketAction(room, playerId, action) {
   return true;
 }
 
+function settleFate(room, playerId) {
+  const player = getActivePlayer(room, playerId);
+  if (!player) return false;
+
+  const { dice, total } = rollDice(room.game.round);
+  const fateIndex = Math.floor(Math.random() * 9);
+  const event = {
+    type: 'fate',
+    playerId,
+    dice,
+    diceTotal: total,
+    fateIndex,
+  };
+
+  if (fateIndex === 0) {
+    const amount = Math.round(150 * total);
+    player.cash += amount;
+    event.text = `${player.name} 命運：中樂透，現金 +${amount}`;
+  } else if (fateIndex === 1) {
+    const requested = Math.round(80 * total);
+    const before = player.cash;
+    const actual = Math.min(before, requested);
+    player.cash -= actual;
+    const emptyPenalty = before === 0 && actual === 0;
+    if (emptyPenalty) player.happiness = round2(player.happiness - (0.5 * total));
+    event.text = emptyPenalty
+      ? `${player.name} 命運：花錢消災但現金已空，幸福 -${round2(0.5 * total)}`
+      : `${player.name} 命運：花錢消災，現金 -${actual}`;
+  } else if (fateIndex === 2) {
+    const units = round2(5 * total);
+    player.stocks = round2(player.stocks + units);
+    event.text = `${player.name} 命運：股神降臨，股票 +${units}`;
+  } else if (fateIndex === 3) {
+    const requested = round2(2 * total);
+    const before = player.stocks;
+    const actual = round2(Math.min(before, requested));
+    player.stocks = round2(Math.max(0, before - actual));
+    const emptyPenalty = before === 0 && actual === 0;
+    if (emptyPenalty) player.happiness = round2(player.happiness - (0.5 * total));
+    event.text = emptyPenalty
+      ? `${player.name} 命運：黑天鵝但股票已空，幸福 -${round2(0.5 * total)}`
+      : `${player.name} 命運：黑天鵝，股票 -${actual}`;
+  } else if (fateIndex === 4) {
+    const units = round2(5 * total);
+    player.land = round2(player.land + units);
+    event.text = `${player.name} 命運：政策利多，土地 +${units}`;
+  } else if (fateIndex === 5) {
+    const requested = round2(2 * total);
+    const before = player.land;
+    const actual = round2(Math.min(before, requested));
+    player.land = round2(Math.max(0, before - actual));
+    const emptyPenalty = before === 0 && actual === 0;
+    if (emptyPenalty) player.happiness = round2(player.happiness - (0.5 * total));
+    event.text = emptyPenalty
+      ? `${player.name} 命運：土地受創但土地已空，幸福 -${round2(0.5 * total)}`
+      : `${player.name} 命運：土地受創，土地 -${actual}`;
+  } else if (fateIndex === 6) {
+    const perPlayer = Math.round(30 * total);
+    let received = 0;
+    room.players.forEach((other) => {
+      if (other.id === playerId) return;
+      const paid = Math.min(other.cash, perPlayer);
+      other.cash -= paid;
+      received += paid;
+    });
+    player.cash += received;
+    event.text = `${player.name} 命運：社福救濟，其他玩家共支付 ${received}`;
+  } else if (fateIndex === 7) {
+    const happiness = round2(1 * total);
+    player.happiness = round2(player.happiness + happiness);
+    event.text = `${player.name} 命運：幸福降臨，幸福 +${happiness}`;
+  } else {
+    const happiness = round2(0.5 * total);
+    player.happiness = round2(player.happiness - happiness);
+    event.text = `${player.name} 命運：人生低潮，幸福 -${happiness}`;
+  }
+
+  room.game.lastEvent = event;
+  advanceTurn(room);
+  return true;
+}
+
+function chooseSabotageTarget(room, actorId) {
+  const others = room.players.filter((player) => player.id !== actorId);
+  if (!others.length) return null;
+
+  const ranked = others.map((player) => ({
+    player,
+    assets: playerAssets(player, room.game),
+  }));
+  const highestAssets = Math.max(...ranked.map((item) => item.assets));
+  const candidates = ranked
+    .filter((item) => item.assets === highestAssets)
+    .map((item) => item.player);
+
+  return randomChoice(candidates);
+}
+
+function settleSabotage(room, playerId) {
+  const player = getActivePlayer(room, playerId);
+  if (!player) return false;
+
+  const target = chooseSabotageTarget(room, playerId);
+  if (!target) return false;
+
+  const { dice, total } = rollDice(room.game.round);
+  const effectIndex = Math.floor(Math.random() * 4);
+  const bonus = Math.round(40 * total);
+  let effectText = '';
+
+  if (effectIndex === 0) {
+    const requested = Math.round(80 * total);
+    const actual = Math.min(target.cash, requested);
+    target.cash -= actual;
+    effectText = `${target.name} 現金 -${actual}`;
+  } else if (effectIndex === 1) {
+    const requested = round2(1 * total);
+    const actual = round2(Math.min(target.stocks, requested));
+    target.stocks = round2(Math.max(0, target.stocks - actual));
+    effectText = `${target.name} 股票 -${actual}`;
+  } else if (effectIndex === 2) {
+    const requested = round2(1 * total);
+    const actual = round2(Math.min(target.land, requested));
+    target.land = round2(Math.max(0, target.land - actual));
+    effectText = `${target.name} 土地 -${actual}`;
+  } else {
+    const happiness = round2(0.3 * total);
+    target.happiness = round2(target.happiness - happiness);
+    effectText = `${target.name} 幸福 -${happiness}`;
+  }
+
+  player.cash += bonus;
+  player.sabotageCount = (player.sabotageCount || 0) + 1;
+
+  room.game.lastEvent = {
+    type: 'sabotage',
+    playerId,
+    targetId: target.id,
+    dice,
+    diceTotal: total,
+    effectIndex,
+    bonus,
+    text: `${player.name} 陷害 ${target.name}：${effectText}；自己現金 +${bonus}`,
+  };
+
+  advanceTurn(room);
+  return true;
+}
+
+function chooseHelpTarget(room, actorId) {
+  const others = room.players.filter((player) => player.id !== actorId);
+  if (!others.length) return null;
+
+  const happinessValues = others.map((player) => Number(player.happiness || 0));
+  const maxHappiness = Math.max(...happinessValues);
+  const minHappiness = Math.min(...happinessValues);
+
+  const eligible = maxHappiness === minHappiness
+    ? others
+    : others.filter((player) => Number(player.happiness || 0) < maxHappiness);
+
+  if (!eligible.length) return null;
+
+  const ranked = eligible.map((player) => ({
+    player,
+    assets: playerAssets(player, room.game),
+  }));
+  const lowestAssets = Math.min(...ranked.map((item) => item.assets));
+  const candidates = ranked
+    .filter((item) => item.assets === lowestAssets)
+    .map((item) => item.player);
+
+  return randomChoice(candidates);
+}
+
+function settleHelp(room, playerId) {
+  const player = getActivePlayer(room, playerId);
+  if (!player) return false;
+
+  const target = chooseHelpTarget(room, playerId);
+  if (!target) return false;
+
+  const { dice, total } = rollDice(room.game.round);
+  const effectIndex = Math.floor(Math.random() * 4);
+  const bonus = Math.round(60 * total);
+  let effectText = '';
+
+  if (effectIndex === 0) {
+    const amount = Math.round(100 * total);
+    target.cash += amount;
+    effectText = `${target.name} 現金 +${amount}`;
+  } else if (effectIndex === 1) {
+    const units = round2(3 * total);
+    target.stocks = round2(target.stocks + units);
+    effectText = `${target.name} 股票 +${units}`;
+  } else if (effectIndex === 2) {
+    const units = round2(3 * total);
+    target.land = round2(target.land + units);
+    effectText = `${target.name} 土地 +${units}`;
+  } else {
+    const happiness = round2(0.75 * total);
+    target.happiness = round2(target.happiness + happiness);
+    effectText = `${target.name} 幸福 +${happiness}`;
+  }
+
+  player.cash += bonus;
+  player.helpCount = (player.helpCount || 0) + 1;
+
+  room.game.lastEvent = {
+    type: 'help',
+    playerId,
+    targetId: target.id,
+    dice,
+    diceTotal: total,
+    effectIndex,
+    bonus,
+    text: `${player.name} 援助 ${target.name}：${effectText}；自己現金 +${bonus}`,
+  };
+
+  advanceTurn(room);
+  return true;
+}
+
 function leaveCurrentRoom(socket) {
   const roomCode = socket.data.roomCode;
   if (!roomCode) return;
@@ -562,17 +790,36 @@ io.on('connection', (socket) => {
       'salary',
       'buyStock',
       'buyLand',
+      'fate',
+      'sabotage',
+      'help',
       'sellStock',
       'sellLand',
     ]);
 
     if (!availableActions.has(action)) {
-      return reply?.({ ok: false, message: '這個行動將在下一階段開放。' });
+      return reply?.({ ok: false, message: '這個行動尚未開放。' });
     }
 
-    const settled = action === 'salary'
-      ? settleSalary(room, socket.id, false)
-      : settleMarketAction(room, socket.id, action);
+    let settled = false;
+
+    if (action === 'salary') {
+      settled = settleSalary(room, socket.id, false);
+    } else if (['buyStock', 'buyLand', 'sellStock', 'sellLand'].includes(action)) {
+      settled = settleMarketAction(room, socket.id, action);
+    } else if (action === 'fate') {
+      settled = settleFate(room, socket.id);
+    } else if (action === 'sabotage') {
+      if (room.players.length < 2) {
+        return reply?.({ ok: false, message: '目前沒有可以陷害的玩家。' });
+      }
+      settled = settleSabotage(room, socket.id);
+    } else if (action === 'help') {
+      if (!chooseHelpTarget(room, socket.id)) {
+        return reply?.({ ok: false, message: '目前沒有可以援助的玩家。' });
+      }
+      settled = settleHelp(room, socket.id);
+    }
 
     if (!settled) {
       return reply?.({ ok: false, message: '目前無法完成這個行動。' });
