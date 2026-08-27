@@ -20,11 +20,12 @@
 
     if (mainCard) {
       mainCard.classList.toggle('home-mode', showOnHome);
+      mainCard.classList.toggle('profession-mode', showOnProfession);
     }
 
     if (logo) {
-      const shouldShowLogo = showOnProfession || showOnResults;
-      logo.style.setProperty('display', shouldShowLogo ? 'block' : 'none', 'important');
+      /* 首頁由 front page.png、職業頁由 select.png 負責完整視覺；Logo 只保留結算畫面。 */
+      logo.style.setProperty('display', showOnResults ? 'block' : 'none', 'important');
     }
   }
 
