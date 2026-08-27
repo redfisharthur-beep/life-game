@@ -163,10 +163,12 @@
   text-align: center;
 }
 
+/* 行動中放在職業頭像左上角。 */
 .player-status-turn-badge {
   position: absolute;
-  top: -6px;
-  right: 72px;
+  top: -5px;
+  left: 2px;
+  right: auto;
   z-index: 2;
   padding: 4px 8px;
   border-radius: 999px;
@@ -208,7 +210,7 @@
   .player-info-label { font-size: 13px; }
   .player-info-value { font-size: 14px; }
   .player-status-happiness-value { font-size: 17px; margin-top: -4px; }
-  .player-status-turn-badge { right: 61px; font-size: 10px; padding: 3px 6px; }
+  .player-status-turn-badge { left: 1px; right: auto; font-size: 10px; padding: 3px 6px; }
 }
 
 @media (max-width: 430px) {
@@ -233,5 +235,5 @@
   .player-info-label { font-size: 11px; }
   .player-info-value { font-size: 12px; margin-left: .18em; }
   .player-status-happiness-value { font-size: 15px; margin-top: -3px; }
-  .player-status-turn-badge { right: 55px; }
+  .player-status-turn-badge { left: 0; right: auto; }
 }
