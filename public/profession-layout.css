@@ -30,7 +30,6 @@
   pointer-events: none;
 }
 
-/* 仍以 select.png 百分比座標定位，卡片格本身不再移動。 */
 .profession-grid {
   position: absolute;
   left: 3.1%;
@@ -46,7 +45,6 @@
   padding: 0;
 }
 
-/* 卡片本身完全透明：底圖原框就是唯一可見框線。 */
 .profession-card,
 .profession-card:hover:not(:disabled),
 .profession-card.selected,
@@ -76,9 +74,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 別人已選：只反灰內容，不畫外框。 */
+/* 別人已選、自己已選都反灰，不再畫額外外框。 */
 .profession-card.taken,
-.profession-card.taken:disabled {
+.profession-card.taken:disabled,
+.profession-card.selected {
   opacity: .28;
   filter: grayscale(.86);
   border: 0 !important;
@@ -87,7 +86,6 @@
   box-shadow: none !important;
 }
 
-/* 左欄職業圖片維持目前位置。 */
 .profession-visual {
   display: flex;
   min-width: 0;
@@ -100,7 +98,6 @@
   transform: translate(.5em, .5em);
 }
 
-/* 右欄三個職業圖片維持目前向右微調的位置。 */
 .profession-card:nth-child(even) .profession-visual {
   transform: translate(1em, .5em);
 }
@@ -120,29 +117,25 @@
   transform-origin: center;
 }
 
-/* 屬性：左欄向右 .7em、右欄向右 1.2em，兩欄都維持向下半個字。 */
-.profession-detail {
+/* 所有屬性與評級統一往右 1.2 個字，並維持往下半個字。 */
+.profession-detail,
+.profession-card:nth-child(even) .profession-detail {
   display: flex;
   min-width: 0;
   height: 96%;
   align-items: center;
   justify-content: center;
-  transform: translate(.7em, .5em);
-}
-
-.profession-card:nth-child(even) .profession-detail {
   transform: translate(1.2em, .5em);
 }
 
 .profession-abilities {
   display: grid;
   width: 100%;
-  gap: 4.5%;
+  gap: .5em;
   align-content: center;
   justify-items: start;
 }
 
-/* 移除整列米白膠囊，只保留文字＋評級色塊；字體縮為先前約 80%，並改細體。 */
 .ability-item {
   display: flex;
   align-items: center;
@@ -237,12 +230,13 @@
     transform: scale(1.15);
   }
 
-  .profession-detail {
-    transform: translate(.7em, .5em);
-  }
-
+  .profession-detail,
   .profession-card:nth-child(even) .profession-detail {
     transform: translate(1.2em, .5em);
+  }
+
+  .profession-abilities {
+    gap: .5em;
   }
 
   .ability-item {
@@ -297,16 +291,13 @@
     transform: scale(1.16);
   }
 
-  .profession-detail {
-    transform: translate(.7em, .5em);
-  }
-
+  .profession-detail,
   .profession-card:nth-child(even) .profession-detail {
     transform: translate(1.2em, .5em);
   }
 
   .profession-abilities {
-    gap: 4.6%;
+    gap: .5em;
   }
 
   .ability-item {
