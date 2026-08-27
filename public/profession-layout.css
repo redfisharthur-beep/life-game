@@ -1,0 +1,152 @@
+/* Compact profession selection: image + enlarged ability grades only */
+#professionPanel {
+  margin-top: 8px;
+}
+
+.profession-title,
+.profession-subtitle,
+.profession-name,
+.profession-state {
+  display: none !important;
+}
+
+.profession-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.profession-card {
+  grid-template-columns: 45% 55%;
+  gap: 6px;
+  min-height: 164px;
+  padding: 8px;
+  border-radius: 18px;
+}
+
+.profession-visual {
+  min-width: 0;
+  justify-content: center;
+  padding: 0;
+}
+
+.profession-image {
+  width: 100%;
+  max-width: 152px;
+  height: 148px;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
+.profession-detail {
+  justify-content: center;
+}
+
+.profession-abilities {
+  gap: 4px;
+}
+
+.ability-item {
+  grid-template-columns: minmax(0, 1fr) 38px;
+  gap: 5px;
+  min-height: 34px;
+  padding: 4px 5px 4px 10px;
+  border-radius: 10px;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.ability-label {
+  letter-spacing: .03em;
+}
+
+.ability-grade {
+  width: 34px;
+  height: 28px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.profession-message {
+  margin-top: 10px;
+  min-height: 22px;
+  font-size: 14px;
+}
+
+@media (max-width: 760px) {
+  #professionPanel {
+    margin-top: 4px;
+  }
+
+  .profession-grid {
+    gap: 6px;
+  }
+
+  .profession-card {
+    grid-template-columns: 44% 56%;
+    gap: 4px;
+    min-height: 148px;
+    padding: 6px;
+    border-radius: 15px;
+  }
+
+  .profession-image {
+    max-width: 122px;
+    height: 132px;
+  }
+
+  .profession-abilities {
+    gap: 3px;
+  }
+
+  .ability-item {
+    grid-template-columns: minmax(0, 1fr) 31px;
+    gap: 3px;
+    min-height: 30px;
+    padding: 3px 4px 3px 7px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .ability-grade {
+    width: 28px;
+    height: 24px;
+    border-radius: 7px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 390px) {
+  .profession-grid {
+    gap: 5px;
+  }
+
+  .profession-card {
+    grid-template-columns: 43% 57%;
+    min-height: 138px;
+    padding: 5px;
+  }
+
+  .profession-image {
+    max-width: 108px;
+    height: 122px;
+  }
+
+  .ability-item {
+    grid-template-columns: minmax(0, 1fr) 28px;
+    min-height: 28px;
+    padding: 2px 3px 2px 6px;
+    font-size: 12.5px;
+  }
+
+  .ability-grade {
+    width: 26px;
+    height: 22px;
+    font-size: 15px;
+  }
+
+  .profession-message {
+    margin-top: 8px;
+    font-size: 12px;
+  }
+}
