@@ -32,6 +32,7 @@ function publicRoom(room) {
       name: player.name,
     })),
     maxPlayers: 6,
+    started: Boolean(room.started),
   };
 }
 
@@ -65,6 +66,7 @@ function leaveCurrentRoom(socket) {
 
 function findJoinableRoom(name) {
   for (const room of rooms.values()) {
+    if (room.started) continue;
     if (room.players.length >= 6) continue;
 
     const duplicateName = room.players.some(
@@ -83,6 +85,7 @@ function createRoomFor(socket, name) {
     code,
     hostId: socket.id,
     players: [{ id: socket.id, name }],
+    started: false,
   };
 
   rooms.set(code, room);
@@ -103,7 +106,7 @@ io.on('connection', (socket) => {
     const name = cleanName(payload?.name);
 
     if (!name) {
-      return reply?.({ ok: false, message: '請先輸入玩家名稱。' });
+      return reply?.({ ok: false, message: '請先輸入暱稱。' });
     }
 
     leaveCurrentRoom(socket);
@@ -120,6 +123,28 @@ io.on('connection', (socket) => {
 
     reply?.({ ok: true, room: publicRoom(room) });
     emitRoom(room);
+  });
+
+  socket.on('room:start', (reply) => {
+    const roomCode = socket.data.roomCode;
+    const room = rooms.get(roomCode);
+
+    if (!room) {
+      return reply?.({ ok: false, message: '目前不在房間內。' });
+    }
+
+    if (room.started) {
+      return reply?.({ ok: true, room: publicRoom(room) });
+    }
+
+    if (room.players.length < 2) {
+      return reply?.({ ok: false, message: '至少需要2位玩家才能啟程。' });
+    }
+
+    room.started = true;
+    const snapshot = publicRoom(room);
+    reply?.({ ok: true, room: snapshot });
+    io.to(room.code).emit('room:started', snapshot);
   });
 
   socket.on('room:leave', (reply) => {
