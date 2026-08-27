@@ -6,6 +6,8 @@
 #gamePanel .player-status-profession,
 #gamePanel .player-status-total-label,
 #gamePanel .player-status-total-value,
+#gamePanel .player-status-cash-label,
+#gamePanel .player-status-cash-value,
 #gamePanel .player-status-happiness-value,
 #gamePanel .player-status-turn-badge,
 #gamePanel .player-summary-label,
@@ -30,8 +32,10 @@
 
 #gamePanel .player-status-profession { font-size: 17px !important; }
 #gamePanel .player-status-name { font-size: 24px !important; }
-#gamePanel .player-status-total-label { font-size: 19px !important; }
-#gamePanel .player-status-total-value { font-size: 23px !important; }
+#gamePanel .player-status-total-label,
+#gamePanel .player-status-cash-label { font-size: 19px !important; }
+#gamePanel .player-status-total-value,
+#gamePanel .player-status-cash-value { font-size: 23px !important; }
 #gamePanel .player-status-happiness-value { font-size: 23px !important; }
 #gamePanel .player-status-turn-badge { font-size: 13px !important; }
 #gamePanel .player-summary-label { font-size: 18px !important; }
@@ -76,8 +80,10 @@
 
   #gamePanel .player-status-profession { font-size: 14px !important; }
   #gamePanel .player-status-name { font-size: 20px !important; }
-  #gamePanel .player-status-total-label { font-size: 16px !important; }
-  #gamePanel .player-status-total-value { font-size: 19px !important; }
+  #gamePanel .player-status-total-label,
+  #gamePanel .player-status-cash-label { font-size: 16px !important; }
+  #gamePanel .player-status-total-value,
+  #gamePanel .player-status-cash-value { font-size: 19px !important; }
   #gamePanel .player-status-happiness-value { font-size: 19px !important; }
   #gamePanel .player-summary-label { font-size: 16px !important; }
   #gamePanel .player-summary-value { font-size: 16px !important; }
@@ -90,8 +96,10 @@
 
   #gamePanel .player-status-profession { font-size: 13px !important; }
   #gamePanel .player-status-name { font-size: 19px !important; }
-  #gamePanel .player-status-total-label { font-size: 15px !important; }
-  #gamePanel .player-status-total-value { font-size: 18px !important; }
+  #gamePanel .player-status-total-label,
+  #gamePanel .player-status-cash-label { font-size: 15px !important; }
+  #gamePanel .player-status-total-value,
+  #gamePanel .player-status-cash-value { font-size: 18px !important; }
   #gamePanel .player-status-happiness-value { font-size: 18px !important; }
   #gamePanel .player-summary-label { font-size: 15px !important; }
   #gamePanel .player-summary-value { font-size: 15px !important; }
