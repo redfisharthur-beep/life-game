@@ -11,6 +11,7 @@
 
   function updateVisualState() {
     const showOnHome = isVisible(entryPanel);
+    const showOnRoom = isVisible(roomPanel);
     const showOnProfession = isVisible(professionPanel);
     const showOnResults = isVisible(gamePanel) && gamePanel.classList.contains('finished-mode');
 
@@ -20,11 +21,12 @@
 
     if (mainCard) {
       mainCard.classList.toggle('home-mode', showOnHome);
+      mainCard.classList.toggle('room-mode', showOnRoom);
       mainCard.classList.toggle('profession-mode', showOnProfession);
     }
 
     if (logo) {
-      /* 首頁由 front page.png、職業頁由 select.png 負責完整視覺；Logo 只保留結算畫面。 */
+      /* 首頁、等待頁、職業頁都有完整底圖；Logo 只保留結算畫面。 */
       logo.style.setProperty('display', showOnResults ? 'block' : 'none', 'important');
     }
   }
