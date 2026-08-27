@@ -85,7 +85,7 @@
   box-shadow: none !important;
 }
 
-/* 自己已選：整個框維持透明，只讓人物圖片本身偏金黃色高亮。 */
+/* 自己已選：框維持透明，只讓人物圖片呈現霧面深米黃色，不發亮。 */
 .profession-card.selected {
   opacity: 1;
   filter: none;
@@ -102,12 +102,11 @@
 
 .profession-card.selected .profession-image {
   filter:
-    sepia(.72)
-    saturate(2.35)
-    hue-rotate(354deg)
-    brightness(1.14)
-    contrast(1.02)
-    drop-shadow(0 0 9px rgba(232, 180, 42, .38));
+    sepia(.58)
+    saturate(.92)
+    hue-rotate(348deg)
+    brightness(.88)
+    contrast(.96);
 }
 
 .profession-visual {
