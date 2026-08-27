@@ -11,6 +11,18 @@
     dream: { label: '圓夢', image: '/images/dream.png' },
   };
 
+  const FATE_RESULTS = [
+    { label: '中樂透', image: '/images/Lotto.png' },
+    { label: '花錢消災', image: '/images/Spendmoney.png' },
+    { label: '股神降臨', image: '/images/Investment%20Guru.png' },
+    { label: '黑天鵝', image: '/images/Black%20Swan.png' },
+    { label: '政策利多', image: '/images/Favorable%20policies.png' },
+    { label: '打房政策', image: '/images/measures%20to%20curb%20the%20property%20market.png' },
+    { label: '社福救濟', image: '/images/Social%20welfare.png' },
+    { label: '幸福降臨', image: '/images/Unbelievable.png' },
+    { label: '人生低潮', image: '/images/Unlucky.png' },
+  ];
+
   const DICE_FACES = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
   const STAGE_MS = 2000;
 
@@ -71,7 +83,29 @@
     `;
   }
 
+  function showFateResultStage(playerName, event) {
+    const fateIndex = Number(event.fateIndex);
+    const fateResult = FATE_RESULTS[fateIndex];
+
+    kickerEl.textContent = `${playerName} 抽到命運`;
+    titleEl.textContent = fateResult?.label || '命運結果';
+
+    bodyEl.innerHTML = `
+      <div class="fate-result-wrap">
+        ${fateResult ? `<img class="fate-result-image" src="${fateResult.image}" alt="${fateResult.label}" />` : ''}
+        <p class="action-showcase-result fate-result-text"></p>
+      </div>
+    `;
+
+    bodyEl.querySelector('.fate-result-text').textContent = event.text || '命運事件完成';
+  }
+
   function showResultStage(playerName, event) {
+    if (event.type === 'fate') {
+      showFateResultStage(playerName, event);
+      return;
+    }
+
     kickerEl.textContent = `${playerName} 的行動結果`;
     titleEl.textContent = '結果公布';
     bodyEl.innerHTML = `<p class="action-showcase-result"></p>`;
