@@ -87,7 +87,7 @@
   box-shadow: none !important;
 }
 
-/* 職業圖片整體往右、往下約半個字。 */
+/* 左欄職業圖片維持目前位置。 */
 .profession-visual {
   display: flex;
   min-width: 0;
@@ -98,6 +98,11 @@
   background: transparent;
   overflow: visible;
   transform: translate(.5em, .5em);
+}
+
+/* 右欄三個職業圖片再往右半個字。 */
+.profession-card:nth-child(even) .profession-visual {
+  transform: translate(1em, .5em);
 }
 
 .profession-image {
@@ -115,14 +120,14 @@
   transform-origin: center;
 }
 
-/* 能力文字整組往右約兩個中文字寬。 */
+/* 屬性整組從原本右移 2em 改為右移 .5em，等於往左 1.5 個字；並往下半個字。 */
 .profession-detail {
   display: flex;
   min-width: 0;
   height: 96%;
   align-items: center;
   justify-content: center;
-  transform: translateX(2em);
+  transform: translate(.5em, .5em);
 }
 
 .profession-abilities {
@@ -217,6 +222,10 @@
     transform: translate(.5em, .5em);
   }
 
+  .profession-card:nth-child(even) .profession-visual {
+    transform: translate(1em, .5em);
+  }
+
   .profession-image {
     width: 116%;
     height: 116%;
@@ -224,7 +233,7 @@
   }
 
   .profession-detail {
-    transform: translateX(2em);
+    transform: translate(.5em, .5em);
   }
 
   .ability-item {
@@ -267,6 +276,10 @@
     transform: translate(.5em, .5em);
   }
 
+  .profession-card:nth-child(even) .profession-visual {
+    transform: translate(1em, .5em);
+  }
+
   .profession-image {
     width: 120%;
     height: 120%;
@@ -274,7 +287,7 @@
   }
 
   .profession-detail {
-    transform: translateX(2em);
+    transform: translate(.5em, .5em);
   }
 
   .profession-abilities {
