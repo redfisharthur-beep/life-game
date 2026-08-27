@@ -165,21 +165,21 @@
   filter: drop-shadow(0 8px 12px rgba(71, 62, 55, .18));
 }
 
-/* 命運／陷害／援助：玩家頭像縮小為原本約一半。 */
+/* 命運／陷害／援助：人物頭像小，事件圖為視覺主角。 */
 .result-person-head-small {
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
 }
 
 .result-person-special {
-  min-width: 60px;
+  min-width: 54px;
 }
 
 .result-person-name {
-  max-width: 110px;
+  max-width: 92px;
   overflow: hidden;
   color: #5b514a;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
   line-height: 1.05;
   text-overflow: ellipsis;
@@ -189,32 +189,32 @@
 .result-event-visual {
   display: grid;
   justify-items: center;
-  gap: 4px;
-  min-width: 96px;
+  gap: 5px;
+  min-width: 146px;
 }
 
 .result-event-image {
   display: block;
-  width: 104px;
-  height: 104px;
+  width: 150px;
+  height: 150px;
   object-fit: contain;
   background: transparent;
   border: 0;
-  filter: drop-shadow(0 9px 15px rgba(71, 62, 55, .22));
+  filter: drop-shadow(0 11px 18px rgba(71, 62, 55, .24));
 }
 
 .result-event-label {
-  max-width: 130px;
+  max-width: 160px;
   overflow: hidden;
   color: #8b665d;
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 800;
   line-height: 1.05;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* 圓夢失敗：人物＋哭哭圖示＋原因。 */
+/* 圓夢失敗：人物＋cry.png＋原因。 */
 .result-visual-dream-fail {
   gap: 22px;
 }
@@ -222,14 +222,18 @@
 .dream-fail-visual {
   display: grid;
   justify-items: center;
-  gap: 4px;
+  gap: 5px;
+  max-width: 240px;
 }
 
-.dream-fail-icon {
+.dream-fail-image {
   display: block;
-  font-size: 64px;
-  line-height: 1;
-  filter: drop-shadow(0 8px 12px rgba(71, 62, 55, .16));
+  width: 104px;
+  height: 104px;
+  object-fit: contain;
+  background: transparent;
+  border: 0;
+  filter: drop-shadow(0 8px 14px rgba(71, 62, 55, .18));
 }
 
 .dream-fail-label {
@@ -243,6 +247,7 @@
   color: #756a62;
   font-size: 17px;
   font-weight: 600;
+  line-height: 1.35;
 }
 
 .simple-result-list {
@@ -326,12 +331,12 @@
   }
 
   .result-visual {
-    gap: 9px;
-    min-height: 94px;
+    gap: 8px;
+    min-height: 116px;
   }
 
   .result-person {
-    min-width: 70px;
+    min-width: 58px;
   }
 
   .result-person-head {
@@ -340,31 +345,40 @@
   }
 
   .result-person-head-small {
-    width: 38px;
-    height: 38px;
+    width: 32px;
+    height: 32px;
   }
 
   .result-person-special {
-    min-width: 52px;
+    min-width: 46px;
+  }
+
+  .result-event-visual {
+    min-width: 118px;
   }
 
   .result-event-image {
-    width: 82px;
-    height: 82px;
+    width: 120px;
+    height: 120px;
   }
 
-  .result-person-name,
+  .result-person-name {
+    max-width: 72px;
+    font-size: 12px;
+  }
+
   .result-event-label {
-    max-width: 92px;
-    font-size: 14px;
+    max-width: 130px;
+    font-size: 16px;
   }
 
   .result-visual-dream-fail {
     gap: 14px;
   }
 
-  .dream-fail-icon {
-    font-size: 54px;
+  .dream-fail-image {
+    width: 86px;
+    height: 86px;
   }
 
   .dream-fail-label {
