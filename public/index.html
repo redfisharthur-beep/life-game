@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/market-icons.css?v=20260827-1510" />
   <link rel="stylesheet" href="/profession-layout.css?v=20260827-1818" />
   <link rel="stylesheet" href="/action-showcase.css?v=20260827-1609a" />
+  <link rel="stylesheet" href="/game-complete.css?v=20260827-1620" />
 </head>
 <body>
   <main class="shell">
@@ -126,13 +127,30 @@
           <span class="event-label">最新事件</span>
           <p id="gameEvent">職業選擇完成，人生啟程！</p>
         </section>
+
+        <section id="gameResults" class="game-results hidden" aria-live="polite">
+          <div class="results-heading">
+            <span>人生結算</span>
+            <strong id="resultWinner">第一名</strong>
+          </div>
+          <div id="rankingList" class="ranking-list"></div>
+          <div class="results-actions">
+            <button id="restartGameBtn" class="start-button" type="button">再來一局</button>
+            <button id="leaveGameBtn" class="ghost" type="button">返回首頁</button>
+          </div>
+        </section>
       </div>
     </section>
   </main>
 
+  <section id="roundAnnouncement" class="round-announcement hidden" aria-live="assertive">
+    <strong>人生加速！</strong>
+    <span>從現在開始每回合擲2顆骰子！</span>
+  </section>
+
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260827-1545"></script>
-  <script src="/player-status.js?v=20260827-1735"></script>
-  <script src="/action-showcase.js?v=20260827-1609a"></script>
+  <script src="/app.js?v=20260827-1620"></script>
+  <script src="/player-status.js?v=20260827-1620"></script>
+  <script src="/action-showcase.js?v=20260827-1620"></script>
 </body>
 </html>
