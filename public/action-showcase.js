@@ -23,7 +23,6 @@
     { label: '人生低潮', image: '/images/Unlucky.png' },
   ];
 
-  const DICE_FACES = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
   const STAGE_MS = 2000;
 
   let lastShowcaseKey = null;
@@ -61,7 +60,12 @@
     });
   }
 
+  function setDiceStageMode(enabled) {
+    overlay.classList.toggle('dice-stage-active', Boolean(enabled));
+  }
+
   function showActionStage(playerName, action) {
+    setDiceStageMode(false);
     kickerEl.textContent = `${playerName} 的選擇`;
     titleEl.textContent = action.label;
     bodyEl.innerHTML = `<img class="action-showcase-image" src="${action.image}" alt="${action.label}" />`;
@@ -70,20 +74,25 @@
   function showDiceStage(playerName, event) {
     const dice = Array.isArray(event.dice) ? event.dice : [];
     const total = Number(event.diceTotal || 0);
-    kickerEl.textContent = `${playerName} 骰到`;
-    titleEl.textContent = `${total} 點`;
+    const diceCount = Math.max(1, Math.min(2, dice.length || 1));
 
-    const faces = dice
-      .map((value) => `<span aria-label="${value} 點">${DICE_FACES[value] || value}</span>`)
-      .join('');
+    setDiceStageMode(true);
+    kickerEl.textContent = `${playerName} 骰到`;
+    titleEl.textContent = String(total);
+
+    const diceImages = Array.from({ length: diceCount }, (_, index) => (
+      `<img class="dice-result-image" src="/images/dice.png" alt="第 ${index + 1} 顆骰子" />`
+    )).join('');
 
     bodyEl.innerHTML = `
-      <div class="action-showcase-dice">${faces}</div>
-      ${dice.length > 1 ? `<div class="action-showcase-total">合計 ${total} 點</div>` : ''}
+      <div class="dice-result-stage" aria-label="骰子結果 ${total}">
+        <div class="dice-result-images ${diceCount > 1 ? 'two-dice' : ''}">${diceImages}</div>
+      </div>
     `;
   }
 
   function showFateResultStage(playerName, event) {
+    setDiceStageMode(false);
     const fateIndex = Number(event.fateIndex);
     const fateResult = FATE_RESULTS[fateIndex];
 
@@ -101,6 +110,7 @@
   }
 
   function showResultStage(playerName, event) {
+    setDiceStageMode(false);
     if (event.type === 'fate') {
       showFateResultStage(playerName, event);
       return;
@@ -156,6 +166,7 @@
 
     stageTimers.push(setTimeout(() => {
       overlay.classList.add('hidden');
+      setDiceStageMode(false);
       if (lockTimer) {
         clearInterval(lockTimer);
         lockTimer = null;
