@@ -64,6 +64,10 @@
     overlay.classList.toggle('dice-stage-active', Boolean(enabled));
   }
 
+  function setChoiceStageMode(enabled) {
+    overlay.classList.toggle('choice-stage-active', Boolean(enabled));
+  }
+
   function getSingleDieImage(value) {
     const point = Number(value);
     if (Number.isInteger(point) && point >= 1 && point <= 6) {
@@ -82,8 +86,9 @@
 
   function showActionStage(playerName, action) {
     setDiceStageMode(false);
-    kickerEl.textContent = `${playerName} 的選擇`;
-    titleEl.textContent = action.label;
+    setChoiceStageMode(true);
+    kickerEl.textContent = `${playerName} 選擇`;
+    titleEl.textContent = '';
     bodyEl.innerHTML = `<img class="action-showcase-image" src="${action.image}" alt="${action.label}" />`;
   }
 
@@ -92,6 +97,7 @@
     const total = Number(event.diceTotal || 0);
     const diceCount = Math.max(1, Math.min(2, dice.length || 1));
 
+    setChoiceStageMode(false);
     setDiceStageMode(true);
     kickerEl.textContent = `${playerName} 骰到`;
     titleEl.textContent = String(total);
@@ -120,6 +126,7 @@
   }
 
   function showFateResultStage(playerName, event) {
+    setChoiceStageMode(false);
     setDiceStageMode(false);
     const fateIndex = Number(event.fateIndex);
     const fateResult = FATE_RESULTS[fateIndex];
@@ -138,6 +145,7 @@
   }
 
   function showResultStage(playerName, event) {
+    setChoiceStageMode(false);
     setDiceStageMode(false);
     if (event.type === 'fate') {
       showFateResultStage(playerName, event);
@@ -194,6 +202,7 @@
 
     stageTimers.push(setTimeout(() => {
       overlay.classList.add('hidden');
+      setChoiceStageMode(false);
       setDiceStageMode(false);
       if (lockTimer) {
         clearInterval(lockTimer);
