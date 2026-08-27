@@ -12,19 +12,24 @@
   <link rel="stylesheet" href="/action-showcase.css?v=20260827-1609a" />
   <link rel="stylesheet" href="/game-complete.css?v=20260827-1620" />
   <link rel="stylesheet" href="/logo-display.css?v=20260827-1610" />
+  <link rel="stylesheet" href="/front-page.css?v=20260827-1710" />
 </head>
 <body>
   <main class="shell">
     <section class="card" id="lobbyCard">
       <img id="gameLogo" class="game-logo" src="/images/logo.png?v=20260827-1610" alt="人生" />
 
-      <div id="entryPanel" class="panel">
-        <label class="field entry-control">
-          <input id="playerName" maxlength="12" autocomplete="nickname" placeholder="暱稱" />
-        </label>
+      <div id="homeStage" class="home-stage">
+        <img class="front-page-image" src="/images/front%20page.png?v=20260827-1710" alt="人生首頁" />
 
-        <button id="joinGameBtn" class="primary entry-control" type="button">迎向新局</button>
-        <p id="message" class="message" aria-live="polite"></p>
+        <div id="entryPanel" class="panel home-entry-panel">
+          <label class="field entry-control">
+            <input id="playerName" maxlength="12" autocomplete="nickname" placeholder="輸入名字" />
+          </label>
+
+          <button id="joinGameBtn" class="primary entry-control" type="button">迎向新局</button>
+          <p id="message" class="message" aria-live="polite"></p>
+        </div>
       </div>
 
       <div id="roomPanel" class="panel hidden">
@@ -153,6 +158,6 @@
   <script src="/app.js?v=20260827-1620"></script>
   <script src="/player-status.js?v=20260827-1845"></script>
   <script src="/action-showcase.js?v=20260827-1620"></script>
-  <script src="/logo-visibility.js?v=20260827-1610"></script>
+  <script src="/logo-visibility.js?v=20260827-1710"></script>
 </body>
 </html>
