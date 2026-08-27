@@ -49,13 +49,9 @@ function renderRoom(room) {
   playerCountEl.textContent = `${room.players.length} / ${room.maxPlayers}`;
 
   playerListEl.innerHTML = '';
-  room.players.forEach((player, index) => {
+  room.players.forEach((player) => {
     const row = document.createElement('div');
     row.className = 'player-row';
-
-    const number = document.createElement('span');
-    number.className = 'player-number';
-    number.textContent = index + 1;
 
     const name = document.createElement('span');
     name.className = 'player-name';
@@ -70,17 +66,24 @@ function renderRoom(room) {
       badge.classList.add('empty');
     }
 
-    row.append(number, name, badge);
+    row.append(name, badge);
     playerListEl.appendChild(row);
   });
 
-  const canStart = room.players.length >= 2 && !room.started;
+  const isHost = socket.id === room.hostId;
+  const hasEnoughPlayers = room.players.length >= 2;
+  const canStart = isHost && hasEnoughPlayers && !room.started;
+
   startGameBtn.disabled = !canStart;
-  startGameBtn.textContent = room.started ? '已啟程' : '啟程';
 
   if (room.started) {
-    setLaunchMessage('準備進入下一階段…');
+    startGameBtn.textContent = '已啟程';
+    setLaunchMessage('遊戲開始！');
+  } else if (!isHost) {
+    startGameBtn.textContent = '等待房主啟程';
+    setLaunchMessage('');
   } else {
+    startGameBtn.textContent = '啟程';
     setLaunchMessage('');
   }
 }
@@ -90,7 +93,7 @@ function withBusy(button, task) {
   button.disabled = true;
   Promise.resolve(task()).finally(() => {
     if (button !== startGameBtn || !currentRoom?.started) {
-      button.disabled = false;
+      renderRoom(currentRoom);
     }
   });
 }
