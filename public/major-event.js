@@ -17,6 +17,7 @@
   const countdownEl = overlay.querySelector('.major-event-countdown span');
   let timer = null;
   let activeKey = null;
+  let localDeadline = 0;
 
   function hide() {
     if (timer) {
@@ -24,6 +25,7 @@
       timer = null;
     }
     activeKey = null;
+    localDeadline = 0;
     overlay.classList.add('hidden');
   }
 
@@ -31,8 +33,8 @@
     const game = room?.game;
     const event = game?.majorEvent;
     const until = Number(game?.majorEventUntil || 0);
-    const now = Number(room?.serverTime || Date.now());
-    const remaining = until - now;
+    const serverNow = Number(room?.serverTime || Date.now());
+    const remaining = until - serverNow;
 
     if (!event || remaining <= 0 || room?.phase !== 'game') {
       hide();
@@ -42,15 +44,18 @@
     const key = `${room.code}:${event.id}:${event.round}`;
     if (key !== activeKey) {
       activeKey = key;
+      localDeadline = Date.now() + remaining;
       titleEl.textContent = event.title || '重大事件';
       descriptionEl.textContent = event.description || '';
       overlay.classList.remove('hidden');
       if (timer) clearInterval(timer);
       timer = setInterval(() => {
-        const localRemaining = Math.max(0, until - Date.now());
+        const localRemaining = Math.max(0, localDeadline - Date.now());
         countdownEl.textContent = String(Math.max(0, Math.ceil(localRemaining / 1000)));
         if (localRemaining <= 0) hide();
       }, 200);
+    } else {
+      localDeadline = Date.now() + remaining;
     }
 
     countdownEl.textContent = String(Math.max(0, Math.ceil(remaining / 1000)));
