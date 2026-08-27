@@ -45,8 +45,7 @@
   }
 
   function formatHappinessDisplay(value) {
-    const number = Number(value || 0);
-    return String(Math.trunc(number));
+    return String(Math.trunc(Number(value || 0)));
   }
 
   function makeText(className, text) {
@@ -56,34 +55,12 @@
     return element;
   }
 
-  function makeSummaryItem(label, value, className = '') {
-    const item = document.createElement('span');
-    item.className = `player-summary-item ${className}`.trim();
-    item.append(
-      makeText('player-summary-label', label),
-      makeText('player-summary-value', value)
-    );
-    return item;
-  }
-
-  function makeTotalAssets(value) {
+  function makeInfoCell(label, value, className = '') {
     const item = document.createElement('div');
-    item.className = 'player-status-total-assets';
-    item.setAttribute('aria-label', `總資產 ${formatAsset(value)}`);
+    item.className = `player-info-cell ${className}`.trim();
     item.append(
-      makeText('player-status-total-label', '總資產'),
-      makeText('player-status-total-value', formatAsset(value))
-    );
-    return item;
-  }
-
-  function makeCash(value) {
-    const item = document.createElement('div');
-    item.className = 'player-status-cash';
-    item.setAttribute('aria-label', `現金 ${formatInteger(value)}`);
-    item.append(
-      makeText('player-status-cash-label', '現金'),
-      makeText('player-status-cash-value', formatInteger(value))
+      makeText('player-info-label', label),
+      makeText('player-info-value', value)
     );
     return item;
   }
@@ -128,10 +105,7 @@
     const mainCard = document.getElementById('lobbyCard');
     if (!bar || !mainCard) return;
 
-    const inGame = Boolean(
-      room?.game && (room.phase === 'game' || room.phase === 'finished')
-    );
-
+    const inGame = Boolean(room?.game && (room.phase === 'game' || room.phase === 'finished'));
     mainCard.classList.toggle('game-mode', inGame);
 
     if (!inGame) {
@@ -164,38 +138,26 @@
       }, { once: true });
       avatarWrap.appendChild(avatar);
 
-      const content = document.createElement('div');
-      content.className = 'player-status-content';
+      const infoGrid = document.createElement('div');
+      infoGrid.className = 'player-status-info-grid';
 
-      const topRow = document.createElement('div');
-      topRow.className = 'player-status-top-row';
+      const nameCell = document.createElement('div');
+      nameCell.className = 'player-info-cell player-info-name';
+      nameCell.append(makeText('player-status-name', player.connected ? player.name : `${player.name}（離線）`));
 
-      const nameBlock = document.createElement('div');
-      nameBlock.className = 'player-status-name-block';
-      nameBlock.append(
-        makeText('player-status-name', player.connected ? player.name : `${player.name}（離線）`)
-      );
-
-      topRow.append(
-        nameBlock,
-        makeTotalAssets(player.totalAssets),
-        makeCash(player.cash),
-        makeHappiness(player.happiness)
+      infoGrid.append(
+        nameCell,
+        makeInfoCell('總資產', formatAsset(player.totalAssets), 'total-assets'),
+        makeInfoCell('現金', formatInteger(player.cash), 'cash'),
+        makeInfoCell('股票', formatUnit(player.stocks), 'stocks'),
+        makeInfoCell('土地', formatUnit(player.land), 'land')
       );
 
       if (player.id === room.game.currentPlayerId && room.phase === 'game') {
-        topRow.append(makeText('player-status-turn-badge', '行動中'));
+        card.append(makeText('player-status-turn-badge', '行動中'));
       }
 
-      const summary = document.createElement('div');
-      summary.className = 'player-status-summary';
-      summary.append(
-        makeSummaryItem('股票', formatUnit(player.stocks), 'stocks'),
-        makeSummaryItem('土地', formatUnit(player.land), 'land')
-      );
-
-      content.append(topRow, summary);
-      card.append(avatarWrap, content);
+      card.append(avatarWrap, infoGrid, makeHappiness(player.happiness));
       bar.appendChild(card);
     });
   }
