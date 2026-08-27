@@ -44,12 +44,12 @@
   pointer-events: none;
 }
 
-/* 名字輸入區再往下約半個字高，讓文字更接近米白框視覺正中央。 */
+/* 名字輸入區以目前位置為基準上移 0.2em。 */
 .home-entry-panel .field.entry-control {
   position: absolute;
   display: block;
   left: 24.1%;
-  top: 52.7%;
+  top: calc(52.7% - .2em);
   width: 51.8%;
   height: 9.6%;
   margin: 0;
