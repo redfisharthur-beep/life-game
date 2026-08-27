@@ -25,6 +25,7 @@ const ROUND_ACCELERATION_MS = 3_000;
 const DISCONNECT_GRACE_MS = 90_000;
 const ROOM_IDLE_MS = 15 * 60_000;
 const TOTAL_ROUNDS = 30;
+const HAPPINESS_GOAL = 36;
 
 const PROFESSIONS = {
   doctor: { name: '醫師', salary: 7, stock: 1.5, land: 2.0, dream: 2.35 },
@@ -319,6 +320,10 @@ function initializeGame(room) {
   beginTurn(room);
 }
 
+function hasReachedHappinessGoal(room) {
+  return room.players.some((player) => Number(player.happiness || 0) >= HAPPINESS_GOAL);
+}
+
 function advanceTurn(room) {
   if (!room.game || room.phase !== 'game') return;
 
@@ -328,10 +333,16 @@ function advanceTurn(room) {
   emitRoom(room);
 
   const expectedTurnId = room.game.turnId;
+  const shouldFinishEarly = hasReachedHappinessGoal(room);
   room.turnTimer = setTimeout(() => {
     const currentRoom = rooms.get(room.code);
     if (!currentRoom || currentRoom.phase !== 'game' || !currentRoom.game) return;
     if (currentRoom.game.turnId !== expectedTurnId) return;
+
+    if (shouldFinishEarly || hasReachedHappinessGoal(currentRoom)) {
+      finishGame(currentRoom, 'happiness');
+      return;
+    }
 
     currentRoom.game.turnIndex += 1;
     beginTurn(currentRoom);
@@ -346,7 +357,7 @@ function updateMarket(room) {
   return stockUp ? '股票上漲 10%' : '股票下跌 7%';
 }
 
-function finishGame(room) {
+function finishGame(room, reason = 'rounds') {
   clearTurnTimer(room);
   room.game.finished = true;
   room.game.currentPlayerId = null;
@@ -358,7 +369,9 @@ function finishGame(room) {
   room.game.results = calculateResults(room);
   room.game.lastEvent = {
     type: 'finish',
-    text: '第 30 回合結束，人生旅程完成！',
+    text: reason === 'happiness'
+      ? `有玩家達成 ${HAPPINESS_GOAL} 幸福值，人生旅程提前完成！`
+      : '50歲人生旅程完成！',
   };
   room.phase = 'finished';
   emitRoom(room);
@@ -369,7 +382,7 @@ function endRound(room) {
   clearTurnTimer(room);
 
   if (room.game.round >= TOTAL_ROUNDS) {
-    finishGame(room);
+    finishGame(room, 'rounds');
     return;
   }
 
