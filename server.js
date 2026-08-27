@@ -21,15 +21,18 @@ app.use(express.static(path.join(__dirname, 'public'), {
 const rooms = new Map();
 const TURN_MS = 10_000;
 const ACTION_SHOWCASE_MS = 6_000;
+const ROUND_ACCELERATION_MS = 3_000;
+const DISCONNECT_GRACE_MS = 90_000;
+const ROOM_IDLE_MS = 15 * 60_000;
 const TOTAL_ROUNDS = 30;
 
 const PROFESSIONS = {
   doctor: { name: '醫師', salary: 7, stock: 1.5, land: 2.0, dream: 2.35 },
-  engineer: { name: '工程師', salary: 8, stock: 2.0, land: 1.0, dream: 2.10 },
-  sales: { name: '超業', salary: 9, stock: 1.5, land: 1.5, dream: 1.95 },
-  office: { name: '白領', salary: 5, stock: 2.0, land: 1.0, dream: 2.975 },
-  athlete: { name: '運動員', salary: 6, stock: 1.0, land: 1.5, dream: 2.70 },
-  rich: { name: '富二代', salary: 10, stock: 1.0, land: 2.0, dream: 1.80 },
+  engineer: { name: '資訊工程師', salary: 8, stock: 2.0, land: 1.0, dream: 2.10 },
+  sales: { name: '超級業務員', salary: 9, stock: 1.5, land: 1.5, dream: 1.95 },
+  office: { name: '白領上班族', salary: 5, stock: 2.0, land: 1.0, dream: 2.975 },
+  athlete: { name: '職棒球員', salary: 6, stock: 1.0, land: 1.5, dream: 2.70 },
+  rich: { name: '企業富二代', salary: 10, stock: 1.0, land: 2.0, dream: 1.80 },
 };
 
 function cleanName(value) {
@@ -44,8 +47,12 @@ function createRoomCode() {
   return code;
 }
 
+function createReconnectToken() {
+  return crypto.randomBytes(24).toString('hex');
+}
+
 function round2(value) {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
+  return Math.round((Number(value || 0) + Number.EPSILON) * 100) / 100;
 }
 
 function shuffle(values) {
@@ -78,11 +85,72 @@ function rollDice(round) {
 }
 
 function playerAssets(player, game) {
-  return Math.round(
-    player.cash
-    + (player.stocks * game.stockPrice)
-    + (player.land * game.landPrice)
+  return round2(
+    Number(player.cash || 0)
+    + (Number(player.stocks || 0) * Number(game.stockPrice || 0))
+    + (Number(player.land || 0) * Number(game.landPrice || 0))
   );
+}
+
+function rankingScore(player, game) {
+  return {
+    playerId: player.id,
+    name: player.name,
+    profession: player.profession,
+    happiness: round2(player.happiness || 0),
+    totalAssets: playerAssets(player, game),
+    helpCount: Number(player.helpCount || 0),
+    sabotageCount: Number(player.sabotageCount || 0),
+    stocks: round2(player.stocks || 0),
+    land: round2(player.land || 0),
+    cash: Math.round(player.cash || 0),
+  };
+}
+
+function sameRankingScore(a, b) {
+  return a.happiness === b.happiness
+    && a.totalAssets === b.totalAssets
+    && a.helpCount === b.helpCount;
+}
+
+function calculateResults(room) {
+  const scores = room.players.map((player) => rankingScore(player, room.game));
+  const sorted = [...scores].sort((a, b) => (
+    (b.happiness - a.happiness)
+    || (b.totalAssets - a.totalAssets)
+    || (b.helpCount - a.helpCount)
+    || a.name.localeCompare(b.name, 'zh-Hant')
+  ));
+
+  let currentRank = 1;
+  const rankings = sorted.map((entry, index) => {
+    if (index > 0 && !sameRankingScore(entry, sorted[index - 1])) {
+      currentRank = index + 1;
+    }
+    return { ...entry, rank: currentRank, titles: [] };
+  });
+
+  const maxValue = (key) => Math.max(...scores.map((entry) => Number(entry[key] || 0)));
+  const titleRules = [
+    ['幸福王', 'happiness'],
+    ['財富王', 'totalAssets'],
+    ['股神', 'stocks'],
+    ['地產王', 'land'],
+    ['暖心王', 'helpCount'],
+    ['搞事王', 'sabotageCount'],
+  ];
+
+  titleRules.forEach(([title, key]) => {
+    const max = maxValue(key);
+    rankings.forEach((entry) => {
+      if (Number(entry[key] || 0) === max) entry.titles.push(title);
+    });
+  });
+
+  return {
+    rankings,
+    winnerIds: rankings.filter((entry) => entry.rank === 1).map((entry) => entry.playerId),
+  };
 }
 
 function publicRoom(room) {
@@ -102,7 +170,13 @@ function publicRoom(room) {
         currentPlayerId: room.game.currentPlayerId,
         turnId: room.game.turnId,
         deadline: room.game.deadline,
+        showcaseUntil: room.game.showcaseUntil || null,
+        transitionUntil: room.game.transitionUntil || null,
+        roundAnnouncement: room.game.round === 20
+          ? '人生加速！從現在開始每回合擲2顆骰子！'
+          : null,
         lastEvent: room.game.lastEvent,
+        results: room.game.results || null,
         finished: Boolean(room.game.finished),
       }
     : null;
@@ -110,10 +184,12 @@ function publicRoom(room) {
   return {
     code: room.code,
     hostId: room.hostId,
+    serverTime: Date.now(),
     players: room.players.map((player) => ({
       id: player.id,
       name: player.name,
       profession: player.profession || null,
+      connected: Boolean(player.connected),
       cash: player.cash || 0,
       stocks: player.stocks || 0,
       land: player.land || 0,
@@ -141,10 +217,41 @@ function clearTurnTimer(room) {
   }
 }
 
+function clearIdleTimer(room) {
+  if (room.idleTimer) {
+    clearTimeout(room.idleTimer);
+    room.idleTimer = null;
+  }
+}
+
+function scheduleRoomIdleCleanup(room) {
+  clearIdleTimer(room);
+  if (room.players.some((player) => player.connected)) return;
+
+  room.idleTimer = setTimeout(() => {
+    const currentRoom = rooms.get(room.code);
+    if (!currentRoom) return;
+    if (currentRoom.players.some((player) => player.connected)) return;
+    clearTurnTimer(currentRoom);
+    rooms.delete(currentRoom.code);
+  }, ROOM_IDLE_MS);
+}
+
+function claimTurn(room, playerId, turnId) {
+  if (!room?.game || room.phase !== 'game' || room.game.finished) return false;
+  if (room.game.currentPlayerId !== playerId) return false;
+  if (!turnId || room.game.turnId !== turnId) return false;
+  if (room.game.turnProcessed) return false;
+  room.game.turnProcessed = true;
+  return true;
+}
+
 function beginTurn(room) {
   if (room.phase !== 'game' || !room.game || room.game.finished) return;
 
   clearTurnTimer(room);
+  room.game.showcaseUntil = null;
+  room.game.transitionUntil = null;
 
   while (room.game.turnIndex < room.game.turnOrder.length) {
     const playerId = room.game.turnOrder[room.game.turnIndex];
@@ -160,6 +267,7 @@ function beginTurn(room) {
 
   room.game.currentPlayerId = room.game.turnOrder[room.game.turnIndex];
   room.game.turnId = crypto.randomUUID();
+  room.game.turnProcessed = false;
   room.game.deadline = Date.now() + TURN_MS;
 
   const expectedTurnId = room.game.turnId;
@@ -167,7 +275,9 @@ function beginTurn(room) {
     const currentRoom = rooms.get(room.code);
     if (!currentRoom || currentRoom.phase !== 'game' || !currentRoom.game) return;
     if (currentRoom.game.turnId !== expectedTurnId) return;
-    settleSalary(currentRoom, currentRoom.game.currentPlayerId, true);
+    const playerId = currentRoom.game.currentPlayerId;
+    if (!claimTurn(currentRoom, playerId, expectedTurnId)) return;
+    settleSalary(currentRoom, playerId, true);
   }, TURN_MS + 50);
 
   emitRoom(room);
@@ -194,11 +304,15 @@ function initializeGame(room) {
     turnIndex: 0,
     currentPlayerId: null,
     turnId: null,
+    turnProcessed: false,
     deadline: null,
+    showcaseUntil: null,
+    transitionUntil: null,
     lastEvent: {
       type: 'start',
       text: '職業選擇完成，人生啟程！',
     },
+    results: null,
     finished: false,
   };
 
@@ -210,6 +324,7 @@ function advanceTurn(room) {
 
   clearTurnTimer(room);
   room.game.deadline = null;
+  room.game.showcaseUntil = Date.now() + ACTION_SHOWCASE_MS;
   emitRoom(room);
 
   const expectedTurnId = room.game.turnId;
@@ -231,21 +346,30 @@ function updateMarket(room) {
   return stockUp ? '股票上漲 10%' : '股票下跌 7%';
 }
 
+function finishGame(room) {
+  clearTurnTimer(room);
+  room.game.finished = true;
+  room.game.currentPlayerId = null;
+  room.game.turnId = null;
+  room.game.turnProcessed = true;
+  room.game.deadline = null;
+  room.game.showcaseUntil = null;
+  room.game.transitionUntil = null;
+  room.game.results = calculateResults(room);
+  room.game.lastEvent = {
+    type: 'finish',
+    text: '第 30 回合結束，人生旅程完成！',
+  };
+  room.phase = 'finished';
+  emitRoom(room);
+}
+
 function endRound(room) {
   if (!room.game) return;
   clearTurnTimer(room);
 
   if (room.game.round >= TOTAL_ROUNDS) {
-    room.game.finished = true;
-    room.game.currentPlayerId = null;
-    room.game.turnId = null;
-    room.game.deadline = null;
-    room.game.lastEvent = {
-      type: 'finish',
-      text: '第 30 回合結束，人生旅程完成！',
-    };
-    room.phase = 'finished';
-    emitRoom(room);
+    finishGame(room);
     return;
   }
 
@@ -255,11 +379,26 @@ function endRound(room) {
   room.game.turnIndex = 0;
   room.game.currentPlayerId = null;
   room.game.turnId = null;
+  room.game.turnProcessed = false;
   room.game.deadline = null;
+  room.game.showcaseUntil = null;
+  room.game.transitionUntil = null;
   room.game.lastEvent = {
     type: 'market',
     text: `${marketText}，土地上漲 3%`,
   };
+
+  if (room.game.round === 20) {
+    room.game.transitionUntil = Date.now() + ROUND_ACCELERATION_MS;
+    emitRoom(room);
+    room.turnTimer = setTimeout(() => {
+      const currentRoom = rooms.get(room.code);
+      if (!currentRoom || currentRoom.phase !== 'game' || !currentRoom.game) return;
+      if (currentRoom.game.round !== 20 || currentRoom.game.currentPlayerId) return;
+      beginTurn(currentRoom);
+    }, ROUND_ACCELERATION_MS);
+    return;
+  }
 
   beginTurn(room);
 }
@@ -281,8 +420,9 @@ function settleSalary(room, playerId, auto = false) {
   const { dice, total } = rollDice(room.game.round);
   const salary = PROFESSIONS[player.profession].salary;
   const income = Math.round(total * salary * 10);
-  player.cash += income;
+  const nextCash = player.cash + income;
 
+  player.cash = nextCash;
   room.game.lastEvent = {
     type: 'salary',
     playerId,
@@ -315,52 +455,37 @@ function settleMarketAction(room, playerId, action) {
     const cost = Math.round(total * room.game.stockPrice);
     const units = round2(total * profession.stock);
     const availableCash = player.cash + salaryIncome;
+    const success = availableCash >= cost;
 
-    player.cash = availableCash;
-    event.salaryIncome = salaryIncome;
-    event.cost = cost;
-    event.units = units;
+    player.cash = success ? availableCash - cost : availableCash;
+    if (success) player.stocks = round2(player.stocks + units);
 
-    if (availableCash >= cost) {
-      player.cash -= cost;
-      player.stocks = round2(player.stocks + units);
-      event.success = true;
-      event.text = `${player.name} 買股成功：70%薪資 +${salaryIncome}，花費 ${cost}，股票 +${units}`;
-    } else {
-      event.success = false;
-      event.text = `${player.name} 買股失敗：現金不足，保留70%薪資 +${salaryIncome}`;
-    }
+    Object.assign(event, { salaryIncome, cost, units, success });
+    event.text = success
+      ? `${player.name} 買股成功：70%薪資 +${salaryIncome}，花費 ${cost}，股票 +${units}`
+      : `${player.name} 買股失敗：現金不足，保留70%薪資 +${salaryIncome}`;
   } else if (action === 'buyLand') {
     const salaryIncome = Math.round(total * profession.salary * 7);
     const cost = Math.round(total * room.game.landPrice);
     const units = round2(total * profession.land);
     const availableCash = player.cash + salaryIncome;
+    const success = availableCash >= cost;
 
-    player.cash = availableCash;
-    event.salaryIncome = salaryIncome;
-    event.cost = cost;
-    event.units = units;
+    player.cash = success ? availableCash - cost : availableCash;
+    if (success) player.land = round2(player.land + units);
 
-    if (availableCash >= cost) {
-      player.cash -= cost;
-      player.land = round2(player.land + units);
-      event.success = true;
-      event.text = `${player.name} 圈地成功：70%薪資 +${salaryIncome}，花費 ${cost}，土地 +${units}`;
-    } else {
-      event.success = false;
-      event.text = `${player.name} 圈地失敗：現金不足，保留70%薪資 +${salaryIncome}`;
-    }
+    Object.assign(event, { salaryIncome, cost, units, success });
+    event.text = success
+      ? `${player.name} 圈地成功：70%薪資 +${salaryIncome}，花費 ${cost}，土地 +${units}`
+      : `${player.name} 圈地失敗：現金不足，保留70%薪資 +${salaryIncome}`;
   } else if (action === 'sellStock') {
     const salaryIncome = Math.round(total * profession.salary * 5);
     const units = round2(Math.min(total, player.stocks));
     const proceeds = Math.round(units * room.game.stockPrice);
 
-    player.cash += salaryIncome + proceeds;
+    player.cash = player.cash + salaryIncome + proceeds;
     player.stocks = round2(Math.max(0, player.stocks - units));
-    event.salaryIncome = salaryIncome;
-    event.units = units;
-    event.proceeds = proceeds;
-    event.success = true;
+    Object.assign(event, { salaryIncome, units, proceeds, success: true });
     event.text = units > 0
       ? `${player.name} 賣股：50%薪資 +${salaryIncome}，賣出 ${units} 股，現金 +${proceeds}`
       : `${player.name} 沒有股票可賣，獲得50%薪資 +${salaryIncome}`;
@@ -369,12 +494,9 @@ function settleMarketAction(room, playerId, action) {
     const units = round2(Math.min(total, player.land));
     const proceeds = Math.round(units * room.game.landPrice);
 
-    player.cash += salaryIncome + proceeds;
+    player.cash = player.cash + salaryIncome + proceeds;
     player.land = round2(Math.max(0, player.land - units));
-    event.salaryIncome = salaryIncome;
-    event.units = units;
-    event.proceeds = proceeds;
-    event.success = true;
+    Object.assign(event, { salaryIncome, units, proceeds, success: true });
     event.text = units > 0
       ? `${player.name} 賣地：50%薪資 +${salaryIncome}，賣出 ${units} 單位土地，現金 +${proceeds}`
       : `${player.name} 沒有土地可賣，獲得50%薪資 +${salaryIncome}`;
@@ -455,7 +577,7 @@ function settleFate(room, playerId) {
     player.cash += received;
     event.text = `${player.name} 命運：社福救濟，其他玩家共支付 ${received}`;
   } else if (fateIndex === 7) {
-    const happiness = round2(1 * total);
+    const happiness = round2(total);
     player.happiness = round2(player.happiness + happiness);
     event.text = `${player.name} 命運：幸福降臨，幸福 +${happiness}`;
   } else {
@@ -503,12 +625,12 @@ function settleSabotage(room, playerId) {
     target.cash -= actual;
     effectText = `${target.name} 現金 -${actual}`;
   } else if (effectIndex === 1) {
-    const requested = round2(1 * total);
+    const requested = round2(total);
     const actual = round2(Math.min(target.stocks, requested));
     target.stocks = round2(Math.max(0, target.stocks - actual));
     effectText = `${target.name} 股票 -${actual}`;
   } else if (effectIndex === 2) {
-    const requested = round2(1 * total);
+    const requested = round2(total);
     const actual = round2(Math.min(target.land, requested));
     target.land = round2(Math.max(0, target.land - actual));
     effectText = `${target.name} 土地 -${actual}`;
@@ -536,30 +658,31 @@ function settleSabotage(room, playerId) {
   return true;
 }
 
-function chooseHelpTarget(room, actorId) {
+function getHelpCandidates(room, actorId) {
   const others = room.players.filter((player) => player.id !== actorId);
-  if (!others.length) return null;
+  if (!others.length) return [];
 
   const happinessValues = others.map((player) => Number(player.happiness || 0));
   const maxHappiness = Math.max(...happinessValues);
   const minHappiness = Math.min(...happinessValues);
-
   const eligible = maxHappiness === minHappiness
     ? others
     : others.filter((player) => Number(player.happiness || 0) < maxHappiness);
 
-  if (!eligible.length) return null;
+  if (!eligible.length) return [];
 
   const ranked = eligible.map((player) => ({
     player,
     assets: playerAssets(player, room.game),
   }));
   const lowestAssets = Math.min(...ranked.map((item) => item.assets));
-  const candidates = ranked
+  return ranked
     .filter((item) => item.assets === lowestAssets)
     .map((item) => item.player);
+}
 
-  return randomChoice(candidates);
+function chooseHelpTarget(room, actorId) {
+  return randomChoice(getHelpCandidates(room, actorId));
 }
 
 function settleHelp(room, playerId) {
@@ -688,10 +811,7 @@ function settleDream(room, playerId) {
   };
 
   let liquidation = null;
-
-  if (deficit > 0) {
-    liquidation = findDreamLiquidation(player, room.game, deficit);
-  }
+  if (deficit > 0) liquidation = findDreamLiquidation(player, room.game, deficit);
 
   if (deficit > 0 && !liquidation) {
     player.cash = cashAfterSalary;
@@ -705,7 +825,6 @@ function settleDream(room, playerId) {
   const liquidationProceeds = liquidation?.proceeds || 0;
   const soldStocks = liquidation?.stocks || 0;
   const soldLand = liquidation?.land || 0;
-
   const nextState = {
     cash: cashAfterSalary + liquidationProceeds - fee,
     stocks: round2(Math.max(0, player.stocks - soldStocks)),
@@ -740,34 +859,90 @@ function settleDream(room, playerId) {
   return true;
 }
 
-function leaveCurrentRoom(socket) {
+function clearPlayerDisconnectTimer(player) {
+  if (player.disconnectTimer) {
+    clearTimeout(player.disconnectTimer);
+    player.disconnectTimer = null;
+  }
+}
+
+function removePlayerById(room, playerId) {
+  const player = room.players.find((item) => item.id === playerId);
+  if (!player) return;
+
+  clearPlayerDisconnectTimer(player);
+  const wasCurrentPlayer = room.game?.currentPlayerId === playerId;
+  room.players = room.players.filter((item) => item.id !== playerId);
+
+  if (!room.players.length) {
+    clearTurnTimer(room);
+    clearIdleTimer(room);
+    rooms.delete(room.code);
+    return;
+  }
+
+  if (room.hostId === playerId) room.hostId = room.players[0].id;
+
+  if (room.phase === 'game' && room.game && wasCurrentPlayer) {
+    clearTurnTimer(room);
+    room.game.turnProcessed = true;
+    room.game.deadline = null;
+    room.game.showcaseUntil = null;
+    room.game.turnIndex += 1;
+    beginTurn(room);
+    return;
+  }
+
+  if (room.phase === 'profession') {
+    const allReady = room.players.length >= 2
+      && room.players.every((item) => Boolean(item.profession));
+    if (allReady) {
+      initializeGame(room);
+      return;
+    }
+  }
+
+  if (room.phase === 'finished' && room.game) {
+    room.game.results = calculateResults(room);
+  }
+
+  emitRoom(room);
+}
+
+function leaveCurrentRoom(socket, explicit = true) {
   const roomCode = socket.data.roomCode;
-  if (!roomCode) return;
+  const playerId = socket.data.playerId;
+  if (!roomCode || !playerId) return;
 
   const room = rooms.get(roomCode);
   socket.leave(roomCode);
   delete socket.data.roomCode;
+  delete socket.data.playerId;
 
   if (!room) return;
 
-  const wasCurrentPlayer = room.game?.currentPlayerId === socket.id;
-  room.players = room.players.filter((player) => player.id !== socket.id);
-
-  if (room.players.length === 0) {
-    clearTurnTimer(room);
-    rooms.delete(roomCode);
+  if (explicit) {
+    removePlayerById(room, playerId);
     return;
   }
 
-  if (room.hostId === socket.id) {
-    room.hostId = room.players[0].id;
+  const player = room.players.find((item) => item.id === playerId);
+  if (!player || player.socketId !== socket.id) return;
+
+  player.connected = false;
+  player.socketId = null;
+  clearPlayerDisconnectTimer(player);
+
+  if (room.phase === 'lobby' || room.phase === 'profession') {
+    player.disconnectTimer = setTimeout(() => {
+      const currentRoom = rooms.get(room.code);
+      const currentPlayer = currentRoom?.players.find((item) => item.id === playerId);
+      if (!currentRoom || !currentPlayer || currentPlayer.connected) return;
+      removePlayerById(currentRoom, playerId);
+    }, DISCONNECT_GRACE_MS);
   }
 
-  if (room.phase === 'game' && room.game && wasCurrentPlayer) {
-    advanceTurn(room);
-    return;
-  }
-
+  scheduleRoomIdleCleanup(room);
   emitRoom(room);
 }
 
@@ -786,22 +961,70 @@ function findJoinableRoom(name) {
   return null;
 }
 
+function createPlayer(socket, name) {
+  return {
+    id: crypto.randomUUID(),
+    reconnectToken: createReconnectToken(),
+    socketId: socket.id,
+    connected: true,
+    disconnectTimer: null,
+    name,
+    profession: null,
+    cash: 0,
+    stocks: 0,
+    land: 0,
+    happiness: 0,
+    helpCount: 0,
+    sabotageCount: 0,
+  };
+}
+
+function attachPlayerSocket(room, player, socket) {
+  clearIdleTimer(room);
+  clearPlayerDisconnectTimer(player);
+
+  if (player.socketId && player.socketId !== socket.id) {
+    const oldSocket = io.sockets.sockets.get(player.socketId);
+    if (oldSocket) {
+      oldSocket.leave(room.code);
+      delete oldSocket.data.roomCode;
+      delete oldSocket.data.playerId;
+    }
+  }
+
+  player.socketId = socket.id;
+  player.connected = true;
+  socket.join(room.code);
+  socket.data.roomCode = room.code;
+  socket.data.playerId = player.id;
+}
+
 function createRoomFor(socket, name) {
   const code = createRoomCode();
+  const player = createPlayer(socket, name);
   const room = {
     code,
-    hostId: socket.id,
-    players: [{ id: socket.id, name, profession: null }],
+    hostId: player.id,
+    players: [player],
     started: false,
     phase: 'lobby',
     game: null,
     turnTimer: null,
+    idleTimer: null,
   };
 
   rooms.set(code, room);
-  socket.join(code);
-  socket.data.roomCode = code;
-  return room;
+  attachPlayerSocket(room, player, socket);
+  return { room, player };
+}
+
+function sessionPayload(room, player) {
+  return {
+    roomCode: room.code,
+    playerId: player.id,
+    reconnectToken: player.reconnectToken,
+    name: player.name,
+  };
 }
 
 io.on('connection', (socket) => {
@@ -812,6 +1035,25 @@ io.on('connection', (socket) => {
     socketId: socket.id,
   });
 
+  socket.on('room:resume', (payload, reply) => {
+    const roomCode = String(payload?.roomCode || '');
+    const playerId = String(payload?.playerId || '');
+    const reconnectToken = String(payload?.reconnectToken || '');
+    const room = rooms.get(roomCode);
+    const player = room?.players.find((item) => (
+      item.id === playerId && item.reconnectToken === reconnectToken
+    ));
+
+    if (!room || !player) {
+      return reply?.({ ok: false, message: '上一局已結束或無法恢復。' });
+    }
+
+    attachPlayerSocket(room, player, socket);
+    const snapshot = publicRoom(room);
+    reply?.({ ok: true, room: snapshot, session: sessionPayload(room, player) });
+    emitRoom(room);
+  });
+
   socket.on('room:autoJoin', (payload, reply) => {
     const name = cleanName(payload?.name);
 
@@ -819,31 +1061,37 @@ io.on('connection', (socket) => {
       return reply?.({ ok: false, message: '請輸入暱稱' });
     }
 
-    leaveCurrentRoom(socket);
+    leaveCurrentRoom(socket, true);
 
     let room = findJoinableRoom(name);
+    let player;
 
     if (room) {
-      room.players.push({ id: socket.id, name, profession: null });
-      socket.join(room.code);
-      socket.data.roomCode = room.code;
+      player = createPlayer(socket, name);
+      room.players.push(player);
+      attachPlayerSocket(room, player, socket);
     } else {
-      room = createRoomFor(socket, name);
+      ({ room, player } = createRoomFor(socket, name));
     }
 
-    reply?.({ ok: true, room: publicRoom(room) });
+    reply?.({
+      ok: true,
+      room: publicRoom(room),
+      session: sessionPayload(room, player),
+    });
     emitRoom(room);
   });
 
   socket.on('room:start', (reply) => {
     const roomCode = socket.data.roomCode;
+    const playerId = socket.data.playerId;
     const room = rooms.get(roomCode);
 
-    if (!room) {
+    if (!room || !playerId) {
       return reply?.({ ok: false, message: '目前不在房間內。' });
     }
 
-    if (room.hostId !== socket.id) {
+    if (room.hostId !== playerId) {
       return reply?.({ ok: false, message: '只有房主可以啟程。' });
     }
 
@@ -868,10 +1116,11 @@ io.on('connection', (socket) => {
 
   socket.on('room:chooseProfession', (payload, reply) => {
     const roomCode = socket.data.roomCode;
+    const playerId = socket.data.playerId;
     const room = rooms.get(roomCode);
     const professionId = String(payload?.profession || '');
 
-    if (!room || room.phase !== 'profession') {
+    if (!room || !playerId || room.phase !== 'profession') {
       return reply?.({ ok: false, message: '目前還不能選擇職業。' });
     }
 
@@ -879,13 +1128,13 @@ io.on('connection', (socket) => {
       return reply?.({ ok: false, message: '這個職業不存在。' });
     }
 
-    const player = room.players.find((item) => item.id === socket.id);
+    const player = room.players.find((item) => item.id === playerId);
     if (!player) {
       return reply?.({ ok: false, message: '找不到玩家資料。' });
     }
 
     const occupied = room.players.some(
-      (item) => item.id !== socket.id && item.profession === professionId
+      (item) => item.id !== playerId && item.profession === professionId
     );
 
     if (occupied) {
@@ -897,9 +1146,7 @@ io.on('connection', (socket) => {
     const allReady = room.players.length >= 2
       && room.players.every((item) => Boolean(item.profession));
 
-    if (allReady) {
-      initializeGame(room);
-    }
+    if (allReady) initializeGame(room);
 
     const snapshot = publicRoom(room);
     reply?.({ ok: true, room: snapshot });
@@ -908,15 +1155,16 @@ io.on('connection', (socket) => {
 
   socket.on('game:action', (payload, reply) => {
     const roomCode = socket.data.roomCode;
+    const playerId = socket.data.playerId;
     const room = rooms.get(roomCode);
     const action = String(payload?.action || '');
     const turnId = String(payload?.turnId || '');
 
-    if (!room || room.phase !== 'game' || !room.game || room.game.finished) {
+    if (!room || !playerId || room.phase !== 'game' || !room.game || room.game.finished) {
       return reply?.({ ok: false, message: '目前不在遊戲回合中。' });
     }
 
-    if (room.game.currentPlayerId !== socket.id) {
+    if (room.game.currentPlayerId !== playerId) {
       return reply?.({ ok: false, message: '還沒輪到你。' });
     }
 
@@ -924,8 +1172,13 @@ io.on('connection', (socket) => {
       return reply?.({ ok: false, message: '這個回合已經結束。' });
     }
 
+    if (room.game.turnProcessed) {
+      return reply?.({ ok: false, message: '這個回合已經結算。' });
+    }
+
     if (Date.now() >= room.game.deadline) {
-      return reply?.({ ok: false, message: '本回合時間已到。' });
+      if (claimTurn(room, playerId, turnId)) settleSalary(room, playerId, true);
+      return reply?.({ ok: false, message: '本回合時間已到，已自動領薪。' });
     }
 
     const availableActions = new Set([
@@ -944,43 +1197,90 @@ io.on('connection', (socket) => {
       return reply?.({ ok: false, message: '這個行動尚未開放。' });
     }
 
-    let settled = false;
+    if (action === 'sabotage' && room.players.length < 2) {
+      return reply?.({ ok: false, message: '目前沒有可以陷害的玩家。' });
+    }
 
+    if (action === 'help' && getHelpCandidates(room, playerId).length === 0) {
+      return reply?.({ ok: false, message: '目前沒有可以援助的玩家。' });
+    }
+
+    if (!claimTurn(room, playerId, turnId)) {
+      return reply?.({ ok: false, message: '這個回合已經結算。' });
+    }
+
+    let settled = false;
     if (action === 'salary') {
-      settled = settleSalary(room, socket.id, false);
+      settled = settleSalary(room, playerId, false);
     } else if (['buyStock', 'buyLand', 'sellStock', 'sellLand'].includes(action)) {
-      settled = settleMarketAction(room, socket.id, action);
+      settled = settleMarketAction(room, playerId, action);
     } else if (action === 'fate') {
-      settled = settleFate(room, socket.id);
+      settled = settleFate(room, playerId);
     } else if (action === 'sabotage') {
-      if (room.players.length < 2) {
-        return reply?.({ ok: false, message: '目前沒有可以陷害的玩家。' });
-      }
-      settled = settleSabotage(room, socket.id);
+      settled = settleSabotage(room, playerId);
     } else if (action === 'help') {
-      if (!chooseHelpTarget(room, socket.id)) {
-        return reply?.({ ok: false, message: '目前沒有可以援助的玩家。' });
-      }
-      settled = settleHelp(room, socket.id);
+      settled = settleHelp(room, playerId);
     } else if (action === 'dream') {
-      settled = settleDream(room, socket.id);
+      settled = settleDream(room, playerId);
     }
 
     if (!settled) {
+      room.game.turnProcessed = false;
       return reply?.({ ok: false, message: '目前無法完成這個行動。' });
     }
 
     reply?.({ ok: true, room: publicRoom(room) });
   });
 
+  socket.on('game:restart', (reply) => {
+    const roomCode = socket.data.roomCode;
+    const playerId = socket.data.playerId;
+    const room = rooms.get(roomCode);
+
+    if (!room || !playerId || room.phase !== 'finished') {
+      return reply?.({ ok: false, message: '目前無法重新開始。' });
+    }
+
+    if (room.hostId !== playerId) {
+      return reply?.({ ok: false, message: '只有房主可以開啟下一局。' });
+    }
+
+    room.players = room.players.filter((player) => player.connected);
+    if (room.players.length < 2) {
+      return reply?.({ ok: false, message: '至少需要2位在線玩家才能再來一局。' });
+    }
+
+    if (!room.players.some((player) => player.id === room.hostId)) {
+      room.hostId = room.players[0].id;
+    }
+
+    clearTurnTimer(room);
+    room.started = true;
+    room.phase = 'profession';
+    room.game = null;
+    room.players.forEach((player) => {
+      player.profession = null;
+      player.cash = 0;
+      player.stocks = 0;
+      player.land = 0;
+      player.happiness = 0;
+      player.helpCount = 0;
+      player.sabotageCount = 0;
+    });
+
+    const snapshot = publicRoom(room);
+    reply?.({ ok: true, room: snapshot });
+    io.to(room.code).emit('room:started', snapshot);
+  });
+
   socket.on('room:leave', (reply) => {
-    leaveCurrentRoom(socket);
+    leaveCurrentRoom(socket, true);
     reply?.({ ok: true });
   });
 
   socket.on('disconnect', () => {
     console.log(`Socket disconnected: ${socket.id}`);
-    leaveCurrentRoom(socket);
+    leaveCurrentRoom(socket, false);
   });
 });
 
