@@ -1,9 +1,10 @@
 /* 首頁專用：front page.png 本身就是可操作介面。
-   所有互動區都以圖片本身的百分比座標定位；不再針對手機/桌機改位置。 */
+   以固定原圖比例 705×868 當唯一座標基準，避免不同裝置因圖片實際高度造成互動區漂移。 */
 .home-stage {
   position: relative;
   display: none;
   width: min(100%, 920px);
+  aspect-ratio: 705 / 868;
   margin: 0 auto;
 }
 
@@ -12,17 +13,18 @@
 }
 
 .front-page-image {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
+  height: 100%;
   max-width: 100%;
-  height: auto;
-  object-fit: contain;
+  object-fit: fill;
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
 }
 
-/* 首頁只呈現完整圖片，不另外加卡片底色或邊框。 */
 .card.home-mode {
   width: min(920px, 100%);
   padding: 0;
@@ -33,11 +35,7 @@
   overflow: visible;
 }
 
-/*
-  entryPanel 永遠完整覆蓋 front page.png。
-  因為它和圖片使用同一個定位基準，所以圖片等比例縮放時，
-  輸入區與按鈕熱區也會等比例跟著縮放，不會因裝置尺寸而位移。
-*/
+/* 互動層與底圖完全共用同一個 705:868 畫布。 */
 .home-entry-panel {
   position: absolute;
   inset: 0;
@@ -49,16 +47,14 @@
   pointer-events: none;
 }
 
-/*
-  原圖 705×868：米白輸入框內部約 x=181~518、y=284~381。
-  以下全部換算成圖片百分比座標。
-*/
+/* 對準原圖中央米白輸入框。 */
 .home-entry-panel .field.entry-control {
   position: absolute;
-  left: 25.7%;
-  top: 32.7%;
-  width: 47.9%;
-  height: 11.2%;
+  display: block;
+  left: 24.3%;
+  top: 32.0%;
+  width: 51.4%;
+  height: 13.4%;
   margin: 0;
   padding: 0;
   pointer-events: auto;
@@ -80,7 +76,7 @@
   font-size: clamp(17px, 3.2vw, 30px);
   font-weight: 700;
   letter-spacing: .06em;
-  line-height: 1;
+  line-height: normal;
   text-align: center;
   caret-color: #76553d;
   appearance: none;
@@ -101,15 +97,15 @@
 }
 
 /*
-  原圖橘色「迎向新局」外框約 x=172~535、y=414~585。
-  HTML button 只當透明點擊熱區，不重畫任何按鈕。
+  橘色「迎向新局」本身就是視覺按鈕。
+  透明熱區刻意比原按鈕更高、並往下延伸，提升手機點選容錯。
 */
 .home-entry-panel #joinGameBtn {
   position: absolute;
-  left: 24.4%;
-  top: 47.7%;
-  width: 51.5%;
-  height: 19.7%;
+  left: 22.5%;
+  top: 47.5%;
+  width: 55%;
+  height: 24%;
   min-height: 0;
   margin: 0;
   padding: 0;
@@ -139,11 +135,11 @@
   outline-offset: -6px;
 }
 
-/* 訊息獨立定位，不參與輸入框或按鈕排版，因此不會把它們推位。 */
+/* 訊息獨立定位，不參與輸入框或按鈕排版。 */
 .home-entry-panel .message {
   position: absolute;
   left: 27%;
-  top: 44.2%;
+  top: 45.2%;
   width: 46%;
   min-height: 0;
   margin: 0;
@@ -161,7 +157,7 @@
   color: #a34f45;
 }
 
-/* RWD 只改外層留白與字級，不再更改互動區座標。 */
+/* RWD 只改外層留白與字級，不改任何互動座標。 */
 @media (max-width: 760px) {
   .shell:has(.card.home-mode) {
     padding: 8px;
