@@ -19,37 +19,67 @@ const PROFESSIONS = [
     id: 'doctor',
     name: '醫師',
     image: '/images/doctor.png',
-    stats: ['薪資 7', '選股 ×1.5', '圈地 ×2.0', '圓夢 ×2.35'],
+    abilities: [
+      { label: '薪資', grade: 'B' },
+      { label: '選股', grade: 'A' },
+      { label: '圈地', grade: 'S' },
+      { label: '圓夢', grade: 'B' },
+    ],
   },
   {
     id: 'engineer',
     name: '工程師',
     image: '/images/engineer.png',
-    stats: ['薪資 8', '選股 ×2.0', '圈地 ×1.0', '圓夢 ×2.10'],
+    abilities: [
+      { label: '薪資', grade: 'A' },
+      { label: '選股', grade: 'S' },
+      { label: '圈地', grade: 'C' },
+      { label: '圓夢', grade: 'B' },
+    ],
   },
   {
     id: 'sales',
     name: '超業',
     image: '/images/sales.png',
-    stats: ['薪資 9', '選股 ×1.5', '圈地 ×1.5', '圓夢 ×1.95'],
+    abilities: [
+      { label: '薪資', grade: 'A' },
+      { label: '選股', grade: 'A' },
+      { label: '圈地', grade: 'A' },
+      { label: '圓夢', grade: 'C' },
+    ],
   },
   {
     id: 'office',
     name: '白領',
     image: '/images/office.png',
-    stats: ['薪資 5', '選股 ×2.0', '圈地 ×1.0', '圓夢 ×2.975'],
+    abilities: [
+      { label: '薪資', grade: 'C' },
+      { label: '選股', grade: 'S' },
+      { label: '圈地', grade: 'C' },
+      { label: '圓夢', grade: 'S' },
+    ],
   },
   {
     id: 'athlete',
     name: '運動員',
     image: '/images/athlete.png',
-    stats: ['薪資 6', '選股 ×1.0', '圈地 ×1.5', '圓夢 ×2.70'],
+    abilities: [
+      { label: '薪資', grade: 'B' },
+      { label: '選股', grade: 'C' },
+      { label: '圈地', grade: 'A' },
+      { label: '圓夢', grade: 'A' },
+    ],
   },
   {
     id: 'rich',
     name: '富二代',
     image: '/images/rich.png',
-    stats: ['薪資 10', '選股 ×1.0', '圈地 ×2.0', '圓夢 ×1.80'],
+    abilities: [
+      { label: '薪資', grade: 'S' },
+      { label: '選股', grade: 'C' },
+      { label: '圈地', grade: 'S' },
+      { label: '圓夢', grade: 'C' },
+    ],
   },
 ];
 
@@ -185,9 +215,11 @@ function renderProfessions(room) {
     name.className = 'profession-name';
     name.textContent = profession.name;
 
-    const stats = document.createElement('span');
-    stats.className = 'profession-stats';
-    stats.innerHTML = profession.stats.map((item) => `<span>${item}</span>`).join('');
+    const abilities = document.createElement('span');
+    abilities.className = 'profession-abilities';
+    abilities.innerHTML = profession.abilities.map(({ label, grade }) => (
+      `<span class="ability-item"><span class="ability-label">${label}</span><span class="ability-grade grade-${grade.toLowerCase()}">${grade}</span></span>`
+    )).join('');
 
     const state = document.createElement('span');
     state.className = 'profession-state';
@@ -200,7 +232,7 @@ function renderProfessions(room) {
       state.textContent = '選擇';
     }
 
-    button.append(image, name, stats, state);
+    button.append(image, name, abilities, state);
 
     button.addEventListener('click', () => {
       chooseProfession(profession.id);
