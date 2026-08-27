@@ -82,6 +82,29 @@
   overflow-wrap: anywhere;
 }
 
+.fate-result-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.fate-result-image {
+  display: block;
+  width: min(190px, 45vw);
+  height: min(190px, 45vw);
+  object-fit: contain;
+  background: transparent;
+}
+
+.fate-result-text {
+  margin-top: 0;
+  padding: 11px 14px;
+  font-size: clamp(16px, 3.8vw, 21px);
+  line-height: 1.4;
+}
+
 @media (max-width: 520px) {
   .action-showcase {
     padding: 14px;
@@ -91,5 +114,15 @@
     min-height: 300px;
     padding: 24px 16px;
     border-radius: 24px;
+  }
+
+  .fate-result-image {
+    width: min(168px, 48vw);
+    height: min(168px, 48vw);
+  }
+
+  .fate-result-text {
+    padding: 9px 11px;
+    font-size: 16px;
   }
 }
