@@ -64,6 +64,14 @@
     overlay.classList.toggle('dice-stage-active', Boolean(enabled));
   }
 
+  function getSingleDieImage(value) {
+    const point = Number(value);
+    if (Number.isInteger(point) && point >= 1 && point <= 6) {
+      return `/images/${point}.png`;
+    }
+    return '/images/dice.png';
+  }
+
   function showActionStage(playerName, action) {
     setDiceStageMode(false);
     kickerEl.textContent = `${playerName} 的選擇`;
@@ -80,9 +88,14 @@
     kickerEl.textContent = `${playerName} 骰到`;
     titleEl.textContent = String(total);
 
-    const diceImages = Array.from({ length: diceCount }, (_, index) => (
-      `<img class="dice-result-image" src="/images/dice.png" alt="第 ${index + 1} 顆骰子" />`
-    )).join('');
+    const diceImages = Array.from({ length: diceCount }, (_, index) => {
+      const point = Number(dice[index] || 0);
+      const image = diceCount === 1 ? getSingleDieImage(point) : '/images/dice.png';
+      const alt = diceCount === 1 && point >= 1 && point <= 6
+        ? `${point}`
+        : `第 ${index + 1} 顆骰子`;
+      return `<img class="dice-result-image" src="${image}" alt="${alt}" />`;
+    }).join('');
 
     bodyEl.innerHTML = `
       <div class="dice-result-stage" aria-label="骰子結果 ${total}">
