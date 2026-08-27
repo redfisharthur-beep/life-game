@@ -8,13 +8,49 @@
 </head>
 <body>
   <main class="shell">
-    <section class="card">
+    <section class="card" id="lobbyCard">
       <p class="eyebrow">LIFE GAME</p>
       <h1>《人生》</h1>
-      <p>30輪多人派對遊戲</p>
+      <p class="sub">30輪多人派對遊戲</p>
+
       <div id="status" class="status">正在連線伺服器…</div>
+
+      <div id="entryPanel" class="panel">
+        <label class="field">
+          <span>玩家名稱</span>
+          <input id="playerName" maxlength="12" autocomplete="nickname" placeholder="輸入你的名字" />
+        </label>
+
+        <button id="createRoomBtn" class="primary" type="button">建立房間</button>
+
+        <div class="divider"><span>或</span></div>
+
+        <label class="field">
+          <span>房號</span>
+          <input id="roomCodeInput" inputmode="numeric" maxlength="4" placeholder="4位數房號" />
+        </label>
+
+        <button id="joinRoomBtn" class="secondary" type="button">加入房間</button>
+        <p id="message" class="message" aria-live="polite"></p>
+      </div>
+
+      <div id="roomPanel" class="panel hidden">
+        <p class="room-label">你的房號</p>
+        <div id="roomCode" class="room-code">----</div>
+        <p class="room-tip">把房號告訴朋友，最多6人。</p>
+
+        <div class="players-head">
+          <strong>玩家名單</strong>
+          <span id="playerCount">0 / 6</span>
+        </div>
+        <div id="playerList" class="players"></div>
+
+        <p id="roomNotice" class="room-notice">等待其他玩家加入…</p>
+        <button id="leaveRoomBtn" class="ghost" type="button">離開房間</button>
+      </div>
     </section>
   </main>
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="/app.js"></script>
 </body>
