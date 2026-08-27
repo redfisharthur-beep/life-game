@@ -44,14 +44,14 @@
   pointer-events: none;
 }
 
-/* 名字輸入區略往下校正，讓文字落在米白框的視覺中心。 */
+/* 名字輸入區再往下校正，讓輸入文字落在米白框正中央。 */
 .home-entry-panel .field.entry-control {
   position: absolute;
   display: block;
   left: 24.1%;
-  top: 50.4%;
+  top: 51.5%;
   width: 51.8%;
-  height: 10.8%;
+  height: 9.6%;
   margin: 0;
   padding: 0;
   pointer-events: auto;
@@ -98,8 +98,7 @@
   box-shadow: none !important;
 }
 
-/* 新版底圖：橘色「迎向新局」約位於 y=61%~75%。
-   點擊熱區略向外擴大，手機更容易操作，但不改任何外觀。 */
+/* 橘色「迎向新局」使用底圖原本視覺，只有透明點擊熱區。 */
 .home-entry-panel #joinGameBtn {
   position: absolute;
   left: 21.5%;
@@ -135,30 +134,9 @@
   outline-offset: -6px;
 }
 
-/* 系統訊息獨立放在名字框下緣，不推動任何元件。 */
+/* 首頁不再顯示「請輸入暱稱」等額外訊息列，避免破壞底圖排版。 */
 .home-entry-panel .message {
-  position: absolute;
-  left: 21%;
-  top: 58.5%;
-  width: 58%;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  color: #72594a;
-  font-size: clamp(10px, 1.45vw, 14px);
-  font-weight: 700;
-  line-height: 1.1;
-  text-align: center;
-  text-shadow: 0 1px 2px rgba(255,255,255,.9);
-  pointer-events: none;
-}
-
-.home-entry-panel .message:empty {
-  display: none;
-}
-
-.home-entry-panel .message.error {
-  color: #a34f45;
+  display: none !important;
 }
 
 /* RWD 只改外層留白與字級，不改互動區座標。 */
