@@ -1,15 +1,16 @@
 .game-topbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto auto minmax(0, 1fr);
   align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
-  border-radius: 15px;
+  column-gap: 8px;
+  padding: 6px 9px;
+  border-radius: 14px;
   min-height: 0;
 }
 
 .stage-block {
   min-width: 0;
+  grid-column: 1;
 }
 
 .stage-name {
@@ -17,6 +18,7 @@
   font-size: 19px;
   font-weight: 700;
   line-height: 1.05;
+  white-space: nowrap;
 }
 
 .round-label {
@@ -24,35 +26,36 @@
   margin-top: 2px;
   font-size: 12px;
   line-height: 1.05;
+  white-space: nowrap;
 }
 
+/* 讓倒數與市場直接成為 topbar 的第 2、3 欄，秒數自然靠近「人生起步」。 */
 .game-topbar-right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 7px;
-  min-width: 0;
+  display: contents;
 }
 
 .topbar-timer {
-  order: 1;
-  min-width: 62px;
-  padding: 6px 8px;
-  border-radius: 13px;
-  flex: 0 0 auto;
+  grid-column: 2;
+  min-width: 58px;
+  padding: 5px 7px;
+  border-radius: 12px;
+  justify-self: start;
 }
 
 .topbar-timer strong {
-  font-size: 26px;
+  font-size: 25px;
   font-weight: 800;
 }
 
 .market-strip {
-  order: 2;
-  display: flex;
+  grid-column: 3;
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
   align-items: center;
-  flex-wrap: nowrap;
+  justify-content: end;
   gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .market-strip .market-item {
@@ -60,7 +63,7 @@
   align-items: center;
   gap: 5px;
   padding: 3px 6px;
-  border-radius: 13px;
+  border-radius: 12px;
   background: #f4efe9;
   color: #69615a;
   white-space: nowrap;
@@ -68,8 +71,8 @@
 
 .market-strip .market-icon {
   display: block;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   object-fit: contain;
   border: 0;
   background: transparent;
@@ -78,58 +81,112 @@
 
 .market-strip .market-value {
   color: #514a45;
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1;
 }
 
 @media (max-width: 760px) {
   .game-topbar {
-    grid-template-columns: minmax(90px, 1fr) auto;
-    gap: 5px;
-    padding: 6px 8px;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    column-gap: 5px;
+    padding: 5px 7px;
   }
+
   .stage-name { font-size: 18px; }
   .round-label { font-size: 11px; }
-  .game-topbar-right { gap: 4px; }
-  .topbar-timer { min-width: 56px; padding: 5px 6px; }
-  .topbar-timer strong { font-size: 24px; }
-  .market-strip { gap: 4px; }
-  .market-strip .market-item { gap: 3px; padding: 2px 4px; }
-  .market-strip .market-icon { width: 39px; height: 39px; }
-  .market-strip .market-value { font-size: 18px; }
+
+  .topbar-timer {
+    min-width: 54px;
+    padding: 4px 5px;
+  }
+
+  .topbar-timer strong { font-size: 23px; }
+
+  .market-strip {
+    grid-template-columns: repeat(2, max-content);
+    gap: 4px;
+  }
+
+  .market-strip .market-item {
+    gap: 3px;
+    padding: 2px 4px;
+  }
+
+  .market-strip .market-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .market-strip .market-value {
+    font-size: 18px;
+  }
 }
 
 @media (max-width: 520px) {
   .game-topbar {
-    grid-template-columns: minmax(82px, 1fr) auto;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    column-gap: 4px;
+    padding: 5px 6px;
   }
-  .game-topbar-right {
-    gap: 3px;
-    transform: translateX(-4px);
-  }
+
+  .stage-name { font-size: 17px; }
+  .round-label { font-size: 10.5px; }
+
   .topbar-timer {
-    min-width: 52px;
-    padding: 4px 5px;
+    min-width: 50px;
+    padding: 4px;
+    margin-left: 1px;
   }
-  .topbar-timer strong { font-size: 22px; }
-  .market-strip { gap: 3px; }
+
+  .topbar-timer strong { font-size: 21px; }
+  .topbar-timer > span:last-child { font-size: 9px; }
+
+  .market-strip {
+    grid-template-columns: repeat(2, max-content);
+    gap: 3px;
+    justify-content: end;
+  }
+
   .market-strip .market-item {
     gap: 2px;
     padding: 2px 3px;
-    border-radius: 11px;
+    border-radius: 10px;
   }
-  .market-strip .market-icon { width: 35px; height: 35px; }
-  .market-strip .market-value { font-size: 16px; }
+
+  .market-strip .market-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .market-strip .market-value {
+    font-size: 15px;
+  }
 }
 
 @media (max-width: 390px) {
-  .stage-name { font-size: 16px; }
-  .round-label { font-size: 10px; }
-  .game-topbar-right { transform: translateX(-6px); }
-  .topbar-timer { min-width: 48px; border-radius: 10px; }
-  .topbar-timer strong { font-size: 20px; }
-  .topbar-timer > span:last-child { font-size: 9px; }
-  .market-strip .market-icon { width: 32px; height: 32px; }
-  .market-strip .market-value { font-size: 14px; }
+  .game-topbar {
+    column-gap: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .stage-name { font-size: 15.5px; }
+  .round-label { font-size: 9.5px; }
+
+  .topbar-timer {
+    min-width: 46px;
+    border-radius: 9px;
+  }
+
+  .topbar-timer strong { font-size: 19px; }
+
+  .market-strip .market-icon {
+    width: 31px;
+    height: 31px;
+  }
+
+  .market-strip .market-value {
+    font-size: 13px;
+  }
 }
