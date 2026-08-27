@@ -11,21 +11,8 @@
     dream: { label: '圓夢', image: '/images/dream.png' },
   };
 
-  const FATE_RESULTS = [
-    { label: '中樂透', image: '/images/Lotto.png' },
-    { label: '花錢消災', image: '/images/Spendmoney.png' },
-    { label: '股神降臨', image: '/images/Investment%20Guru.png' },
-    { label: '黑天鵝', image: '/images/Black%20Swan.png' },
-    { label: '政策利多', image: '/images/Favorable%20policies.png' },
-    { label: '打房政策', image: '/images/measures%20to%20curb%20the%20property%20market.png' },
-    { label: '社福救濟', image: '/images/Social%20welfare.png' },
-    { label: '幸福降臨', image: '/images/Unbelievable.png' },
-    { label: '人生低潮', image: '/images/Unlucky.png' },
-  ];
-
-  // 伺服器目前保留 6 秒展示：前 0.5 秒顯示選擇、接著 0.5 秒骰子，最後結果完整停留 5 秒。
-  const CHOICE_MS = 500;
-  const DICE_MS = 500;
+  const CHOICE_MS = 2000;
+  const DICE_MS = 2000;
   const RESULT_MS = 5000;
   const RESULT_START_MS = CHOICE_MS + DICE_MS;
   const SHOWCASE_MS = CHOICE_MS + DICE_MS + RESULT_MS;
@@ -64,6 +51,7 @@
     overlay.classList.add('hidden');
     setChoiceStageMode(false);
     setDiceStageMode(false);
+    overlay.classList.remove('result-stage-active');
     restoreCurrentTurnIfReady();
   }
 
@@ -96,6 +84,7 @@
   function showActionStage(playerName, action) {
     setDiceStageMode(false);
     setChoiceStageMode(true);
+    overlay.classList.remove('result-stage-active');
     kickerEl.textContent = `${playerName} 選擇`;
     titleEl.textContent = '';
     bodyEl.innerHTML = `<img class="action-showcase-image" src="${action.image}" alt="${action.label}" />`;
@@ -108,7 +97,7 @@
 
     setChoiceStageMode(false);
     setDiceStageMode(true);
-
+    overlay.classList.remove('result-stage-active');
     kickerEl.textContent = '';
     titleEl.textContent = '';
 
@@ -135,35 +124,122 @@
     `;
   }
 
-  function showFateResultStage(playerName, event) {
-    setChoiceStageMode(false);
-    setDiceStageMode(false);
-    const fateIndex = Number(event.fateIndex);
-    const fateResult = FATE_RESULTS[fateIndex];
-
-    kickerEl.textContent = `${playerName} 抽到命運`;
-    titleEl.textContent = fateResult?.label || '命運結果';
-    bodyEl.innerHTML = `
-      <div class="fate-result-wrap">
-        ${fateResult ? `<img class="fate-result-image" src="${fateResult.image}" alt="${fateResult.label}" />` : ''}
-        <p class="action-showcase-result fate-result-text"></p>
-      </div>
-    `;
-    bodyEl.querySelector('.fate-result-text').textContent = event.text || '命運事件完成';
+  function signed(value) {
+    const number = Number(value || 0);
+    if (Math.abs(number) < 0.000001) return '0';
+    return `${number > 0 ? '+' : '-'}${Math.abs(number)}`;
   }
 
-  function showResultStage(playerName, event) {
-    setChoiceStageMode(false);
-    setDiceStageMode(false);
-    if (event.type === 'fate') {
-      showFateResultStage(playerName, event);
-      return;
+  function makeEffect(label, value) {
+    const normalizedLabel = label === '幸福' ? '幸福值' : label;
+    return `${normalizedLabel} ${signed(value)}`;
+  }
+
+  function firstSignedEffect(text) {
+    const match = String(text || '').match(/(現金|股票|土地|幸福)\s*([+-])\s*(\d+(?:\.\d+)?)/);
+    if (!match) return null;
+    const value = Number(match[3]) * (match[2] === '-' ? -1 : 1);
+    return makeEffect(match[1], value);
+  }
+
+  function pushResult(rows, name, effects) {
+    const cleanEffects = effects.filter(Boolean).filter((item) => !item.endsWith(' 0'));
+    if (!cleanEffects.length) cleanEffects.push('無資產變動');
+    rows.push({ name, effects: cleanEffects });
+  }
+
+  function buildResultRows(room, event, playerName) {
+    const rows = [];
+    const target = room.players.find((item) => item.id === event.targetId);
+    const total = Number(event.diceTotal || 0);
+
+    if (event.type === 'salary') {
+      pushResult(rows, playerName, [makeEffect('現金', event.amount)]);
+    } else if (event.type === 'buyStock') {
+      const cash = Number(event.salaryIncome || 0) - (event.success ? Number(event.cost || 0) : 0);
+      pushResult(rows, playerName, [
+        makeEffect('現金', cash),
+        event.success ? makeEffect('股票', event.units) : null,
+      ]);
+    } else if (event.type === 'buyLand') {
+      const cash = Number(event.salaryIncome || 0) - (event.success ? Number(event.cost || 0) : 0);
+      pushResult(rows, playerName, [
+        makeEffect('現金', cash),
+        event.success ? makeEffect('土地', event.units) : null,
+      ]);
+    } else if (event.type === 'sellStock') {
+      pushResult(rows, playerName, [
+        makeEffect('現金', Number(event.salaryIncome || 0) + Number(event.proceeds || 0)),
+        Number(event.units || 0) ? makeEffect('股票', -Number(event.units || 0)) : null,
+      ]);
+    } else if (event.type === 'sellLand') {
+      pushResult(rows, playerName, [
+        makeEffect('現金', Number(event.salaryIncome || 0) + Number(event.proceeds || 0)),
+        Number(event.units || 0) ? makeEffect('土地', -Number(event.units || 0)) : null,
+      ]);
+    } else if (event.type === 'dream') {
+      if (event.success) {
+        const liquidation = event.liquidation || {};
+        pushResult(rows, playerName, [
+          makeEffect('現金', Number(event.salaryIncome || 0) + Number(liquidation.proceeds || 0) - Number(event.fee || 0)),
+          Number(liquidation.stocks || 0) ? makeEffect('股票', -Number(liquidation.stocks || 0)) : null,
+          Number(liquidation.land || 0) ? makeEffect('土地', -Number(liquidation.land || 0)) : null,
+          makeEffect('幸福', event.happinessGain),
+        ]);
+      } else {
+        pushResult(rows, playerName, [makeEffect('現金', event.salaryIncome)]);
+      }
+    } else if (event.type === 'sabotage') {
+      if (target) pushResult(rows, target.name, [firstSignedEffect(event.text)]);
+      pushResult(rows, playerName, [makeEffect('現金', event.bonus)]);
+    } else if (event.type === 'help') {
+      if (target) pushResult(rows, target.name, [firstSignedEffect(event.text)]);
+      pushResult(rows, playerName, [makeEffect('現金', event.bonus)]);
+    } else if (event.type === 'fate') {
+      const fateIndex = Number(event.fateIndex);
+      if (fateIndex === 0) {
+        pushResult(rows, playerName, [makeEffect('現金', 150 * total)]);
+      } else if (fateIndex === 2) {
+        pushResult(rows, playerName, [makeEffect('股票', 5 * total)]);
+      } else if (fateIndex === 4) {
+        pushResult(rows, playerName, [makeEffect('土地', 5 * total)]);
+      } else if (fateIndex === 6) {
+        const received = Number(String(event.text || '').match(/共支付\s*(\d+(?:\.\d+)?)/)?.[1] || 0);
+        pushResult(rows, playerName, [makeEffect('現金', received)]);
+      } else if (fateIndex === 7) {
+        pushResult(rows, playerName, [makeEffect('幸福', total)]);
+      } else if (fateIndex === 8) {
+        pushResult(rows, playerName, [makeEffect('幸福', -(0.5 * total))]);
+      } else {
+        pushResult(rows, playerName, [firstSignedEffect(event.text)]);
+      }
+    } else {
+      pushResult(rows, playerName, [firstSignedEffect(event.text)]);
     }
 
-    kickerEl.textContent = `${playerName} 的行動結果`;
-    titleEl.textContent = '結果公布';
-    bodyEl.innerHTML = `<p class="action-showcase-result"></p>`;
-    bodyEl.querySelector('.action-showcase-result').textContent = event.text || '行動完成';
+    return rows;
+  }
+
+  function showResultStage(room, playerName, event) {
+    setChoiceStageMode(false);
+    setDiceStageMode(false);
+    overlay.classList.add('result-stage-active');
+    kickerEl.textContent = '';
+    titleEl.textContent = '';
+
+    const rows = buildResultRows(room, event, playerName);
+    bodyEl.innerHTML = `
+      <div class="simple-result">
+        ${rows.map((row) => `
+          <div class="simple-result-row">
+            <strong class="simple-result-player">${row.name}</strong>
+            <div class="simple-result-effects">
+              ${row.effects.map((effect) => `<span class="simple-result-effect">${effect}</span>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
   }
 
   function restoreCurrentTurnIfReady() {
@@ -209,7 +285,7 @@
     } else if (elapsed < RESULT_START_MS) {
       showDiceStage(playerName, event);
     } else {
-      showResultStage(playerName, event);
+      showResultStage(room, playerName, event);
     }
 
     if (elapsed < CHOICE_MS) {
@@ -222,7 +298,7 @@
     if (elapsed < RESULT_START_MS) {
       stageTimers.push(setTimeout(() => {
         lockActionButtons();
-        showResultStage(playerName, event);
+        showResultStage(room, playerName, event);
       }, RESULT_START_MS - elapsed));
     }
 
