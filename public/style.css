@@ -11,7 +11,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 button, input { font: inherit; }
-button { cursor: pointer; transition: transform .16s ease, opacity .16s ease, background .16s ease; }
+button { cursor: pointer; transition: transform .16s ease, opacity .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease; }
 button:active:not(:disabled) { transform: translateY(1px) scale(.995); }
 button:disabled { opacity: .42; cursor: not-allowed; }
 
@@ -218,18 +218,19 @@ button {
 
 .profession-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
 .profession-card {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 40% 60%;
+  gap: 12px;
   align-items: stretch;
-  min-height: 0;
+  min-height: 176px;
   padding: 12px;
-  border: 1px solid #cfc5bc;
+  border: 2px solid #cfc5bc;
   border-radius: 22px;
   background: #f5f0ea;
   color: #514c48;
@@ -244,89 +245,128 @@ button {
 }
 
 .profession-card.selected {
-  border: 2px solid #8f9a8d;
-  background: #e4e8e1;
-  box-shadow: 0 7px 18px rgba(100, 116, 102, .12);
+  opacity: 1;
+  filter: none;
+  border: 3px solid #c3a05b;
+  background: #fbf6e9;
+  box-shadow: 0 8px 22px rgba(171, 134, 66, .22), inset 0 0 0 1px rgba(255, 255, 255, .45);
 }
 
 .profession-card.taken,
-.profession-card:disabled {
-  opacity: .46;
-  filter: grayscale(.25);
+.profession-card.taken:disabled {
+  opacity: .34;
+  filter: grayscale(1);
+  border-color: #bbb5af;
+  background: #dedbd7;
+  box-shadow: none;
+}
+
+.profession-visual {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: transparent;
 }
 
 .profession-image {
   display: block;
   width: 100%;
+  max-width: 128px;
   aspect-ratio: 1 / 1;
   object-fit: contain;
-  border-radius: 16px;
-  background: #ece6df;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .profession-name {
-  margin-top: 10px;
-  font-size: 22px;
+  display: block;
+  margin-top: 6px;
+  font-size: 20px;
+  line-height: 1.1;
   color: #5f5852;
+  white-space: nowrap;
+}
+
+.profession-detail {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .profession-abilities {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
-  margin-top: 10px;
+  grid-template-columns: 1fr;
+  gap: 6px;
 }
 
 .ability-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 34px;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
+  gap: 7px;
   min-width: 0;
-  padding: 6px 7px;
-  border-radius: 11px;
+  min-height: 31px;
+  padding: 4px 5px 4px 11px;
+  border: 1px solid #ddd4cb;
+  border-radius: 10px;
   background: #ece6df;
-  color: #756d66;
-  font-size: 13px;
+  color: #6e665f;
+  font-size: 14px;
   line-height: 1;
+  text-align: left;
 }
 
 .ability-label {
   min-width: 0;
   white-space: nowrap;
+  letter-spacing: .06em;
 }
 
 .ability-grade {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
+  width: 29px;
   height: 24px;
-  flex: 0 0 24px;
+  justify-self: end;
   border-radius: 8px;
   font-size: 15px;
   letter-spacing: 0;
   color: #fffaf6;
 }
 
-.grade-s { background: #a9828c; }
-.grade-a { background: #87998b; }
-.grade-b { background: #a49587; }
-.grade-c { background: #9a9691; }
+.grade-s { background: #b28e55; }
+.grade-a { background: #829486; }
+.grade-b { background: #9b8b7c; }
+.grade-c { background: #96918c; }
 
 .profession-state {
   display: block;
-  margin-top: 11px;
-  padding: 7px 8px;
+  margin-top: 8px;
+  padding: 6px 7px;
   border-radius: 999px;
   background: #ddd5cd;
   color: #6f665f;
-  font-size: 14px;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .profession-card.selected .profession-state {
-  background: #8f9a8d;
-  color: #fffaf6;
+  background: #c3a05b;
+  color: #fffdf8;
+}
+
+.profession-card.taken .profession-state {
+  background: #aaa6a2;
+  color: #f4f2ef;
 }
 
 .profession-message {
@@ -383,32 +423,70 @@ button {
 
   .profession-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 10px;
   }
 
   .profession-card {
-    padding: 10px;
-    border-radius: 20px;
+    grid-template-columns: 39% 61%;
+    gap: 7px;
+    min-height: 154px;
+    padding: 8px;
+    border-radius: 18px;
   }
 
-  .profession-name { font-size: 21px; }
-  .ability-item { padding: 6px; font-size: 12px; }
-  .ability-grade { width: 23px; height: 23px; flex-basis: 23px; font-size: 14px; }
-  .profession-state { font-size: 13px; }
+  .profession-card.selected { border-width: 3px; }
+  .profession-image { max-width: 104px; }
+  .profession-name { margin-top: 4px; font-size: 17px; }
+  .profession-abilities { gap: 4px; }
+  .ability-item {
+    grid-template-columns: 1fr 27px;
+    gap: 4px;
+    min-height: 27px;
+    padding: 3px 4px 3px 7px;
+    border-radius: 8px;
+    font-size: 11px;
+  }
+  .ability-grade {
+    width: 24px;
+    height: 21px;
+    border-radius: 7px;
+    font-size: 13px;
+  }
+  .profession-state { margin-top: 5px; padding: 5px 4px; font-size: 10px; }
 }
 
 @media (max-width: 390px) {
   .shell { padding: 10px; }
-  .card { padding: 24px 12px; border-radius: 22px; }
+  .card { padding: 24px 10px; border-radius: 22px; }
   .game-logo { width: 100%; max-height: 170px; }
   .entry-control, .ghost { width: min(74vw, 260px); }
   .start-button { width: min(80vw, 285px); }
   .player-row { padding: 16px 14px; gap: 10px; min-height: 80px; }
   .player-name { font-size: 20px; }
-  .profession-grid { gap: 9px; }
-  .profession-card { padding: 8px; border-radius: 17px; }
-  .profession-name { font-size: 19px; }
-  .profession-abilities { grid-template-columns: 1fr 1fr; gap: 5px; }
-  .ability-item { padding: 5px 6px; font-size: 11px; }
-  .ability-grade { width: 21px; height: 21px; flex-basis: 21px; font-size: 13px; border-radius: 7px; }
+
+  .profession-grid { gap: 7px; }
+  .profession-card {
+    grid-template-columns: 38% 62%;
+    gap: 5px;
+    min-height: 142px;
+    padding: 6px;
+    border-radius: 15px;
+  }
+  .profession-image { max-width: 84px; }
+  .profession-name { font-size: 15px; }
+  .profession-abilities { gap: 3px; }
+  .ability-item {
+    grid-template-columns: 1fr 23px;
+    min-height: 24px;
+    padding: 2px 3px 2px 5px;
+    font-size: 10px;
+    border-radius: 7px;
+  }
+  .ability-grade {
+    width: 21px;
+    height: 19px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+  .profession-state { font-size: 9px; padding: 4px 3px; }
 }
