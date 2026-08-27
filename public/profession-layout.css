@@ -1,4 +1,4 @@
-/* 職業選擇：select.png 作為固定座標底圖，6 個職業等比例疊入 2×3 框位 */
+/* 職業選擇：select.png 是唯一座標基準，6 個職業精準疊入底圖 2×3 框位 */
 #professionPanel {
   position: relative;
   margin: 0;
@@ -27,24 +27,28 @@
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 /*
-  這個 grid 永遠以 select.png 本身為座標基準。
-  不使用 px、bottom 或不同裝置的獨立座標，因此圖片縮放時 6 個職業會一起縮放、不跑位。
+  依實際手機截圖重新量測 select.png 的 6 個框：
+  - 左右框幾乎貼近底圖兩側，不能再用原本 7.5% 的大留白。
+  - 三排之間的實際間距很小，不能使用原本 3.2% 的 row-gap。
+  所有值仍然是底圖百分比，所以手機 / 平板 / 桌機會一起等比例縮放。
 */
 .profession-grid {
   position: absolute;
-  left: 7.5%;
-  top: 17.5%;
-  width: 85%;
-  height: 76%;
+  left: 1.9%;
+  top: 16.6%;
+  width: 94.0%;
+  height: 69.5%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(3, minmax(0, 1fr));
-  column-gap: 4.5%;
-  row-gap: 3.2%;
+  column-gap: .8%;
+  row-gap: 1.0%;
   margin: 0;
+  padding: 0;
 }
 
 .profession-card {
@@ -55,11 +59,12 @@
   gap: 1.5%;
   width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
   margin: 0;
-  padding: 2.5%;
+  padding: 3.2% 7%;
   border: 0;
-  border-radius: 8%;
+  border-radius: 9%;
   background: transparent;
   box-shadow: none;
   color: #514c48;
@@ -70,27 +75,29 @@
 }
 
 .profession-card:hover:not(:disabled) {
-  background: rgba(255, 255, 255, .08);
+  background: rgba(255, 255, 255, .06);
   transform: none;
 }
 
 .profession-card:focus-visible {
-  outline: 3px solid rgba(255, 255, 255, .9);
-  outline-offset: -4px;
+  outline: 3px solid rgba(255, 255, 255, .88);
+  outline-offset: -7px;
 }
 
+/* 自己選到：外框直接貼著底圖職業框，不再出現窄長錯位框。 */
 .profession-card.selected {
   opacity: 1;
   filter: none;
   border: 0;
-  background: rgba(255, 248, 221, .12);
-  box-shadow: inset 0 0 0 clamp(2px, .35vw, 4px) rgba(195, 160, 91, .95);
+  background: rgba(255, 248, 221, .08);
+  box-shadow: inset 0 0 0 clamp(2px, .28vw, 4px) rgba(195, 160, 91, .9);
 }
 
+/* 別人已選：只反灰人物與能力內容，底圖本身不移位。 */
 .profession-card.taken,
 .profession-card.taken:disabled {
   opacity: .28;
-  filter: grayscale(.82);
+  filter: grayscale(.86);
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -99,7 +106,7 @@
 .profession-visual {
   display: flex;
   min-width: 0;
-  height: 100%;
+  height: 92%;
   align-items: center;
   justify-content: center;
   padding: 0;
@@ -122,7 +129,7 @@
 .profession-detail {
   display: flex;
   min-width: 0;
-  height: 100%;
+  height: 92%;
   align-items: center;
   justify-content: center;
 }
@@ -130,7 +137,7 @@
 .profession-abilities {
   display: grid;
   width: 100%;
-  gap: 3.5%;
+  gap: 3.2%;
   align-content: center;
 }
 
@@ -142,12 +149,12 @@
   width: 100%;
   min-width: 0;
   min-height: 0;
-  padding: 3.5% 5%;
-  border: 1px solid rgba(134, 115, 91, .20);
+  padding: 3.4% 5%;
+  border: 1px solid rgba(134, 115, 91, .18);
   border-radius: 10px;
-  background: rgba(255, 250, 241, .72);
+  background: rgba(255, 250, 241, .70);
   color: #695f55;
-  font-size: clamp(10px, 1.7vw, 17px);
+  font-size: clamp(10px, 1.65vw, 17px);
   line-height: 1;
   text-align: left;
 }
@@ -172,7 +179,7 @@
   line-height: 1;
 }
 
-/* 職業底圖模式：讓 select.png 成為整個選擇畫面，不再包原本灰色卡片。 */
+/* 職業底圖模式：select.png 本身就是整個職業選擇介面。 */
 .card.profession-mode {
   width: min(920px, 100%);
   padding: 0;
@@ -190,7 +197,7 @@
   }
 
   .profession-card {
-    padding: 2%;
+    padding: 3% 6.5%;
   }
 
   .ability-item {
@@ -208,9 +215,13 @@
     width: 100%;
   }
 
+  .profession-card {
+    padding: 3% 6.5%;
+  }
+
   .profession-card:focus-visible {
     outline-width: 2px;
-    outline-offset: -3px;
+    outline-offset: -5px;
   }
 
   .ability-item {
