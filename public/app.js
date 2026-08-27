@@ -1,6 +1,5 @@
 const socket = io();
 
-const statusEl = document.getElementById('status');
 const entryPanel = document.getElementById('entryPanel');
 const roomPanel = document.getElementById('roomPanel');
 const playerNameInput = document.getElementById('playerName');
@@ -85,11 +84,6 @@ function withBusy(button, task) {
   });
 }
 
-socket.on('connect', () => {
-  statusEl.textContent = '伺服器連線正常';
-  statusEl.classList.add('ok');
-});
-
 socket.on('server:ready', (payload) => {
   console.log(payload);
 });
@@ -98,11 +92,6 @@ socket.on('room:update', (room) => {
   if (currentRoom && room.code === currentRoom.code) {
     renderRoom(room);
   }
-});
-
-socket.on('disconnect', () => {
-  statusEl.textContent = '與伺服器連線中斷，正在重新連線…';
-  statusEl.classList.remove('ok');
 });
 
 joinGameBtn.addEventListener('click', () => {
