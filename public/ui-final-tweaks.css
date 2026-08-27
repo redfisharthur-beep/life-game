@@ -1,0 +1,93 @@
+/* 最終 UI 微調：只調整顯示，不改遊戲資料與計算。 */
+
+/* 等待畫面：隱藏玩家數量膠囊。 */
+.room-mode .players-head.compact,
+.room-mode #playerCount {
+  display: none !important;
+}
+
+/* 玩家名片：總資產／現金／股票／土地稍微放大。 */
+#gamePanel .player-info-label {
+  font-size: 16px !important;
+}
+
+#gamePanel .player-info-value {
+  font-size: 18px !important;
+}
+
+/* 玩家名片不同資訊膠囊維持不同底色。 */
+#gamePanel .player-info-cell.total-assets { background: #eee6d8 !important; }
+#gamePanel .player-info-cell.cash { background: #dfeae2 !important; }
+#gamePanel .player-info-cell.stocks { background: #dfe6ef !important; }
+#gamePanel .player-info-cell.land { background: #eee2d5 !important; }
+
+/* 結算畫面：不同統計膠囊使用不同底配色。 */
+.ranking-stats > span:nth-child(1) { background: #f3dddd !important; }
+.ranking-stats > span:nth-child(2) { background: #eee6d8 !important; }
+.ranking-stats > span:nth-child(3) { background: #dfe8df !important; }
+
+/* 稱號膠囊也避免全部同色。 */
+.ranking-titles span:nth-child(4n + 1) { background: #eadfca !important; color: #755f3f !important; }
+.ranking-titles span:nth-child(4n + 2) { background: #dde7df !important; color: #526b59 !important; }
+.ranking-titles span:nth-child(4n + 3) { background: #e2e3ec !important; color: #5d6078 !important; }
+.ranking-titles span:nth-child(4n) { background: #eedddd !important; color: #795b5b !important; }
+
+/* 名次圖示。 */
+.ranking-number {
+  min-width: 58px !important;
+  text-align: center;
+  font-size: 25px !important;
+}
+
+.results-heading > strong {
+  min-width: 1.4em;
+  text-align: center;
+  font-size: clamp(34px, 7vw, 46px) !important;
+  line-height: 1 !important;
+}
+
+/* 再來一局／返回首頁：固定兩欄，各自在自己的欄位置中、字級相同。 */
+.results-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-items: stretch;
+}
+
+.results-actions button {
+  width: 100% !important;
+  min-height: 48px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 18px !important;
+  line-height: 1.1;
+}
+
+.results-actions #restartGameBtn {
+  background: #dfe8df !important;
+  color: #53685a !important;
+}
+
+.results-actions #leaveGameBtn {
+  background: #eee2d5 !important;
+  color: #765f4b !important;
+}
+
+@media (max-width: 760px) {
+  #gamePanel .player-info-label { font-size: 14px !important; }
+  #gamePanel .player-info-value { font-size: 16px !important; }
+}
+
+@media (max-width: 520px) {
+  #gamePanel .player-info-label { font-size: 13px !important; }
+  #gamePanel .player-info-value { font-size: 15px !important; }
+  .ranking-number { min-width: 48px !important; font-size: 22px !important; }
+  .results-actions { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .results-actions button { font-size: 16px !important; min-height: 44px; }
+}
+
+@media (max-width: 390px) {
+  #gamePanel .player-info-label { font-size: 12px !important; }
+  #gamePanel .player-info-value { font-size: 14px !important; }
+  .results-actions button { font-size: 15px !important; }
+}
