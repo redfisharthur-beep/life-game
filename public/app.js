@@ -115,10 +115,16 @@ socket.on('room:started', (room) => {
 });
 
 joinGameBtn.addEventListener('click', () => {
-  withBusy(joinGameBtn, () => new Promise((resolve) => {
-    const name = getPlayerName();
-    setMessage('');
+  const name = getPlayerName();
+  setMessage('');
 
+  if (!name) {
+    setMessage('請輸入暱稱', 'error');
+    playerNameInput.focus();
+    return;
+  }
+
+  withBusy(joinGameBtn, () => new Promise((resolve) => {
     socket.emit('room:autoJoin', { name }, (result) => {
       if (!result?.ok) {
         setMessage(result?.message || '加入遊戲失敗。', 'error');
@@ -133,6 +139,19 @@ joinGameBtn.addEventListener('click', () => {
 });
 
 startGameBtn.addEventListener('click', () => {
+  if (!currentRoom) return;
+
+  const isHost = socket.id === currentRoom.hostId;
+  if (!isHost) {
+    setLaunchMessage('等待房主啟程', 'error');
+    return;
+  }
+
+  if (currentRoom.players.length < 2) {
+    setLaunchMessage('至少需要2位玩家才能啟程。', 'error');
+    return;
+  }
+
   withBusy(startGameBtn, () => new Promise((resolve) => {
     setLaunchMessage('');
 
