@@ -32,7 +32,8 @@
 .rules-pill {
   position: absolute;
   top: 3.2%;
-  left: 3.2%;
+  right: 3.2%;
+  left: auto;
   z-index: 30;
   width: 5.2em;
   min-width: 0;
@@ -188,7 +189,8 @@
 @media (max-width: 600px) {
   .rules-pill {
     top: 2.2%;
-    left: 2.8%;
+    right: 2.8%;
+    left: auto;
     width: 5.1em;
     padding: 5px 3px;
     font-size: 12px;
