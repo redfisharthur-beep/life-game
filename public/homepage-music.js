@@ -10,6 +10,7 @@
     audio.preload = 'auto';
     audio.volume = 0.35;
   });
+  tracks.game.volume = 0.20;
 
   const entryPanel = document.getElementById('entryPanel');
   const roomPanel = document.getElementById('roomPanel');
