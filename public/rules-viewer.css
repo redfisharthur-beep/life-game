@@ -149,23 +149,23 @@
   overflow: hidden;
 }
 
-/* 兩張規則圖上下排列，直接往下滑閱讀。 */
+/* 規則圖固定放大為原本 2 倍，可上下左右自由滑動查看。 */
 .rules-viewer-page {
   width: 100%;
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  touch-action: pan-y;
+  touch-action: pan-x pan-y;
   background: #f6efe8;
 }
 
 .rules-viewer-image {
   display: block;
-  width: 100%;
-  max-width: 100%;
+  width: 200%;
+  max-width: none;
   height: auto;
+  max-height: none;
   margin: 0;
   object-fit: contain;
   border-radius: 0;
