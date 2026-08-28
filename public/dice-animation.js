@@ -2,11 +2,19 @@
   const ROLL_FRAMES = Array.from({ length: 12 }, (_, index) => `/images/roll${index + 1}.png`);
   const FRAME_MS = 100;
   const ROLL_MS = 1200;
+  const FINAL_HOLD_MS = 1000;
 
   let activeImage = null;
   let rollInterval = null;
   let settleTimer = null;
+  let holdTimer = null;
   let animationToken = 0;
+
+  function removeFinalHold() {
+    document.querySelectorAll('.dice-final-hold-layer').forEach((layer) => layer.remove());
+    const overlay = document.querySelector('.action-showcase');
+    overlay?.classList.remove('dice-final-hold-active');
+  }
 
   function clearAnimation() {
     animationToken += 1;
@@ -18,11 +26,37 @@
       clearTimeout(settleTimer);
       settleTimer = null;
     }
+    if (holdTimer) {
+      clearTimeout(holdTimer);
+      holdTimer = null;
+    }
+    removeFinalHold();
     if (activeImage) {
       activeImage.classList.remove('dice-rolling', 'dice-landed');
       delete activeImage.dataset.diceAnimating;
     }
     activeImage = null;
+  }
+
+  function showFinalHold(finalSrc, finalAlt) {
+    const overlay = document.querySelector('.action-showcase');
+    const card = overlay?.querySelector('.action-showcase-card');
+    if (!overlay || !card) return;
+
+    removeFinalHold();
+    overlay.classList.add('dice-final-hold-active');
+
+    const layer = document.createElement('div');
+    layer.className = 'dice-final-hold-layer';
+    layer.setAttribute('aria-label', finalAlt);
+    layer.innerHTML = `<img class="dice-final-hold-image" src="${finalSrc}" alt="${finalAlt}" />`;
+    card.appendChild(layer);
+
+    holdTimer = setTimeout(() => {
+      layer.remove();
+      overlay.classList.remove('dice-final-hold-active');
+      holdTimer = null;
+    }, FINAL_HOLD_MS);
   }
 
   function startAnimation(image) {
@@ -55,12 +89,14 @@
         rollInterval = null;
       }
 
-      // 1.2 秒素材動畫結束後，切回伺服器真正擲出的結果圖。
-      // 骰子階段總長 2.2 秒，因此最終結果會完整定格 1 秒。
       image.src = finalSrc;
       image.alt = finalAlt;
       image.classList.remove('dice-rolling');
       image.classList.add('dice-landed');
+
+      // 1.2 秒素材動畫後，獨立覆蓋顯示真正骰到的結果 1 秒。
+      // 即使原本結果階段在 2 秒時切換，最終骰面仍會完整看滿 1 秒。
+      showFinalHold(finalSrc, finalAlt);
     }, ROLL_MS);
   }
 
@@ -73,7 +109,7 @@
     );
 
     if (!isDiceStage) {
-      if (activeImage) clearAnimation();
+      if (activeImage && !holdTimer) clearAnimation();
       return;
     }
 
