@@ -29,7 +29,7 @@
   transform: translateY(0);
 }
 
-/* 遊戲規則：右上方扁平橢圓膠囊。 */
+/* 遊戲規則：職業選擇頁右上方扁平橢圓膠囊。 */
 .rules-pill {
   position: absolute;
   top: 3.2%;
@@ -56,18 +56,51 @@
   font-size: 14px;
 }
 
-#roomPanel .home-pill {
-  align-self: center;
+/* 玩家等待列表：右上角小型「回到首頁」，盡量不遮住房子底圖。 */
+.room-mode #leaveRoomBtn {
+  display: block !important;
+  position: absolute;
+  top: 3.0%;
+  right: 3.0%;
+  left: auto;
+  z-index: 12;
+  width: 5.5em;
+  min-width: 0;
+  min-height: 0;
+  height: 1.65em;
+  margin: 0;
+  padding: 0 .45em;
+  border-radius: 999px;
+  font-size: clamp(11px, 1.35vw, 14px);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: auto;
 }
 
+/* 職業選擇：左上角三個人物上方放「回到首頁」。 */
 #professionPanel .profession-home-pill {
+  position: absolute;
+  top: 3.2%;
+  left: 3.2%;
+  right: auto;
+  z-index: 30;
   display: block;
-  width: fit-content;
-  min-width: 7.2em;
-  margin: 10px auto 0;
-  padding: 7px 18px;
-  font-size: 14px;
+  width: 5.5em;
+  min-width: 0;
+  min-height: 0;
+  height: 1.75em;
+  margin: 0;
+  padding: 0 .45em;
+  border-radius: 999px;
+  font-size: clamp(12px, 1.42vw, 15px);
   font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .results-actions .start-button,
@@ -189,10 +222,22 @@
     line-height: 1;
   }
 
+  .room-mode #leaveRoomBtn {
+    top: 2.2%;
+    right: 2.8%;
+    width: 5.35em;
+    height: 1.55em;
+    padding: 0 .35em;
+    font-size: 10.5px;
+  }
+
   #professionPanel .profession-home-pill {
-    margin-top: 8px;
-    padding: 6px 15px;
-    font-size: 13px;
+    top: 2.2%;
+    left: 2.8%;
+    width: 5.35em;
+    height: 1.7em;
+    padding: 0 .35em;
+    font-size: 11.5px;
   }
 
   .rules-viewer-card {
