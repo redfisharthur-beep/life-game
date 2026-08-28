@@ -36,7 +36,10 @@
     viewer.classList.remove('hidden');
     viewer.setAttribute('aria-hidden', 'false');
     document.documentElement.style.overflow = 'hidden';
-    if (scrollArea) scrollArea.scrollTop = 0;
+    if (scrollArea) {
+      scrollArea.scrollTop = 0;
+      scrollArea.scrollLeft = 0;
+    }
     closeBtn.focus({ preventScroll: true });
   }
 
