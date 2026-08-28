@@ -21,8 +21,8 @@ const replacements = [
     '    amount: income,\n    auto,',
     '    amount: income,\n    baseSalary: salary,\n    effectiveSalary,\n    salaryRaiseFactor,\n    auto,'
   ],
-  ['    const units = round2(total * profession.stock);', '    const units = round2(total * 2);'],
-  ['    const units = round2(total * profession.land);', '    const units = round2(total * 2);'],
+  ['    const units = round2(total * profession.stock);', '    const units = round2(total * 2 * profession.stock);'],
+  ['    const units = round2(total * profession.land);', '    const units = round2(total * 2 * profession.land);'],
   ['    const after = before > 0 ? round2(before * positiveFactor) : round2(before + total);', '    const after = before > 0 ? round2(before * positiveFactor) : before;'],
   ['    const after = before > 0 ? round2(before * negativeFactor) : round2(before - (0.5 * total));', '    const after = before > 0 ? round2(before * negativeFactor) : before;'],
   ['    const after = before > 0 ? round2(before * factor) : round2(before - (0.25 * total));', '    const after = before > 0 ? round2(before * factor) : before;'],
