@@ -1,0 +1,41 @@
+.dice-result-image.dice-rolling {
+  will-change: transform, filter;
+  animation: dice-roll-jitter 170ms ease-in-out infinite alternate;
+  filter: drop-shadow(0 20px 34px rgba(38, 31, 27, .62)) blur(.35px);
+}
+
+.dice-result-image.dice-landed {
+  animation: dice-land-pop 320ms cubic-bezier(.2, .9, .25, 1.25) both;
+  filter: drop-shadow(0 19px 30px rgba(38, 31, 27, .58));
+}
+
+@keyframes dice-roll-jitter {
+  0% {
+    transform: translate3d(-7px, -4px, 0) rotate(-10deg) scale(.92);
+  }
+  50% {
+    transform: translate3d(4px, 6px, 0) rotate(7deg) scale(1.03);
+  }
+  100% {
+    transform: translate3d(8px, -2px, 0) rotate(11deg) scale(.97);
+  }
+}
+
+@keyframes dice-land-pop {
+  0% {
+    transform: scale(.82) rotate(-5deg);
+  }
+  62% {
+    transform: scale(1.12) rotate(2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dice-result-image.dice-rolling,
+  .dice-result-image.dice-landed {
+    animation: none !important;
+  }
+}
