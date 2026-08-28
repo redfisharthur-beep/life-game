@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="/major-event.css?v=20260828-1905" />
   <link rel="stylesheet" href="/announcement-tone.css?v=20260827-2225" />
   <link rel="stylesheet" href="/ui-final-tweaks.css?v=20260827-2318" />
+  <link rel="stylesheet" href="/rules-viewer.css?v=20260828-2052" />
 </head>
 <body>
   <main class="shell">
@@ -51,7 +52,7 @@
 
             <button id="startGameBtn" class="start-button" type="button" disabled>啟程</button>
             <p id="launchMessage" class="launch-message" aria-live="polite"></p>
-            <button id="leaveRoomBtn" class="ghost" type="button">離開房間</button>
+            <button id="leaveRoomBtn" class="home-pill" type="button">回到首頁</button>
           </div>
         </div>
       </div>
@@ -59,6 +60,7 @@
       <div id="professionPanel" class="panel hidden">
         <div class="profession-stage">
           <img class="profession-stage-image" src="/images/select.png?v=20260827-1735" alt="選擇職業" />
+          <button id="rulesOpenBtn" class="rules-pill" type="button">遊戲規則</button>
           <div id="professionGrid" class="profession-grid"></div>
         </div>
         <p id="professionMessage" class="profession-message" aria-live="polite"></p>
@@ -157,7 +159,7 @@
           <div id="rankingList" class="ranking-list"></div>
           <div class="results-actions">
             <button id="restartGameBtn" class="start-button" type="button">再來一局</button>
-            <button id="leaveGameBtn" class="ghost" type="button">返回首頁</button>
+            <button id="leaveGameBtn" class="home-pill" type="button">回到首頁</button>
           </div>
         </section>
       </div>
@@ -167,6 +169,21 @@
   <section id="roundAnnouncement" class="round-announcement hidden" aria-live="assertive">
     <strong>人生加速！</strong>
     <span>從現在開始每回合擲2顆骰子！</span>
+  </section>
+
+  <section id="rulesViewer" class="rules-viewer hidden" aria-hidden="true" aria-label="遊戲規則">
+    <div class="rules-viewer-card" role="dialog" aria-modal="true" aria-label="遊戲規則圖片">
+      <button id="rulesCloseBtn" class="rules-viewer-close" type="button" aria-label="關閉遊戲規則">×</button>
+      <div class="rules-viewer-page">
+        <img id="rulesViewerImage" class="rules-viewer-image" alt="遊戲規則" />
+        <p id="rulesViewerError" class="rules-viewer-error"></p>
+      </div>
+      <div class="rules-viewer-controls">
+        <button id="rulesPrevBtn" type="button">上一頁</button>
+        <span id="rulesPageIndicator" class="rules-page-indicator">1 / 2</span>
+        <button id="rulesNextBtn" type="button">下一頁</button>
+      </div>
+    </div>
   </section>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -181,5 +198,6 @@
   <script src="/announcement-tone.js?v=20260827-2225"></script>
   <script src="/logo-visibility.js?v=20260827-1905"></script>
   <script src="/ui-final-tweaks.js?v=20260827-2334"></script>
+  <script src="/rules-viewer.js?v=20260828-2052"></script>
 </body>
 </html>
