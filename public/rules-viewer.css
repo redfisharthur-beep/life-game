@@ -34,8 +34,14 @@
   top: 3.2%;
   left: 3.2%;
   z-index: 30;
-  padding: 8px 17px;
-  font-size: clamp(13px, 1.55vw, 17px);
+  width: 5.2em;
+  min-width: 0;
+  padding: 6px 4px;
+  font-size: clamp(13px, 1.5vw, 16px);
+  font-weight: 400;
+  letter-spacing: .02em;
+  line-height: 1.1;
+  text-align: center;
   white-space: nowrap;
 }
 
@@ -183,8 +189,10 @@
   .rules-pill {
     top: 2.2%;
     left: 2.8%;
-    padding: 7px 13px;
+    width: 5.1em;
+    padding: 5px 3px;
     font-size: 12px;
+    font-weight: 400;
   }
 
   .rules-viewer {
