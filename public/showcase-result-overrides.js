@@ -71,7 +71,10 @@
     const rows = [...overlay.querySelectorAll('.simple-result-row')];
     const actorRow = rows.at(-1);
     if (!actorRow) return;
-    setEffects(actorRow, [`現金 ${formatSigned(event.bonus)}`]);
+    setEffects(actorRow, [
+      `現金 ${formatSigned(event.bonus)}`,
+      '幸福值 +0.7',
+    ]);
   }
 
   function syncFateResult(overlay, event) {
