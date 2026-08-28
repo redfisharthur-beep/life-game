@@ -15,7 +15,7 @@
   ];
   const FRAME_MS = 300;
   const ROLL_MS = 1500;
-  const FINAL_HOLD_MS = 1000;
+  const FINAL_HOLD_MS = 1500;
 
   const singleRollAudio = new Audio('/music/Dice_Roll.mp3');
   const doubleRollAudio = new Audio('/music/2Dice_Roll.mp3');
