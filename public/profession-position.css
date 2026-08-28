@@ -1,6 +1,6 @@
 /* 職業選擇介面位置微調：
    手機不動；平板維持原本整體偏移；桌機不再移動整張底圖，
-   改為只把每一格內的人物＋能力資訊往右，讓內容遠離左邊框。 */
+   人物維持目前位置；評級文字與 S/A/B/C 再往右 20px。 */
 
 @media (min-width: 431px) and (pointer: coarse) {
   .profession-stage {
@@ -22,11 +22,11 @@
   }
 
   .profession-detail {
-    transform: translate(calc(1.4em + 30px), .5em) !important;
+    transform: translate(calc(1.4em + 50px), .5em) !important;
   }
 
   .profession-card:nth-child(even) .profession-detail {
-    transform: translate(calc(1.9em + 30px), .5em) !important;
+    transform: translate(calc(1.9em + 50px), .5em) !important;
   }
 }
 
@@ -45,10 +45,10 @@
   }
 
   .profession-detail {
-    transform: translate(calc(1.4em + 30px), .5em) !important;
+    transform: translate(calc(1.4em + 50px), .5em) !important;
   }
 
   .profession-card:nth-child(even) .profession-detail {
-    transform: translate(calc(1.9em + 30px), .5em) !important;
+    transform: translate(calc(1.9em + 50px), .5em) !important;
   }
 }
