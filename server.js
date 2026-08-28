@@ -19,10 +19,10 @@ app.use(express.static(path.join(__dirname, 'public'), {
 }));
 
 const rooms = new Map();
-const TURN_MS = 10_000;
-const ACTION_SHOWCASE_MS = 9_000;
+const TURN_MS = 6_000;
+const ACTION_SHOWCASE_MS = 7_500;
 const ROUND_ACCELERATION_MS = 3_000;
-const MAJOR_EVENT_MS = 8_000;
+const MAJOR_EVENT_MS = 4_000;
 const MAJOR_EVENT_CHANCE = 0.05;
 const DISCONNECT_GRACE_MS = 90_000;
 const ROOM_IDLE_MS = 15 * 60_000;
