@@ -1,35 +1,84 @@
+.dice-result-stage {
+  overflow: hidden;
+  min-height: 250px;
+}
+
+.dice-result-images {
+  width: 100%;
+  min-height: 250px;
+  overflow: visible;
+}
+
 .dice-result-image.dice-rolling {
   will-change: transform, filter;
-  animation: dice-roll-jitter 170ms ease-in-out infinite alternate;
-  filter: drop-shadow(0 20px 34px rgba(38, 31, 27, .62)) blur(.35px);
+  animation: dice-roll-throw 620ms cubic-bezier(.22, .72, .2, 1) infinite;
+  filter: drop-shadow(0 24px 38px rgba(38, 31, 27, .64)) blur(.45px);
+  transform-origin: 50% 50%;
 }
 
 .dice-result-image.dice-landed {
-  animation: dice-land-pop 320ms cubic-bezier(.2, .9, .25, 1.25) both;
-  filter: drop-shadow(0 19px 30px rgba(38, 31, 27, .58));
+  animation: dice-land-pop 220ms cubic-bezier(.18, .88, .3, 1.18) both;
+  filter: drop-shadow(0 22px 32px rgba(38, 31, 27, .6));
 }
 
-@keyframes dice-roll-jitter {
+@keyframes dice-roll-throw {
   0% {
-    transform: translate3d(-7px, -4px, 0) rotate(-10deg) scale(.92);
+    transform: translate3d(-88px, 24px, 0) rotate(-120deg) scale(.78);
   }
-  50% {
-    transform: translate3d(4px, 6px, 0) rotate(7deg) scale(1.03);
+  18% {
+    transform: translate3d(-42px, -44px, 0) rotate(80deg) scale(.96);
+  }
+  38% {
+    transform: translate3d(18px, -62px, 0) rotate(245deg) scale(1.12);
+  }
+  58% {
+    transform: translate3d(76px, -16px, 0) rotate(430deg) scale(.98);
+  }
+  76% {
+    transform: translate3d(34px, 34px, 0) rotate(575deg) scale(.9);
   }
   100% {
-    transform: translate3d(8px, -2px, 0) rotate(11deg) scale(.97);
+    transform: translate3d(-18px, 6px, 0) rotate(720deg) scale(1.02);
   }
 }
 
 @keyframes dice-land-pop {
   0% {
-    transform: scale(.82) rotate(-5deg);
+    transform: translate3d(0, -10px, 0) scale(.9) rotate(-3deg);
   }
-  62% {
-    transform: scale(1.12) rotate(2deg);
+  68% {
+    transform: translate3d(0, 2px, 0) scale(1.09) rotate(1.5deg);
   }
   100% {
-    transform: scale(1) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+}
+
+@media (max-width: 520px) {
+  .dice-result-stage,
+  .dice-result-images {
+    min-height: 225px;
+  }
+
+  @keyframes dice-roll-throw {
+    0% {
+      transform: translate3d(-62px, 20px, 0) rotate(-110deg) scale(.8);
+    }
+    18% {
+      transform: translate3d(-32px, -34px, 0) rotate(70deg) scale(.96);
+    }
+    38% {
+      transform: translate3d(12px, -48px, 0) rotate(235deg) scale(1.08);
+    }
+    58% {
+      transform: translate3d(56px, -12px, 0) rotate(420deg) scale(.98);
+    }
+    76% {
+      transform: translate3d(28px, 26px, 0) rotate(565deg) scale(.92);
+    }
+    100% {
+      transform: translate3d(-12px, 4px, 0) rotate(700deg) scale(1.02);
+    }
   }
 }
 
