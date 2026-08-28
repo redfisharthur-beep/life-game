@@ -1,9 +1,9 @@
 (() => {
   const ROLL_FRAMES = [
     '/images/roll1.png',
-    '/images/roll4.png',
-    '/images/roll7.png',
-    '/images/roll11.png',
+    '/images/roll3.png',
+    '/images/roll5.png',
+    '/images/roll8.png',
   ];
   const FRAME_MS = 375;
   const ROLL_MS = 1500;
@@ -103,7 +103,7 @@
       image.classList.remove('dice-rolling');
       image.classList.add('dice-landed');
 
-      // 1.5 秒只播放 roll1 / roll4 / roll7 / roll11，最後結果完整定格 1 秒。
+      // 1.5 秒依序播放 roll1 / roll3 / roll5 / roll8，最後結果完整定格 1 秒。
       showFinalHold(finalSrc, finalAlt);
     }, ROLL_MS);
   }
