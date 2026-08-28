@@ -35,6 +35,38 @@ const replacements = [
   [
     '  player.cash = actorCashAfter;\n  player.helpCount = (player.helpCount || 0) + 1;',
     '  player.cash = actorCashAfter;\n  player.happiness = round2(Number(player.happiness || 0) + 0.7);\n  player.helpCount = (player.helpCount || 0) + 1;'
+  ],
+  [
+    'const ROOM_IDLE_MS = 15 * 60_000;\nconst TOTAL_ROUNDS = 30;',
+    'const ROOM_IDLE_MS = 15 * 60_000;\nconst PROFESSION_AUTO_PICK_MS = 5 * 60_000;\nconst TOTAL_ROUNDS = 30;'
+  ],
+  [
+    'function clearIdleTimer(room) {\n  if (room.idleTimer) {\n    clearTimeout(room.idleTimer);\n    room.idleTimer = null;\n  }\n}\n',
+    'function clearIdleTimer(room) {\n  if (room.idleTimer) {\n    clearTimeout(room.idleTimer);\n    room.idleTimer = null;\n  }\n}\n\nfunction clearProfessionTimer(room) {\n  if (room.professionTimer) {\n    clearTimeout(room.professionTimer);\n    room.professionTimer = null;\n  }\n}\n\nfunction scheduleProfessionAutoPick(room) {\n  clearProfessionTimer(room);\n  room.professionTimer = setTimeout(() => {\n    const currentRoom = rooms.get(room.code);\n    if (!currentRoom || currentRoom.phase !== \'profession\') return;\n\n    const used = new Set(currentRoom.players.map((player) => player.profession).filter(Boolean));\n    const available = shuffle(Object.keys(PROFESSIONS).filter((professionId) => !used.has(professionId)));\n    const waitingPlayers = shuffle(currentRoom.players.filter((player) => !player.profession));\n\n    waitingPlayers.forEach((player) => {\n      const professionId = available.shift();\n      if (professionId) player.profession = professionId;\n    });\n\n    currentRoom.professionTimer = null;\n    if (currentRoom.players.length >= 2 && currentRoom.players.every((player) => Boolean(player.profession))) {\n      initializeGame(currentRoom);\n      return;\n    }\n    emitRoom(currentRoom);\n  }, PROFESSION_AUTO_PICK_MS);\n}\n'
+  ],
+  [
+    'function initializeGame(room) {\n  clearTurnTimer(room);',
+    'function initializeGame(room) {\n  clearProfessionTimer(room);\n  clearTurnTimer(room);'
+  ],
+  [
+    "  const room = { code, hostId: player.id, players: [player], started: false, phase: 'lobby', game: null, turnTimer: null, idleTimer: null };",
+    "  const room = { code, hostId: player.id, players: [player], started: false, phase: 'lobby', game: null, turnTimer: null, idleTimer: null, professionTimer: null };"
+  ],
+  [
+    "    room.started = true; room.phase = 'profession'; room.players.forEach((player) => { player.profession = null; });\n    const snapshot = publicRoom(room);",
+    "    room.started = true; room.phase = 'profession'; room.players.forEach((player) => { player.profession = null; });\n    scheduleProfessionAutoPick(room);\n    const snapshot = publicRoom(room);"
+  ],
+  [
+    "    room.players.forEach((player) => { player.profession = null; player.cash = 0; player.stocks = 0; player.land = 0; player.happiness = 0; player.helpCount = 0; player.sabotageCount = 0; });\n    const snapshot = publicRoom(room);",
+    "    room.players.forEach((player) => { player.profession = null; player.cash = 0; player.stocks = 0; player.land = 0; player.happiness = 0; player.helpCount = 0; player.sabotageCount = 0; });\n    scheduleProfessionAutoPick(room);\n    const snapshot = publicRoom(room);"
+  ],
+  [
+    "  if (!room.players.length) { clearTurnTimer(room); clearIdleTimer(room); rooms.delete(room.code); return; }",
+    "  if (!room.players.length) { clearTurnTimer(room); clearIdleTimer(room); clearProfessionTimer(room); rooms.delete(room.code); return; }"
+  ],
+  [
+    '    clearTurnTimer(currentRoom);\n    rooms.delete(currentRoom.code);',
+    '    clearTurnTimer(currentRoom);\n    clearProfessionTimer(currentRoom);\n    rooms.delete(currentRoom.code);'
   ]
 ];
 
