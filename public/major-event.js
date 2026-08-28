@@ -16,24 +16,20 @@
   overlay.innerHTML = `
     <div class="major-event-card">
       <img class="major-event-image" src="" alt="" />
-      <div class="major-event-countdown"><span>8</span></div>
     </div>
   `;
   document.body.appendChild(overlay);
 
   const imageEl = overlay.querySelector('.major-event-image');
-  const countdownEl = overlay.querySelector('.major-event-countdown span');
-  let timer = null;
+  let hideTimer = null;
   let activeKey = null;
-  let localDeadline = 0;
 
   function hide() {
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
     }
     activeKey = null;
-    localDeadline = 0;
     imageEl.removeAttribute('src');
     imageEl.alt = '';
     overlay.classList.add('hidden');
@@ -60,21 +56,13 @@
     const key = `${room.code}:${event.id}:${event.round}`;
     if (key !== activeKey) {
       activeKey = key;
-      localDeadline = Date.now() + remaining;
       imageEl.src = imageSrc;
       imageEl.alt = '';
       overlay.classList.remove('hidden');
-      if (timer) clearInterval(timer);
-      timer = setInterval(() => {
-        const localRemaining = Math.max(0, localDeadline - Date.now());
-        countdownEl.textContent = String(Math.max(0, Math.ceil(localRemaining / 1000)));
-        if (localRemaining <= 0) hide();
-      }, 200);
-    } else {
-      localDeadline = Date.now() + remaining;
     }
 
-    countdownEl.textContent = String(Math.max(0, Math.ceil(remaining / 1000)));
+    if (hideTimer) clearTimeout(hideTimer);
+    hideTimer = setTimeout(hide, Math.max(0, remaining));
   }
 
   socket.on('room:update', render);
