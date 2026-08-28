@@ -347,3 +347,16 @@
     font-weight: 500;
   }
 }
+
+/* 僅移動整個職業選擇介面，不改內部卡片座標。手機版維持原位。 */
+@media (min-width: 431px) and (max-width: 1024px) {
+  .profession-stage {
+    transform: translateX(10px);
+  }
+}
+
+@media (min-width: 1025px) {
+  .profession-stage {
+    transform: translate(15px, 5px);
+  }
+}
