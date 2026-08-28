@@ -13,7 +13,37 @@
     { label: '幸福降臨', image: '/images/Unbelievable.png' },
   ];
 
+  const FATE_RESULTS = [
+    POSITIVE_RESULTS[0],
+    NEGATIVE_RESULTS[0],
+    POSITIVE_RESULTS[1],
+    NEGATIVE_RESULTS[1],
+    POSITIVE_RESULTS[2],
+    NEGATIVE_RESULTS[2],
+    { label: '社福救濟', image: '/images/Social%20welfare.png' },
+    POSITIVE_RESULTS[3],
+    NEGATIVE_RESULTS[3],
+  ];
+
+  const DRAW_MS = 1500;
+  const DRAW_FRAME_MS = 250;
+
   let applying = false;
+  let carouselKey = null;
+  let carouselInterval = null;
+  let carouselFinalTimer = null;
+
+  function clearCarousel() {
+    if (carouselInterval) {
+      clearInterval(carouselInterval);
+      carouselInterval = null;
+    }
+    if (carouselFinalTimer) {
+      clearTimeout(carouselFinalTimer);
+      carouselFinalTimer = null;
+    }
+    carouselKey = null;
+  }
 
   function formatSigned(value) {
     const number = Number(value || 0);
@@ -63,48 +93,114 @@
     }
   }
 
+  function getPoolAndFinal(event) {
+    if (event.type === 'fate') {
+      const index = Math.max(0, Math.min(FATE_RESULTS.length - 1, Number(event.fateIndex) || 0));
+      return { pool: FATE_RESULTS, final: FATE_RESULTS[index] };
+    }
+    if (event.type === 'sabotage') {
+      const index = Math.max(0, Math.min(3, Number(event.effectIndex) || 0));
+      return { pool: NEGATIVE_RESULTS, final: NEGATIVE_RESULTS[index] };
+    }
+    if (event.type === 'help') {
+      const index = Math.max(0, Math.min(3, Number(event.effectIndex) || 0));
+      return { pool: POSITIVE_RESULTS, final: POSITIVE_RESULTS[index] };
+    }
+    return null;
+  }
+
+  function setEventVisual(overlay, result) {
+    const eventImage = overlay.querySelector('.result-event-image');
+    const eventLabel = overlay.querySelector('.result-event-label');
+    if (eventImage) {
+      eventImage.src = result.image;
+      eventImage.alt = result.label;
+    }
+    if (eventLabel) eventLabel.textContent = result.label;
+  }
+
+  function normalizeSabotageHelpVisual(overlay, event, finalResult) {
+    if (!['sabotage', 'help'].includes(event.type)) return;
+    const visual = overlay.querySelector('.result-visual');
+    if (!visual) return;
+
+    visual.classList.remove('result-visual-dual');
+    visual.classList.add('result-visual-actor-event');
+
+    const people = [...visual.querySelectorAll('.result-person')];
+    people.slice(1).forEach((person) => person.remove());
+
+    const actorHead = visual.querySelector('.result-person-head');
+    if (actorHead) actorHead.classList.remove('result-person-head-small');
+
+    setEventVisual(overlay, finalResult);
+  }
+
+  function startDrawCarousel(overlay, event) {
+    const config = getPoolAndFinal(event);
+    if (!config) {
+      clearCarousel();
+      return;
+    }
+
+    const roomCode = typeof currentRoom !== 'undefined' ? currentRoom?.code : '';
+    const turnId = typeof currentRoom !== 'undefined' ? currentRoom?.game?.turnId : '';
+    const key = `${roomCode}:${turnId}:${event.type}:${event.fateIndex ?? event.effectIndex ?? ''}`;
+    if (carouselKey === key) return;
+
+    clearCarousel();
+    carouselKey = key;
+
+    let frame = 0;
+    const showFrame = () => {
+      const result = config.pool[frame % config.pool.length];
+      setEventVisual(overlay, result);
+      frame += 1;
+    };
+
+    showFrame();
+    carouselInterval = setInterval(showFrame, DRAW_FRAME_MS);
+
+    carouselFinalTimer = setTimeout(() => {
+      if (carouselInterval) {
+        clearInterval(carouselInterval);
+        carouselInterval = null;
+      }
+      setEventVisual(overlay, config.final);
+      carouselFinalTimer = null;
+      // 結果階段共 3.5 秒：前 1.5 秒抽圖輪播，最後結果自然定格 2 秒。
+    }, DRAW_MS);
+  }
+
   function applySpecialResultVisual() {
     if (applying) return;
     applying = true;
 
     try {
       const overlay = document.querySelector('.action-showcase.result-stage-active:not(.hidden)');
-      if (!overlay || typeof currentRoom === 'undefined') return;
+      if (!overlay || typeof currentRoom === 'undefined') {
+        clearCarousel();
+        return;
+      }
 
       const event = currentRoom?.game?.lastEvent;
-      if (!event) return;
+      if (!event) {
+        clearCarousel();
+        return;
+      }
 
       simplifyDreamFail(overlay, event);
       syncHelpActorRewards(overlay, event);
       syncFateResult(overlay, event);
 
-      if (!['sabotage', 'help'].includes(event.type)) return;
-
-      const visual = overlay.querySelector('.result-visual');
-      if (!visual) return;
-
-      const effectIndex = Math.max(0, Math.min(3, Number(event.effectIndex) || 0));
-      const result = event.type === 'sabotage'
-        ? NEGATIVE_RESULTS[effectIndex]
-        : POSITIVE_RESULTS[effectIndex];
-
-      visual.classList.remove('result-visual-dual');
-      visual.classList.add('result-visual-actor-event');
-
-      const people = [...visual.querySelectorAll('.result-person')];
-      people.slice(1).forEach((person) => person.remove());
-
-      const actorHead = visual.querySelector('.result-person-head');
-      if (actorHead) actorHead.classList.remove('result-person-head-small');
-
-      const eventImage = visual.querySelector('.result-event-image');
-      if (eventImage) {
-        eventImage.src = result.image;
-        eventImage.alt = result.label;
+      const config = getPoolAndFinal(event);
+      if (!config) {
+        clearCarousel();
+        return;
       }
 
-      const eventLabel = visual.querySelector('.result-event-label');
-      if (eventLabel) eventLabel.textContent = result.label;
+      normalizeSabotageHelpVisual(overlay, event, config.final);
+      startDrawCarousel(overlay, event);
     } finally {
       applying = false;
     }
@@ -122,4 +218,7 @@
   });
 
   socket.on('room:update', () => requestAnimationFrame(applySpecialResultVisual));
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) clearCarousel();
+  });
 })();
