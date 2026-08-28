@@ -15,7 +15,7 @@
 }
 
 .major-event-card {
-  width: min(760px, 94vw);
+  width: min(608px, 75.2vw);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,13 +28,23 @@
 
 .major-event-image {
   display: block;
-  width: min(720px, 90vw);
-  max-height: 78vh;
+  width: min(576px, 72vw);
+  max-height: 62.4vh;
   object-fit: contain;
   border: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
+  animation: major-event-fade-in .55s ease-out both;
+}
+
+@keyframes major-event-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 600px) {
@@ -43,11 +53,17 @@
   }
 
   .major-event-card {
-    width: 96vw;
+    width: 76.8vw;
   }
 
   .major-event-image {
-    width: 94vw;
-    max-height: 76vh;
+    width: 75.2vw;
+    max-height: 60.8vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .major-event-image {
+    animation: none !important;
   }
 }
