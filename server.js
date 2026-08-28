@@ -67,6 +67,10 @@ function round2(value) {
   return Math.round((Number(value || 0) + Number.EPSILON) * 100) / 100;
 }
 
+function roundHalf(value) {
+  return Math.round((Number(value || 0) + Number.EPSILON) * 2) / 2;
+}
+
 function shuffle(values) {
   const items = [...values];
   for (let index = items.length - 1; index > 0; index -= 1) {
@@ -597,27 +601,79 @@ function settleFate(room, playerId) {
   const { dice, total } = rollDice(room.game.round);
   const fateIndex = Math.floor(Math.random() * 9);
   const event = { type: 'fate', playerId, dice, diceTotal: total, fateIndex };
+  const positiveFactor = 1 + (0.1 * total);
+  const negativeFactor = Math.max(0, 1 - (0.1 * total));
 
   if (fateIndex === 0) {
-    const amount = Math.round(150 * total); player.cash += amount; event.text = `${player.name} 現金 +${amount}`;
+    const before = Math.round(player.cash || 0);
+    const after = Math.round(before * positiveFactor);
+    const amount = after - before;
+    player.cash = after;
+    Object.assign(event, { amount, before, after, factor: positiveFactor });
+    event.text = `${player.name} 現金 +${amount}`;
   } else if (fateIndex === 1) {
-    const actual = Math.min(player.cash, Math.round(80 * total)); player.cash -= actual; event.text = `${player.name} 現金 -${actual}`;
+    const before = Math.round(player.cash || 0);
+    const after = Math.max(0, Math.round(before * negativeFactor));
+    const amount = after - before;
+    player.cash = after;
+    Object.assign(event, { amount, before, after, factor: negativeFactor });
+    event.text = `${player.name} 現金 ${amount >= 0 ? '+' : ''}${amount}`;
   } else if (fateIndex === 2) {
-    const units = round2(5 * total); player.stocks = round2(player.stocks + units); event.text = `${player.name} 股票 +${units}`;
+    const before = roundHalf(player.stocks || 0);
+    const after = roundHalf(before * positiveFactor);
+    const units = roundHalf(after - before);
+    player.stocks = after;
+    Object.assign(event, { units, before, after, factor: positiveFactor });
+    event.text = `${player.name} 股票 +${units}`;
   } else if (fateIndex === 3) {
-    const actual = round2(Math.min(player.stocks, 2 * total)); player.stocks = round2(player.stocks - actual); event.text = `${player.name} 股票 -${actual}`;
+    const before = roundHalf(player.stocks || 0);
+    const after = Math.max(0, roundHalf(before * negativeFactor));
+    const units = roundHalf(after - before);
+    player.stocks = after;
+    Object.assign(event, { units, before, after, factor: negativeFactor });
+    event.text = `${player.name} 股票 ${units >= 0 ? '+' : ''}${units}`;
   } else if (fateIndex === 4) {
-    const units = round2(5 * total); player.land = round2(player.land + units); event.text = `${player.name} 土地 +${units}`;
+    const before = roundHalf(player.land || 0);
+    const after = roundHalf(before * positiveFactor);
+    const units = roundHalf(after - before);
+    player.land = after;
+    Object.assign(event, { units, before, after, factor: positiveFactor });
+    event.text = `${player.name} 土地 +${units}`;
   } else if (fateIndex === 5) {
-    const actual = round2(Math.min(player.land, 2 * total)); player.land = round2(player.land - actual); event.text = `${player.name} 土地 -${actual}`;
+    const before = roundHalf(player.land || 0);
+    const after = Math.max(0, roundHalf(before * negativeFactor));
+    const units = roundHalf(after - before);
+    player.land = after;
+    Object.assign(event, { units, before, after, factor: negativeFactor });
+    event.text = `${player.name} 土地 ${units >= 0 ? '+' : ''}${units}`;
   } else if (fateIndex === 6) {
-    let received = 0; const perPlayer = Math.round(30 * total);
-    room.players.forEach((other) => { if (other.id !== playerId) { const paid = Math.min(other.cash, perPlayer); other.cash -= paid; received += paid; } });
-    player.cash += received; event.text = `${player.name} 共支付 ${received}`;
+    let received = 0;
+    const payments = [];
+    room.players.forEach((other) => {
+      if (other.id === playerId) return;
+      const before = Math.round(other.cash || 0);
+      const paid = Math.min(before, Math.round(before * 0.02 * total));
+      other.cash = before - paid;
+      received += paid;
+      payments.push({ playerId: other.id, amount: paid });
+    });
+    player.cash = Math.round(player.cash || 0) + received;
+    Object.assign(event, { received, payments, rate: 0.02 * total });
+    event.text = `${player.name} 社福救濟收入 +${received}`;
   } else if (fateIndex === 7) {
-    const happiness = round2(total); player.happiness = round2(player.happiness + happiness); event.text = `${player.name} 幸福 +${happiness}`;
+    const before = round2(player.happiness || 0);
+    const after = before > 0 ? round2(before * positiveFactor) : round2(before + total);
+    const happinessChange = round2(after - before);
+    player.happiness = after;
+    Object.assign(event, { happinessChange, before, after, factor: before > 0 ? positiveFactor : null });
+    event.text = `${player.name} 幸福 ${happinessChange >= 0 ? '+' : ''}${happinessChange}`;
   } else {
-    const happiness = round2(0.5 * total); player.happiness = round2(player.happiness - happiness); event.text = `${player.name} 幸福 -${happiness}`;
+    const before = round2(player.happiness || 0);
+    const after = before > 0 ? round2(before * negativeFactor) : round2(before - (0.5 * total));
+    const happinessChange = round2(after - before);
+    player.happiness = after;
+    Object.assign(event, { happinessChange, before, after, factor: before > 0 ? negativeFactor : null });
+    event.text = `${player.name} 幸福 ${happinessChange >= 0 ? '+' : ''}${happinessChange}`;
   }
 
   room.game.lastEvent = event;
@@ -628,22 +684,9 @@ function settleFate(room, playerId) {
 function chooseSabotageTarget(room, actorId) {
   const others = room.players.filter((player) => player.id !== actorId);
   if (!others.length) return null;
-
-  const highestHappiness = Math.max(...others.map((player) => Number(player.happiness || 0)));
-  const happinessLeaders = others.filter(
-    (player) => Number(player.happiness || 0) === highestHappiness
-  );
-
-  const ranked = happinessLeaders.map((player) => ({
-    player,
-    assets: playerAssets(player, room.game),
-  }));
+  const ranked = others.map((player) => ({ player, assets: playerAssets(player, room.game) }));
   const highestAssets = Math.max(...ranked.map((item) => item.assets));
-  const candidates = ranked
-    .filter((item) => item.assets === highestAssets)
-    .map((item) => item.player);
-
-  return randomChoice(candidates);
+  return randomChoice(ranked.filter((item) => item.assets === highestAssets).map((item) => item.player));
 }
 
 function settleSabotage(room, playerId) {
@@ -653,17 +696,46 @@ function settleSabotage(room, playerId) {
   if (!target) return false;
   const { dice, total } = rollDice(room.game.round);
   const effectIndex = Math.floor(Math.random() * 4);
-  const bonus = Math.round(40 * total);
+  const factor = Math.max(0, 1 - (0.05 * total));
   let effectText = '';
+  let targetChange = 0;
 
-  if (effectIndex === 0) { const actual = Math.min(target.cash, Math.round(80 * total)); target.cash -= actual; effectText = `${target.name} 現金 -${actual}`; }
-  else if (effectIndex === 1) { const actual = round2(Math.min(target.stocks, total)); target.stocks = round2(target.stocks - actual); effectText = `${target.name} 股票 -${actual}`; }
-  else if (effectIndex === 2) { const actual = round2(Math.min(target.land, total)); target.land = round2(target.land - actual); effectText = `${target.name} 土地 -${actual}`; }
-  else { const happiness = round2(0.3 * total); target.happiness = round2(target.happiness - happiness); effectText = `${target.name} 幸福 -${happiness}`; }
+  if (effectIndex === 0) {
+    const before = Math.round(target.cash || 0);
+    const after = Math.max(0, Math.round(before * factor));
+    target.cash = after;
+    targetChange = after - before;
+    effectText = `${target.name} 現金 ${targetChange >= 0 ? '+' : ''}${targetChange}`;
+  } else if (effectIndex === 1) {
+    const before = roundHalf(target.stocks || 0);
+    const after = Math.max(0, roundHalf(before * factor));
+    target.stocks = after;
+    targetChange = roundHalf(after - before);
+    effectText = `${target.name} 股票 ${targetChange >= 0 ? '+' : ''}${targetChange}`;
+  } else if (effectIndex === 2) {
+    const before = roundHalf(target.land || 0);
+    const after = Math.max(0, roundHalf(before * factor));
+    target.land = after;
+    targetChange = roundHalf(after - before);
+    effectText = `${target.name} 土地 ${targetChange >= 0 ? '+' : ''}${targetChange}`;
+  } else {
+    const before = round2(target.happiness || 0);
+    const after = before > 0 ? round2(before * factor) : round2(before - (0.25 * total));
+    target.happiness = after;
+    targetChange = round2(after - before);
+    effectText = `${target.name} 幸福 ${targetChange >= 0 ? '+' : ''}${targetChange}`;
+  }
 
-  player.cash += bonus;
+  const actorCashBefore = Math.round(player.cash || 0);
+  const actorCashAfter = Math.round(actorCashBefore * (1 + (0.02 * total)));
+  const bonus = actorCashAfter - actorCashBefore;
+  player.cash = actorCashAfter;
   player.sabotageCount = (player.sabotageCount || 0) + 1;
-  room.game.lastEvent = { type: 'sabotage', playerId, targetId: target.id, dice, diceTotal: total, effectIndex, bonus, text: `${player.name} 陷害 ${target.name}：${effectText}；自己現金 +${bonus}` };
+  room.game.lastEvent = {
+    type: 'sabotage', playerId, targetId: target.id, dice, diceTotal: total,
+    effectIndex, targetChange, bonus, factor,
+    text: `${player.name} 陷害 ${target.name}：${effectText}；自己現金 +${bonus}`,
+  };
   advanceTurn(room);
   return true;
 }
@@ -689,19 +761,46 @@ function settleHelp(room, playerId) {
   if (!target) return false;
   const { dice, total } = rollDice(room.game.round);
   const effectIndex = Math.floor(Math.random() * 4);
-  const bonus = Math.round(40 * total);
-  const helperHappiness = round2(0.3 * total);
+  const factor = 1 + (0.05 * total);
   let effectText = '';
+  let targetChange = 0;
 
-  if (effectIndex === 0) { const amount = Math.round(100 * total); target.cash += amount; effectText = `${target.name} 現金 +${amount}`; }
-  else if (effectIndex === 1) { const units = round2(3 * total); target.stocks = round2(target.stocks + units); effectText = `${target.name} 股票 +${units}`; }
-  else if (effectIndex === 2) { const units = round2(3 * total); target.land = round2(target.land + units); effectText = `${target.name} 土地 +${units}`; }
-  else { const happiness = round2(0.75 * total); target.happiness = round2(target.happiness + happiness); effectText = `${target.name} 幸福 +${happiness}`; }
+  if (effectIndex === 0) {
+    const before = Math.round(target.cash || 0);
+    const after = Math.round(before * factor);
+    target.cash = after;
+    targetChange = after - before;
+    effectText = `${target.name} 現金 +${targetChange}`;
+  } else if (effectIndex === 1) {
+    const before = roundHalf(target.stocks || 0);
+    const after = roundHalf(before * factor);
+    target.stocks = after;
+    targetChange = roundHalf(after - before);
+    effectText = `${target.name} 股票 +${targetChange}`;
+  } else if (effectIndex === 2) {
+    const before = roundHalf(target.land || 0);
+    const after = roundHalf(before * factor);
+    target.land = after;
+    targetChange = roundHalf(after - before);
+    effectText = `${target.name} 土地 +${targetChange}`;
+  } else {
+    const before = round2(target.happiness || 0);
+    const after = before > 0 ? round2(before * factor) : round2(before + (0.5 * total));
+    target.happiness = after;
+    targetChange = round2(after - before);
+    effectText = `${target.name} 幸福 +${targetChange}`;
+  }
 
-  player.cash += bonus;
-  player.happiness = round2(player.happiness + helperHappiness);
+  const actorCashBefore = Math.round(player.cash || 0);
+  const actorCashAfter = Math.round(actorCashBefore * (1 + (0.03 * total)));
+  const bonus = actorCashAfter - actorCashBefore;
+  player.cash = actorCashAfter;
   player.helpCount = (player.helpCount || 0) + 1;
-  room.game.lastEvent = { type: 'help', playerId, targetId: target.id, dice, diceTotal: total, effectIndex, bonus, helperHappiness, text: `${player.name} 援助 ${target.name}：${effectText}；自己現金 +${bonus}、幸福 +${helperHappiness}` };
+  room.game.lastEvent = {
+    type: 'help', playerId, targetId: target.id, dice, diceTotal: total,
+    effectIndex, targetChange, bonus, factor,
+    text: `${player.name} 援助 ${target.name}：${effectText}；自己現金 +${bonus}`,
+  };
   advanceTurn(room);
   return true;
 }
