@@ -27,14 +27,14 @@
   const base = '/images/';
   const pages = [
     [
+      'rules1.png',
       '人生_玩法說明_幸福冒險指南.png',
       '人生_玩法說明_快速上手篇.png',
-      'rules1.png',
       'rule1.png',
     ],
     [
-      '人生_玩法說明_行動攻略篇.png',
       'rules2.png',
+      '人生_玩法說明_行動攻略篇.png',
       'rule2.png',
     ],
   ];
