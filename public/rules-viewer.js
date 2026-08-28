@@ -7,6 +7,20 @@
   const prevBtn = document.getElementById('rulesPrevBtn');
   const nextBtn = document.getElementById('rulesNextBtn');
   const indicator = document.getElementById('rulesPageIndicator');
+  const restartBtn = document.getElementById('restartGameBtn');
+
+  function syncRestartLabel() {
+    if (!restartBtn) return;
+    restartBtn.textContent = '再來一局';
+  }
+
+  if (restartBtn) {
+    syncRestartLabel();
+    if (typeof socket !== 'undefined') {
+      socket.on('room:update', () => requestAnimationFrame(syncRestartLabel));
+      socket.on('room:started', () => requestAnimationFrame(syncRestartLabel));
+    }
+  }
 
   if (!openBtn || !viewer || !image || !closeBtn || !prevBtn || !nextBtn || !indicator) return;
 
