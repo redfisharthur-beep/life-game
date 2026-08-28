@@ -60,6 +60,16 @@
   align-self: center;
 }
 
+#professionPanel .profession-home-pill {
+  display: block;
+  width: fit-content;
+  min-width: 7.2em;
+  margin: 10px auto 0;
+  padding: 7px 18px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
 .results-actions .start-button,
 .results-actions .home-pill {
   width: 100%;
@@ -177,6 +187,12 @@
     font-size: 11.5px;
     font-weight: 400;
     line-height: 1;
+  }
+
+  #professionPanel .profession-home-pill {
+    margin-top: 8px;
+    padding: 6px 15px;
+    font-size: 13px;
   }
 
   .rules-viewer-card {
