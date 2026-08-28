@@ -22,8 +22,8 @@ const rooms = new Map();
 const TURN_MS = 10_000;
 const ACTION_SHOWCASE_MS = 9_000;
 const ROUND_ACCELERATION_MS = 3_000;
-const MAJOR_EVENT_MS = 10_000;
-const MAJOR_EVENT_CHANCE = 0.03;
+const MAJOR_EVENT_MS = 8_000;
+const MAJOR_EVENT_CHANCE = 0.05;
 const DISCONNECT_GRACE_MS = 90_000;
 const ROOM_IDLE_MS = 15 * 60_000;
 const TOTAL_ROUNDS = 30;
@@ -39,12 +39,13 @@ const PROFESSIONS = {
 };
 
 const MAJOR_EVENTS = [
-  { id: 'financialCrash', title: '金融海嘯', description: '股市重挫，股價立刻打7折' },
-  { id: 'earthquake', title: '大地震', description: '地價重挫，土地價格立刻打8折' },
-  { id: 'inflation', title: '通貨膨脹', description: '現金貶值，每人持有現金立刻打9折' },
-  { id: 'aiBoom', title: 'AI世代爆發', description: '股市爆發，股價立刻 ×1.4' },
-  { id: 'urbanRenewal', title: '都市重劃', description: '地價爆發，土地價格立刻 ×1.3' },
-  { id: 'cashGrant', title: '普發現金', description: '每人持有現金立刻增加 1000 元' },
+  { id: 'financialCrash', title: '金融海嘯', description: '股市重挫，股票價格立刻 ×0.6' },
+  { id: 'earthquake', title: '大地震', description: '地價重挫，土地價格立刻 ×0.6' },
+  { id: 'inflation', title: '通貨膨脹', description: '所有玩家現金立刻 ×0.7' },
+  { id: 'aiBoom', title: 'AI世代爆發', description: '股票價格立刻 ×1.6' },
+  { id: 'urbanRenewal', title: '都市重劃', description: '土地價格立刻 ×1.6' },
+  { id: 'eraWave', title: '時代浪潮', description: '從現在開始，後續所有骰子都改為2顆' },
+  { id: 'happinessBoost', title: '幸福加倍', description: '所有玩家幸福值立刻 ×1.3' },
 ];
 
 function cleanName(value) {
@@ -91,8 +92,8 @@ function stageName(round) {
   return '人生加速';
 }
 
-function rollDice(round) {
-  const diceCount = round >= 20 ? 2 : 1;
+function rollDice(round, forceDoubleDice = false) {
+  const diceCount = forceDoubleDice || round >= 20 ? 2 : 1;
   const dice = Array.from({ length: diceCount }, () => 1 + Math.floor(Math.random() * 6));
   return {
     dice,
@@ -190,7 +191,8 @@ function publicRoom(room) {
         transitionUntil: room.game.transitionUntil || null,
         majorEvent: room.game.majorEvent || null,
         majorEventUntil: room.game.majorEventUntil || null,
-        roundAnnouncement: room.game.round === 20
+        forceDoubleDice: Boolean(room.game.forceDoubleDice),
+        roundAnnouncement: room.game.round === 20 && !room.game.forceDoubleDice
           ? '人生加速！從現在開始每回合擲2顆骰子！'
           : null,
         lastEvent: room.game.lastEvent,
@@ -331,6 +333,7 @@ function initializeGame(room) {
     majorEvent: null,
     majorEventUntil: null,
     triggeredMajorEvents: [],
+    forceDoubleDice: false,
     lastEvent: {
       type: 'start',
       text: '職業選擇完成，人生啟程！',
@@ -382,20 +385,22 @@ function updateMarket(room) {
 
 function applyMajorEvent(room, event) {
   if (event.id === 'financialCrash') {
-    room.game.stockPrice = round2(room.game.stockPrice * 0.7);
+    room.game.stockPrice = round2(room.game.stockPrice * 0.6);
   } else if (event.id === 'earthquake') {
-    room.game.landPrice = round2(room.game.landPrice * 0.8);
+    room.game.landPrice = round2(room.game.landPrice * 0.6);
   } else if (event.id === 'inflation') {
     room.players.forEach((player) => {
-      player.cash = Math.round(Number(player.cash || 0) * 0.9);
+      player.cash = Math.round(Number(player.cash || 0) * 0.7);
     });
   } else if (event.id === 'aiBoom') {
-    room.game.stockPrice = round2(room.game.stockPrice * 1.4);
+    room.game.stockPrice = round2(room.game.stockPrice * 1.6);
   } else if (event.id === 'urbanRenewal') {
-    room.game.landPrice = round2(room.game.landPrice * 1.3);
-  } else if (event.id === 'cashGrant') {
+    room.game.landPrice = round2(room.game.landPrice * 1.6);
+  } else if (event.id === 'eraWave') {
+    room.game.forceDoubleDice = true;
+  } else if (event.id === 'happinessBoost') {
     room.players.forEach((player) => {
-      player.cash = Math.round(Number(player.cash || 0)) + 1000;
+      player.happiness = round2(Number(player.happiness || 0) * 1.3);
     });
   }
 }
@@ -470,7 +475,7 @@ function continueAfterRound(room, completedRound, marketText) {
     text: marketText,
   };
 
-  if (room.game.round === 20) {
+  if (room.game.round === 20 && !room.game.forceDoubleDice) {
     room.game.transitionUntil = Date.now() + ROUND_ACCELERATION_MS;
     emitRoom(room);
     room.turnTimer = setTimeout(() => {
@@ -527,7 +532,7 @@ function settleSalary(room, playerId, auto = false) {
   const player = getActivePlayer(room, playerId);
   if (!player) return false;
 
-  const { dice, total } = rollDice(room.game.round);
+  const { dice, total } = rollDice(room.game.round, room.game.forceDoubleDice);
   const salary = PROFESSIONS[player.profession].salary;
   const income = Math.round(total * salary * 10);
   player.cash += income;
@@ -549,7 +554,7 @@ function settleMarketAction(room, playerId, action) {
   const player = getActivePlayer(room, playerId);
   if (!player) return false;
   const profession = PROFESSIONS[player.profession];
-  const { dice, total } = rollDice(room.game.round);
+  const { dice, total } = rollDice(room.game.round, room.game.forceDoubleDice);
   const event = { type: action, playerId, dice, diceTotal: total };
 
   if (action === 'buyStock') {
@@ -598,7 +603,7 @@ function settleMarketAction(room, playerId, action) {
 function settleFate(room, playerId) {
   const player = getActivePlayer(room, playerId);
   if (!player) return false;
-  const { dice, total } = rollDice(room.game.round);
+  const { dice, total } = rollDice(room.game.round, room.game.forceDoubleDice);
   const fateIndex = Math.floor(Math.random() * 9);
   const event = { type: 'fate', playerId, dice, diceTotal: total, fateIndex };
   const positiveFactor = 1 + (0.1 * total);
@@ -694,7 +699,7 @@ function settleSabotage(room, playerId) {
   if (!player) return false;
   const target = chooseSabotageTarget(room, playerId);
   if (!target) return false;
-  const { dice, total } = rollDice(room.game.round);
+  const { dice, total } = rollDice(room.game.round, room.game.forceDoubleDice);
   const effectIndex = Math.floor(Math.random() * 4);
   const factor = Math.max(0, 1 - (0.05 * total));
   let effectText = '';
@@ -759,7 +764,7 @@ function settleHelp(room, playerId) {
   if (!player) return false;
   const target = chooseHelpTarget(room, playerId);
   if (!target) return false;
-  const { dice, total } = rollDice(room.game.round);
+  const { dice, total } = rollDice(room.game.round, room.game.forceDoubleDice);
   const effectIndex = Math.floor(Math.random() * 4);
   const factor = 1 + (0.05 * total);
   let effectText = '';
@@ -829,7 +834,7 @@ function settleDream(room, playerId) {
   const player = getActivePlayer(room, playerId);
   if (!player) return false;
   const profession = PROFESSIONS[player.profession];
-  const { dice, total } = rollDice(room.game.round);
+  const { dice, total } = rollDice(room.game.round, room.game.forceDoubleDice);
   const salaryIncome = Math.round(total * profession.salary * 3);
   const fee = Math.round(total * 500);
   const cashAfterSalary = player.cash + salaryIncome;
