@@ -7,7 +7,7 @@
       <div class="major-event-kicker">重大事件</div>
       <h2 class="major-event-title"></h2>
       <p class="major-event-description"></p>
-      <div class="major-event-countdown"><span>10</span> 秒</div>
+      <div class="major-event-countdown"><span>8</span></div>
     </div>
   `;
   document.body.appendChild(overlay);
