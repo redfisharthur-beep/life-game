@@ -5,7 +5,7 @@
   "description": "《人生》30輪多人派對遊戲",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node runtime-rules.js",
     "test": "node tests/smoke.test.js"
   },
   "engines": {
