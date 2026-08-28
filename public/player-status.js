@@ -35,10 +35,7 @@
   }
 
   function formatUnit(value) {
-    return Number(value || 0).toLocaleString('zh-TW', {
-      minimumFractionDigits: Number(value || 0) % 1 ? 1 : 0,
-      maximumFractionDigits: 1,
-    });
+    return Math.round(Number(value) || 0).toLocaleString('zh-TW');
   }
 
   function formatHappinessDisplay(value) {
