@@ -11,7 +11,7 @@
 
 .dice-result-image.dice-rolling {
   will-change: transform, opacity;
-  animation: dice-grow 1200ms cubic-bezier(.18, .72, .2, 1) both;
+  animation: dice-grow 1500ms cubic-bezier(.18, .72, .2, 1) both;
   filter: none !important;
   transform-origin: 50% 50%;
 }
@@ -50,20 +50,16 @@
 
 @keyframes dice-grow {
   0% {
-    transform: scale(.48);
+    transform: scale(.46);
     opacity: .72;
   }
-  25% {
+  33% {
     transform: scale(.62);
     opacity: .84;
   }
-  50% {
-    transform: scale(.78);
-    opacity: .92;
-  }
-  75% {
-    transform: scale(.92);
-    opacity: .98;
+  66% {
+    transform: scale(.82);
+    opacity: .94;
   }
   100% {
     transform: scale(1);
