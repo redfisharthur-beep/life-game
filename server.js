@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
 
 const rooms = new Map();
 const TURN_MS = 6_000;
-const ACTION_SHOWCASE_MS = 7_500;
+const ACTION_SHOWCASE_MS = 8_000;
 const ROUND_ACCELERATION_MS = 3_000;
 const MAJOR_EVENT_MS = 4_000;
 const MAJOR_EVENT_CHANCE = 0.05;
