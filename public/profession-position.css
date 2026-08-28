@@ -1,4 +1,7 @@
-/* 職業選擇介面位置微調：手機不動；平板維持 10px；桌機改以精準指標判斷，避免窄視窗被誤判成平板。 */
+/* 職業選擇介面位置微調：
+   手機不動；平板維持原本整體偏移；桌機不再移動整張底圖，
+   改為只把每一格內的人物＋能力資訊往右，讓內容遠離左邊框。 */
+
 @media (min-width: 431px) and (pointer: coarse) {
   .profession-stage {
     transform: translateX(10px);
@@ -7,13 +10,45 @@
 
 @media (min-width: 431px) and (hover: hover) and (pointer: fine) {
   .profession-stage {
-    transform: translate(75px, 5px);
+    transform: translateY(5px) !important;
+  }
+
+  .profession-visual {
+    transform: translate(calc(.5em + 30px), .5em) !important;
+  }
+
+  .profession-card:nth-child(even) .profession-visual {
+    transform: translate(calc(1em + 30px), .5em) !important;
+  }
+
+  .profession-detail {
+    transform: translate(calc(1.4em + 30px), .5em) !important;
+  }
+
+  .profession-card:nth-child(even) .profession-detail {
+    transform: translate(calc(1.9em + 30px), .5em) !important;
   }
 }
 
-/* 寬螢幕裝置即使媒體能力偵測不完整，也套用桌機位置。 */
+/* 寬螢幕裝置即使媒體能力偵測不完整，也套用相同桌機內容位移。 */
 @media (min-width: 761px) and (hover: none) and (pointer: none) {
   .profession-stage {
-    transform: translate(75px, 5px);
+    transform: translateY(5px) !important;
+  }
+
+  .profession-visual {
+    transform: translate(calc(.5em + 30px), .5em) !important;
+  }
+
+  .profession-card:nth-child(even) .profession-visual {
+    transform: translate(calc(1em + 30px), .5em) !important;
+  }
+
+  .profession-detail {
+    transform: translate(calc(1.4em + 30px), .5em) !important;
+  }
+
+  .profession-card:nth-child(even) .profession-detail {
+    transform: translate(calc(1.9em + 30px), .5em) !important;
   }
 }
