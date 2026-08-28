@@ -46,7 +46,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translateY(.1em);
+  transform: translateY(.2em);
 }
 
 .player-status-avatar {
@@ -58,7 +58,6 @@
   background: transparent;
 }
 
-/* 中間區塊用 4 欄 × 2 列：上排姓名／總資產各占 2 欄；下排現金占 2 欄、股票 1 欄、土地 1 欄。 */
 .player-status-info-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -138,7 +137,6 @@
 .player-info-cell.land .player-info-label,
 .player-info-cell.land .player-info-value { color: #8b6f54; }
 
-/* 幸福值獨立在最右側：圖片在上，數字在下。 */
 .player-status-happiness {
   display: flex;
   flex-direction: column;
@@ -166,7 +164,6 @@
   text-align: center;
 }
 
-/* 行動中放在職業頭像左上角。 */
 .player-status-turn-badge {
   position: absolute;
   top: -5px;
