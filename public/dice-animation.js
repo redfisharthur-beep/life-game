@@ -1,7 +1,7 @@
 (() => {
   const ROLL_FRAMES = Array.from({ length: 12 }, (_, index) => `/images/roll${index + 1}.png`);
-  const FRAME_MS = 75;
-  const ROLL_MS = 900;
+  const FRAME_MS = 100;
+  const ROLL_MS = 1200;
 
   let activeImage = null;
   let rollInterval = null;
@@ -43,7 +43,8 @@
 
     rollInterval = setInterval(() => {
       if (token !== animationToken || !image.isConnected) return;
-      frameIndex = (frameIndex + 1) % ROLL_FRAMES.length;
+      frameIndex += 1;
+      if (frameIndex >= ROLL_FRAMES.length) frameIndex = ROLL_FRAMES.length - 1;
       image.src = ROLL_FRAMES[frameIndex];
     }, FRAME_MS);
 
@@ -54,7 +55,8 @@
         rollInterval = null;
       }
 
-      // 最後一定切回伺服器真正骰到的結果圖，並在骰子階段剩餘時間內定格約 1 秒。
+      // 1.2 秒素材動畫結束後，切回伺服器真正擲出的結果圖。
+      // 骰子階段總長 2.2 秒，因此最終結果會完整定格 1 秒。
       image.src = finalSrc;
       image.alt = finalAlt;
       image.classList.remove('dice-rolling');
@@ -82,7 +84,6 @@
     }
   }
 
-  // 預載 12 張滾動素材，減少第一輪切圖閃爍。
   ROLL_FRAMES.forEach((src) => {
     const img = new Image();
     img.src = src;
