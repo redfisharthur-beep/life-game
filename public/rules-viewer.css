@@ -98,9 +98,7 @@
   position: relative;
   width: 100vw;
   height: 100vh;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 0;
+  display: block;
   padding: 0;
   border-radius: 0;
   background: #f6efe8;
@@ -108,79 +106,32 @@
   overflow: hidden;
 }
 
-/* 規則圖片顯示區：在目前 1.5 倍基準上再放大 1.5 倍，總計為原始顯示的 2.25 倍，可上下左右滑動。 */
+/* 兩張規則圖上下排列，直接往下滑閱讀。 */
 .rules-viewer-page {
-  min-width: 0;
-  min-height: 0;
-  display: block;
-  overflow: auto;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  touch-action: pan-x pan-y;
-  border-radius: 0;
-  text-align: center;
+  touch-action: pan-y;
+  background: #f6efe8;
 }
 
 .rules-viewer-image {
   display: block;
-  width: 225%;
-  max-width: none;
-  max-height: none;
+  width: 100%;
+  max-width: 100%;
   height: auto;
-  margin: 0 auto;
+  margin: 0;
   object-fit: contain;
   border-radius: 0;
   user-select: none;
   -webkit-user-drag: none;
 }
 
-.rules-viewer-error {
-  display: none;
-  padding: 26px 20px;
-  color: #7a6d64;
-  font-size: 16px;
-  text-align: center;
-}
-
-.rules-viewer.error .rules-viewer-error {
-  display: block;
-}
-
-.rules-viewer.error .rules-viewer-image {
-  display: none;
-}
-
-.rules-viewer-controls {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px 10px;
-  background: rgba(246, 239, 232, .96);
-}
-
-.rules-viewer-controls button {
-  min-height: 40px;
-  border: 0;
-  border-radius: 999px;
-  background: #e7ddd4;
-  color: #66584f;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.rules-viewer-controls button:disabled {
-  opacity: .38;
-  cursor: default;
-}
-
-.rules-page-indicator {
-  min-width: 66px;
-  color: #7a6c62;
-  font-size: 14px;
-  font-weight: 700;
-  text-align: center;
+.rules-viewer-image + .rules-viewer-image {
+  margin-top: 0;
 }
 
 /* 關閉鍵只顯示叉叉，不要圓形／膠囊底。 */
@@ -233,18 +184,10 @@
     height: 100vh;
   }
 
-  .rules-viewer-image {
-    width: 225%;
-  }
-
   .rules-viewer-close {
     top: 8px;
     right: 10px;
     padding: 2px 5px;
     font-size: 34px;
-  }
-
-  .rules-viewer-controls {
-    padding: 7px 9px 9px;
   }
 }
