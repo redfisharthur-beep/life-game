@@ -1,52 +1,82 @@
 (() => {
-  const audio = new Audio('/music/homepage.mp3');
-  audio.loop = true;
-  audio.preload = 'auto';
-  audio.volume = 0.35;
+  const tracks = {
+    homepage: new Audio('/music/homepage.mp3'),
+    lobby: new Audio('/music/lobby.mp3'),
+  };
+
+  Object.values(tracks).forEach((audio) => {
+    audio.loop = true;
+    audio.preload = 'auto';
+    audio.volume = 0.35;
+  });
 
   const entryPanel = document.getElementById('entryPanel');
   const roomPanel = document.getElementById('roomPanel');
   const professionPanel = document.getElementById('professionPanel');
   const gamePanel = document.getElementById('gamePanel');
 
+  let activeTrack = null;
   let unlocked = false;
 
-  function isHomepageVisible() {
-    if (!entryPanel) return false;
-    return !entryPanel.classList.contains('hidden')
-      && roomPanel?.classList.contains('hidden')
-      && professionPanel?.classList.contains('hidden')
-      && gamePanel?.classList.contains('hidden');
+  function isVisible(panel) {
+    return Boolean(panel) && !panel.classList.contains('hidden');
   }
 
-  async function playHomepageMusic() {
-    if (!isHomepageVisible()) return;
+  function desiredTrack() {
+    if (isVisible(gamePanel)) return null;
+    if (isVisible(roomPanel) || isVisible(professionPanel)) return 'lobby';
+    if (isVisible(entryPanel)) return 'homepage';
+    return null;
+  }
+
+  function stopTrack(name, reset = true) {
+    const audio = tracks[name];
+    if (!audio) return;
+    audio.pause();
+    if (reset) audio.currentTime = 0;
+  }
+
+  function stopAll(except = null) {
+    Object.keys(tracks).forEach((name) => {
+      if (name !== except) stopTrack(name, true);
+    });
+  }
+
+  async function playTrack(name) {
+    const audio = tracks[name];
+    if (!audio) return;
+
+    stopAll(name);
+    activeTrack = name;
+
     try {
       await audio.play();
       unlocked = true;
     } catch (_) {
-      // Browser autoplay policy may block sound until the first user gesture.
+      // Browsers may block audible autoplay until the first user gesture.
     }
-  }
-
-  function stopHomepageMusic() {
-    if (audio.paused) return;
-    audio.pause();
-    audio.currentTime = 0;
   }
 
   function syncMusic() {
-    if (isHomepageVisible()) {
-      playHomepageMusic();
-    } else {
-      stopHomepageMusic();
+    const wanted = desiredTrack();
+
+    if (!wanted) {
+      stopAll();
+      activeTrack = null;
+      return;
     }
+
+    if (activeTrack === wanted && !tracks[wanted].paused) return;
+    playTrack(wanted);
   }
 
   function unlockFromGesture() {
-    if (!isHomepageVisible()) return;
-    playHomepageMusic();
-    if (unlocked) removeUnlockListeners();
+    const wanted = desiredTrack();
+    if (!wanted) return;
+
+    playTrack(wanted).then(() => {
+      if (unlocked) removeUnlockListeners();
+    });
   }
 
   function removeUnlockListeners() {
@@ -69,7 +99,7 @@
   window.addEventListener('pageshow', syncMusic);
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-      audio.pause();
+      Object.values(tracks).forEach((audio) => audio.pause());
     } else {
       syncMusic();
     }
