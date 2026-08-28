@@ -1,19 +1,27 @@
 (() => {
+  const EVENT_IMAGES = {
+    financialCrash: '/images/Financial%20crisis.png',
+    earthquake: '/images/Major%20earthquake.png',
+    inflation: '/images/Inflation.png',
+    aiBoom: '/images/The%20AI%20revolution.png',
+    urbanRenewal: '/images/Urban%20rezoning.png',
+    eraWave: '/images/The%20tide%20of%20the%20times.png',
+    happinessBoost: '/images/Double%20the%20happiness.png',
+    cashGrant: '/images/Universal%20cash%20payouts.png',
+  };
+
   const overlay = document.createElement('section');
   overlay.className = 'major-event-overlay hidden';
   overlay.setAttribute('aria-live', 'assertive');
   overlay.innerHTML = `
     <div class="major-event-card">
-      <div class="major-event-kicker">重大事件</div>
-      <h2 class="major-event-title"></h2>
-      <p class="major-event-description"></p>
+      <img class="major-event-image" src="" alt="" />
       <div class="major-event-countdown"><span>8</span></div>
     </div>
   `;
   document.body.appendChild(overlay);
 
-  const titleEl = overlay.querySelector('.major-event-title');
-  const descriptionEl = overlay.querySelector('.major-event-description');
+  const imageEl = overlay.querySelector('.major-event-image');
   const countdownEl = overlay.querySelector('.major-event-countdown span');
   let timer = null;
   let activeKey = null;
@@ -26,6 +34,8 @@
     }
     activeKey = null;
     localDeadline = 0;
+    imageEl.removeAttribute('src');
+    imageEl.alt = '';
     overlay.classList.add('hidden');
   }
 
@@ -41,12 +51,18 @@
       return;
     }
 
+    const imageSrc = EVENT_IMAGES[event.id];
+    if (!imageSrc) {
+      hide();
+      return;
+    }
+
     const key = `${room.code}:${event.id}:${event.round}`;
     if (key !== activeKey) {
       activeKey = key;
       localDeadline = Date.now() + remaining;
-      titleEl.textContent = event.title || '重大事件';
-      descriptionEl.textContent = event.description || '';
+      imageEl.src = imageSrc;
+      imageEl.alt = '';
       overlay.classList.remove('hidden');
       if (timer) clearInterval(timer);
       timer = setInterval(() => {
