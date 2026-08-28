@@ -2,6 +2,7 @@
   const tracks = {
     homepage: new Audio('/music/homepage.mp3'),
     lobby: new Audio('/music/lobby.mp3'),
+    game: new Audio('/music/game.mp3'),
   };
 
   Object.values(tracks).forEach((audio) => {
@@ -14,6 +15,7 @@
   const roomPanel = document.getElementById('roomPanel');
   const professionPanel = document.getElementById('professionPanel');
   const gamePanel = document.getElementById('gamePanel');
+  const gameResults = document.getElementById('gameResults');
 
   let activeTrack = null;
   let unlocked = false;
@@ -23,7 +25,9 @@
   }
 
   function desiredTrack() {
-    if (isVisible(gamePanel)) return null;
+    if (isVisible(gamePanel)) {
+      return isVisible(gameResults) ? null : 'game';
+    }
     if (isVisible(roomPanel) || isVisible(professionPanel)) return 'lobby';
     if (isVisible(entryPanel)) return 'homepage';
     return null;
@@ -89,7 +93,7 @@
   document.addEventListener('keydown', unlockFromGesture, true);
   document.addEventListener('touchstart', unlockFromGesture, true);
 
-  [entryPanel, roomPanel, professionPanel, gamePanel].filter(Boolean).forEach((panel) => {
+  [entryPanel, roomPanel, professionPanel, gamePanel, gameResults].filter(Boolean).forEach((panel) => {
     new MutationObserver(syncMusic).observe(panel, {
       attributes: true,
       attributeFilter: ['class'],
