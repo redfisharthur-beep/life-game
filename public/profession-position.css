@@ -1,11 +1,18 @@
-/* 職業選擇介面位置微調：手機不動；431～760px 維持平板偏移；761px 以上套用桌機位置。 */
-@media (min-width: 431px) and (max-width: 760px) {
+/* 職業選擇介面位置微調：手機不動；平板維持 10px；桌機改以精準指標判斷，避免窄視窗被誤判成平板。 */
+@media (min-width: 431px) and (pointer: coarse) {
   .profession-stage {
     transform: translateX(10px);
   }
 }
 
-@media (min-width: 761px) {
+@media (min-width: 431px) and (hover: hover) and (pointer: fine) {
+  .profession-stage {
+    transform: translate(75px, 5px);
+  }
+}
+
+/* 寬螢幕裝置即使媒體能力偵測不完整，也套用桌機位置。 */
+@media (min-width: 761px) and (hover: none) and (pointer: none) {
   .profession-stage {
     transform: translate(75px, 5px);
   }
