@@ -1,6 +1,7 @@
 (() => {
-  const FRAME_MS = 135;
-  const ROLL_MS = 1780;
+  const ROLL_FRAMES = Array.from({ length: 12 }, (_, index) => `/images/roll${index + 1}.png`);
+  const FRAME_MS = 75;
+  const ROLL_MS = 900;
 
   let activeImage = null;
   let rollInterval = null;
@@ -24,14 +25,6 @@
     activeImage = null;
   }
 
-  function randomSingleImage() {
-    return `/images/${1 + Math.floor(Math.random() * 6)}.png`;
-  }
-
-  function randomDoubleImage() {
-    return `/images/2-${2 + Math.floor(Math.random() * 11)}.png`;
-  }
-
   function startAnimation(image) {
     if (!image || image.dataset.diceAnimating === '1') return;
 
@@ -42,17 +35,16 @@
     const token = animationToken;
     const finalSrc = image.getAttribute('src') || '/images/dice.png';
     const finalAlt = image.getAttribute('alt') || '骰子結果';
-    const container = image.closest('.dice-result-images');
-    const isDouble = Boolean(container?.classList.contains('double-dice-total'));
-    const nextFrame = isDouble ? randomDoubleImage : randomSingleImage;
+    let frameIndex = 0;
 
     image.classList.remove('dice-landed');
     image.classList.add('dice-rolling');
-    image.src = nextFrame();
+    image.src = ROLL_FRAMES[0];
 
     rollInterval = setInterval(() => {
       if (token !== animationToken || !image.isConnected) return;
-      image.src = nextFrame();
+      frameIndex = (frameIndex + 1) % ROLL_FRAMES.length;
+      image.src = ROLL_FRAMES[frameIndex];
     }, FRAME_MS);
 
     settleTimer = setTimeout(() => {
@@ -62,7 +54,7 @@
         rollInterval = null;
       }
 
-      // 最後一定回到伺服器真正擲出的結果圖，並定格到結果階段開始。
+      // 最後一定切回伺服器真正骰到的結果圖，並在骰子階段剩餘時間內定格約 1 秒。
       image.src = finalSrc;
       image.alt = finalAlt;
       image.classList.remove('dice-rolling');
@@ -89,6 +81,12 @@
       startAnimation(image);
     }
   }
+
+  // 預載 12 張滾動素材，減少第一輪切圖閃爍。
+  ROLL_FRAMES.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+  });
 
   const observer = new MutationObserver(syncDiceAnimation);
   observer.observe(document.body, {
