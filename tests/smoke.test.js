@@ -63,9 +63,15 @@ const serverSource = fs.readFileSync(path.join(root, 'server.js'), 'utf8');
 const runtimeSource = fs.readFileSync(path.join(root, 'runtime-rules.js'), 'utf8');
 [
   'const HAPPINESS_GOAL = 48;',
+  "dream: 2.25",
+  "dream: 2.20",
+  "dream: 2.05",
+  "dream: 2.60",
+  "dream: 2.45",
+  "dream: 2.00",
   'const stockUp = Math.random() < 0.60;',
   'const landUp = Math.random() < 0.80;',
-  'stockUp ? 1.15 : 0.92',
+  'stockUp ? 1.12 : 0.92',
   'landUp ? 1.04 : 0.96',
   'salaryRaiseFactor = 1 + (Math.floor((room.game.round - 1) / 5) * 0.1)',
   'total * 2 * profession.stock',
@@ -73,6 +79,7 @@ const runtimeSource = fs.readFileSync(path.join(root, 'runtime-rules.js'), 'utf8
   'before > 0 ? round2(before * positiveFactor) : before',
   'before > 0 ? round2(before * negativeFactor) : before',
   'before > 0 ? round2(before * factor) : before',
+  'player.happiness = round2(Number(player.happiness || 0) + 0.7)',
 ].forEach((needle) => {
   assert.ok(runtimeSource.includes(needle), `Missing runtime rule: ${needle}`);
 });
