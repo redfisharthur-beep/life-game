@@ -10,46 +10,46 @@
 }
 
 .dice-result-image.dice-rolling {
-  will-change: transform, filter, opacity;
-  animation: dice-grow-spin 900ms cubic-bezier(.18, .72, .2, 1) both;
-  filter: drop-shadow(0 24px 38px rgba(38, 31, 27, .6));
+  will-change: transform, opacity;
+  animation: dice-grow 1200ms cubic-bezier(.18, .72, .2, 1) both;
+  filter: none !important;
   transform-origin: 50% 50%;
 }
 
 .dice-result-image.dice-landed {
-  animation: dice-settle 150ms ease-out both;
+  animation: dice-settle 120ms ease-out both;
   filter: drop-shadow(0 22px 32px rgba(38, 31, 27, .58));
 }
 
-@keyframes dice-grow-spin {
+@keyframes dice-grow {
   0% {
-    transform: scale(.48) rotate(-40deg);
+    transform: scale(.48);
     opacity: .72;
   }
-  20% {
-    transform: scale(.62) rotate(80deg);
-    opacity: .86;
+  25% {
+    transform: scale(.62);
+    opacity: .84;
   }
-  45% {
-    transform: scale(.78) rotate(230deg);
-    opacity: .94;
+  50% {
+    transform: scale(.78);
+    opacity: .92;
   }
-  72% {
-    transform: scale(.92) rotate(430deg);
-    opacity: 1;
+  75% {
+    transform: scale(.92);
+    opacity: .98;
   }
   100% {
-    transform: scale(1.02) rotate(610deg);
+    transform: scale(1);
     opacity: 1;
   }
 }
 
 @keyframes dice-settle {
   0% {
-    transform: scale(1.08) rotate(2deg);
+    transform: scale(1.04);
   }
   100% {
-    transform: scale(1) rotate(0deg);
+    transform: scale(1);
   }
 }
 
