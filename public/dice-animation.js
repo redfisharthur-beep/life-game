@@ -1,19 +1,51 @@
 (() => {
-  const ROLL_FRAMES = [
+  const SINGLE_ROLL_FRAMES = [
     '/images/roll1.png',
+    '/images/roll2.png',
     '/images/roll3.png',
+    '/images/roll4.png',
     '/images/roll5.png',
-    '/images/roll8.png',
   ];
-  const FRAME_MS = 375;
+  const DOUBLE_ROLL_FRAMES = [
+    '/images/2roll1.png',
+    '/images/2roll2.png',
+    '/images/2roll3.png',
+    '/images/2roll4.png',
+    '/images/2roll5.png',
+  ];
+  const FRAME_MS = 300;
   const ROLL_MS = 1500;
   const FINAL_HOLD_MS = 1000;
+
+  const singleRollAudio = new Audio('/music/Dice_Roll.mp3');
+  const doubleRollAudio = new Audio('/music/2Dice_Roll.mp3');
+  singleRollAudio.preload = 'auto';
+  doubleRollAudio.preload = 'auto';
+  singleRollAudio.volume = 0.7;
+  doubleRollAudio.volume = 0.7;
 
   let activeImage = null;
   let rollInterval = null;
   let settleTimer = null;
   let holdTimer = null;
   let animationToken = 0;
+
+  function stopDiceAudio() {
+    [singleRollAudio, doubleRollAudio].forEach((audio) => {
+      try {
+        audio.pause();
+        audio.currentTime = 0;
+      } catch (_) {}
+    });
+  }
+
+  function playDiceAudio(isDouble) {
+    stopDiceAudio();
+    const audio = isDouble ? doubleRollAudio : singleRollAudio;
+    audio.volume = 0.7;
+    const playPromise = audio.play();
+    if (playPromise?.catch) playPromise.catch(() => {});
+  }
 
   function removeFinalHold() {
     document.querySelectorAll('.dice-final-hold-layer').forEach((layer) => layer.remove());
@@ -35,6 +67,7 @@
       clearTimeout(holdTimer);
       holdTimer = null;
     }
+    stopDiceAudio();
     removeFinalHold();
     if (activeImage) {
       activeImage.classList.remove('dice-rolling', 'dice-landed');
@@ -74,21 +107,24 @@
     const token = animationToken;
     const finalSrc = image.getAttribute('src') || '/images/dice.png';
     const finalAlt = image.getAttribute('alt') || '骰子結果';
+    const isDouble = Boolean(image.closest('.double-dice-total'));
+    const frames = isDouble ? DOUBLE_ROLL_FRAMES : SINGLE_ROLL_FRAMES;
     let frameIndex = 0;
 
     image.classList.remove('dice-landed');
     image.classList.add('dice-rolling');
-    image.src = ROLL_FRAMES[0];
+    image.src = frames[0];
+    playDiceAudio(isDouble);
 
     rollInterval = setInterval(() => {
       if (token !== animationToken || !image.isConnected) return;
       frameIndex += 1;
-      if (frameIndex >= ROLL_FRAMES.length) {
+      if (frameIndex >= frames.length) {
         clearInterval(rollInterval);
         rollInterval = null;
-        frameIndex = ROLL_FRAMES.length - 1;
+        frameIndex = frames.length - 1;
       }
-      image.src = ROLL_FRAMES[frameIndex];
+      image.src = frames[frameIndex];
     }, FRAME_MS);
 
     settleTimer = setTimeout(() => {
@@ -97,13 +133,11 @@
         clearInterval(rollInterval);
         rollInterval = null;
       }
-
+      stopDiceAudio();
       image.src = finalSrc;
       image.alt = finalAlt;
       image.classList.remove('dice-rolling');
       image.classList.add('dice-landed');
-
-      // 1.5 秒依序播放 roll1 / roll3 / roll5 / roll8，最後結果完整定格 1 秒。
       showFinalHold(finalSrc, finalAlt);
     }, ROLL_MS);
   }
@@ -128,7 +162,7 @@
     }
   }
 
-  ROLL_FRAMES.forEach((src) => {
+  [...SINGLE_ROLL_FRAMES, ...DOUBLE_ROLL_FRAMES].forEach((src) => {
     const img = new Image();
     img.src = src;
   });
