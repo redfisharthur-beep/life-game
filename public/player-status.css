@@ -46,6 +46,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transform: translateY(.1em);
 }
 
 .player-status-avatar {
@@ -78,9 +79,10 @@
   grid-column: span 2;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   background: transparent;
-  padding-left: 2px;
+  padding-left: 0;
+  text-align: center;
 }
 
 .player-info-cell.total-assets {
@@ -104,6 +106,7 @@
   font-size: 21px;
   font-weight: 800;
   line-height: 1.05;
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -230,7 +233,7 @@
 
   .player-status-info-grid { gap: 3px; }
   .player-info-cell { padding: 3px 2px; border-radius: 7px; }
-  .player-info-name { padding-left: 1px; }
+  .player-info-name { padding-left: 0; }
   .player-status-name { font-size: 16px; }
   .player-info-label { font-size: 11px; }
   .player-info-value { font-size: 12px; margin-left: .18em; }
