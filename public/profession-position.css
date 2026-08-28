@@ -1,6 +1,7 @@
 /* 職業選擇介面位置微調：
    手機不動；平板維持原本整體偏移；桌機不再移動整張底圖，
-   人物維持目前位置；評級文字與 S/A/B/C 再往右 20px。 */
+   人物維持目前水平位置；評級文字與 S/A/B/C 往右 20px；
+   最下面兩個角色（第 5、6 張）的圖檔與文字整體往下 25px。 */
 
 @media (min-width: 431px) and (pointer: coarse) {
   .profession-stage {
@@ -28,6 +29,23 @@
   .profession-card:nth-child(even) .profession-detail {
     transform: translate(calc(1.9em + 50px), .5em) !important;
   }
+
+  /* 最下面兩張（職棒球員、企業富二代）圖檔與文字一起往下 25px。 */
+  .profession-card:nth-child(5) .profession-visual {
+    transform: translate(calc(.5em + 30px), calc(.5em + 25px)) !important;
+  }
+
+  .profession-card:nth-child(6) .profession-visual {
+    transform: translate(calc(1em + 30px), calc(.5em + 25px)) !important;
+  }
+
+  .profession-card:nth-child(5) .profession-detail {
+    transform: translate(calc(1.4em + 50px), calc(.5em + 25px)) !important;
+  }
+
+  .profession-card:nth-child(6) .profession-detail {
+    transform: translate(calc(1.9em + 50px), calc(.5em + 25px)) !important;
+  }
 }
 
 /* 寬螢幕裝置即使媒體能力偵測不完整，也套用相同桌機內容位移。 */
@@ -50,5 +68,21 @@
 
   .profession-card:nth-child(even) .profession-detail {
     transform: translate(calc(1.9em + 50px), .5em) !important;
+  }
+
+  .profession-card:nth-child(5) .profession-visual {
+    transform: translate(calc(.5em + 30px), calc(.5em + 25px)) !important;
+  }
+
+  .profession-card:nth-child(6) .profession-visual {
+    transform: translate(calc(1em + 30px), calc(.5em + 25px)) !important;
+  }
+
+  .profession-card:nth-child(5) .profession-detail {
+    transform: translate(calc(1.4em + 50px), calc(.5em + 25px)) !important;
+  }
+
+  .profession-card:nth-child(6) .profession-detail {
+    transform: translate(calc(1.9em + 50px), calc(.5em + 25px)) !important;
   }
 }
