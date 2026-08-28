@@ -6,7 +6,6 @@ const serverPath = path.join(__dirname, 'server.js');
 let source = fs.readFileSync(serverPath, 'utf8');
 
 const replacements = [
-  ['const TURN_MS = 10_000;', 'const TURN_MS = 8_000;'],
   ['const HAPPINESS_GOAL = 36;', 'const HAPPINESS_GOAL = 48;'],
   ['  const stockUp = Math.random() < 0.65;', '  const stockUp = Math.random() < 0.60;'],
   ['  const landUp = Math.random() < 0.90;', '  const landUp = Math.random() < 0.80;'],
@@ -29,12 +28,16 @@ const replacements = [
   ['    const after = before > 0 ? round2(before * factor) : round2(before + (0.5 * total));', '    const after = before > 0 ? round2(before * factor) : before;']
 ];
 
-for (const [from, to] of replacements) {
-  if (!source.includes(from)) {
-    throw new Error(`Gameplay rule patch target not found: ${from.slice(0, 100)}`);
+function applyReplacement(from, to) {
+  if (source.includes(from)) {
+    source = source.replace(from, to);
+    return;
   }
-  source = source.replace(from, to);
+  if (source.includes(to)) return;
+  throw new Error(`Gameplay rule patch target not found: ${from.slice(0, 120)}`);
 }
+
+for (const [from, to] of replacements) applyReplacement(from, to);
 
 const runtimeModule = new Module(serverPath, module);
 runtimeModule.filename = serverPath;
