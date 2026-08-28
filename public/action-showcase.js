@@ -41,9 +41,9 @@
     { label: '人生低潮', image: '/images/Unlucky.png' },
   ];
 
-  const CHOICE_MS = 2000;
-  const DICE_MS = 2000;
-  const RESULT_MS = 5000;
+  const CHOICE_MS = 1500;
+  const DICE_MS = 2500;
+  const RESULT_MS = 3500;
   const RESULT_START_MS = CHOICE_MS + DICE_MS;
   const SHOWCASE_MS = CHOICE_MS + DICE_MS + RESULT_MS;
 
