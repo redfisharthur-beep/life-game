@@ -357,6 +357,6 @@
 
 @media (min-width: 1025px) {
   .profession-stage {
-    transform: translate(15px, 5px);
+    transform: translate(45px, 5px);
   }
 }
