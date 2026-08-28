@@ -15,33 +15,52 @@
 
   let applying = false;
 
+  function formatSigned(value) {
+    const number = Number(value || 0);
+    if (Math.abs(number) < 0.000001) return '0';
+    return `${number > 0 ? '+' : '-'}${Math.abs(number)}`;
+  }
+
+  function setEffects(row, effects) {
+    const container = row?.querySelector('.simple-result-effects');
+    if (!container) return;
+    container.innerHTML = effects
+      .map((effect) => `<span class="simple-result-effect">${effect}</span>`)
+      .join('');
+  }
+
   function simplifyDreamFail(overlay, event) {
     if (event.type !== 'dream' || event.success) return;
-
     const row = overlay.querySelector('.simple-result-row');
     if (!row) return;
-
-    const effects = row.querySelector('.simple-result-effects');
-    if (!effects) return;
-
-    const salaryIncome = Number(event.salaryIncome || 0);
-    effects.innerHTML = `<span class="simple-result-effect">現金 +${salaryIncome}</span>`;
+    setEffects(row, [`現金 +${Number(event.salaryIncome || 0)}`]);
   }
 
   function syncHelpActorRewards(overlay, event) {
     if (event.type !== 'help') return;
-
     const rows = [...overlay.querySelectorAll('.simple-result-row')];
     const actorRow = rows.at(-1);
-    const effects = actorRow?.querySelector('.simple-result-effects');
-    if (!effects) return;
+    if (!actorRow) return;
+    setEffects(actorRow, [`現金 ${formatSigned(event.bonus)}`]);
+  }
 
-    const bonus = Number(event.bonus || 0);
-    const helperHappiness = Number(event.helperHappiness || 0);
-    effects.innerHTML = `
-      <span class="simple-result-effect">現金 +${bonus}</span>
-      <span class="simple-result-effect">幸福值 +${helperHappiness}</span>
-    `;
+  function syncFateResult(overlay, event) {
+    if (event.type !== 'fate') return;
+    const row = overlay.querySelector('.simple-result-row');
+    if (!row) return;
+
+    const fateIndex = Number(event.fateIndex);
+    if (fateIndex === 0 || fateIndex === 1) {
+      setEffects(row, [`現金 ${formatSigned(event.amount)}`]);
+    } else if (fateIndex === 2 || fateIndex === 3) {
+      setEffects(row, [`股票 ${formatSigned(event.units)}`]);
+    } else if (fateIndex === 4 || fateIndex === 5) {
+      setEffects(row, [`土地 ${formatSigned(event.units)}`]);
+    } else if (fateIndex === 6) {
+      setEffects(row, [`現金 ${formatSigned(event.received)}`]);
+    } else if (fateIndex === 7 || fateIndex === 8) {
+      setEffects(row, [`幸福值 ${formatSigned(event.happinessChange)}`]);
+    }
   }
 
   function applySpecialResultVisual() {
@@ -57,6 +76,7 @@
 
       simplifyDreamFail(overlay, event);
       syncHelpActorRewards(overlay, event);
+      syncFateResult(overlay, event);
 
       if (!['sabotage', 'help'].includes(event.type)) return;
 
