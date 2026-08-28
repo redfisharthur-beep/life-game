@@ -42,7 +42,7 @@
   ];
 
   const CHOICE_MS = 1500;
-  const DICE_MS = 2500;
+  const DICE_MS = 3000;
   const RESULT_MS = 3500;
   const RESULT_START_MS = CHOICE_MS + DICE_MS;
   const SHOWCASE_MS = CHOICE_MS + DICE_MS + RESULT_MS;
