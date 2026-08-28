@@ -3,6 +3,7 @@
   const viewer = document.getElementById('rulesViewer');
   const closeBtn = document.getElementById('rulesCloseBtn');
   const restartBtn = document.getElementById('restartGameBtn');
+  const professionHomeBtn = document.getElementById('professionHomeBtn');
   const scrollArea = viewer?.querySelector('.rules-viewer-page');
 
   function syncRestartLabel() {
@@ -16,6 +17,17 @@
       socket.on('room:update', () => requestAnimationFrame(syncRestartLabel));
       socket.on('room:started', () => requestAnimationFrame(syncRestartLabel));
     }
+  }
+
+  if (professionHomeBtn && typeof socket !== 'undefined') {
+    professionHomeBtn.addEventListener('click', () => {
+      professionHomeBtn.disabled = true;
+      socket.emit('room:leave', () => {
+        if (typeof clearSession === 'function') clearSession();
+        if (typeof showEntry === 'function') showEntry();
+        professionHomeBtn.disabled = false;
+      });
+    });
   }
 
   if (!openBtn || !viewer || !closeBtn) return;
