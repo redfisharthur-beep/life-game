@@ -1,11 +1,11 @@
-/* 職業選擇介面位置微調：手機不動、平板維持、桌機以目前位置再往右 30px。 */
-@media (min-width: 431px) and (max-width: 1024px) {
+/* 職業選擇介面位置微調：手機不動；431～760px 維持平板偏移；761px 以上套用桌機位置。 */
+@media (min-width: 431px) and (max-width: 760px) {
   .profession-stage {
     transform: translateX(10px);
   }
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 761px) {
   .profession-stage {
     transform: translate(75px, 5px);
   }
