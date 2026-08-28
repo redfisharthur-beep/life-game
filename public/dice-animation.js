@@ -1,7 +1,12 @@
 (() => {
-  const ROLL_FRAMES = Array.from({ length: 12 }, (_, index) => `/images/roll${index + 1}.png`);
-  const FRAME_MS = 100;
-  const ROLL_MS = 1200;
+  const ROLL_FRAMES = [
+    '/images/roll1.png',
+    '/images/roll4.png',
+    '/images/roll7.png',
+    '/images/roll11.png',
+  ];
+  const FRAME_MS = 375;
+  const ROLL_MS = 1500;
   const FINAL_HOLD_MS = 1000;
 
   let activeImage = null;
@@ -78,7 +83,11 @@
     rollInterval = setInterval(() => {
       if (token !== animationToken || !image.isConnected) return;
       frameIndex += 1;
-      if (frameIndex >= ROLL_FRAMES.length) frameIndex = ROLL_FRAMES.length - 1;
+      if (frameIndex >= ROLL_FRAMES.length) {
+        clearInterval(rollInterval);
+        rollInterval = null;
+        frameIndex = ROLL_FRAMES.length - 1;
+      }
       image.src = ROLL_FRAMES[frameIndex];
     }, FRAME_MS);
 
@@ -94,8 +103,7 @@
       image.classList.remove('dice-rolling');
       image.classList.add('dice-landed');
 
-      // 1.2 秒素材動畫後，獨立覆蓋顯示真正骰到的結果 1 秒。
-      // 即使原本結果階段在 2 秒時切換，最終骰面仍會完整看滿 1 秒。
+      // 1.5 秒只播放 roll1 / roll4 / roll7 / roll11，最後結果完整定格 1 秒。
       showFinalHold(finalSrc, finalAlt);
     }, ROLL_MS);
   }
