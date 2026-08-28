@@ -17,39 +17,24 @@
 .major-event-card {
   width: min(760px, 94vw);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 18px;
   padding: 0;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  text-align: center;
-  font-family: "Huninn", "PingFang TC", "Microsoft JhengHei", sans-serif;
-}
-
-.major-event-image {
-  display: block;
-  width: min(720px, 90vw);
-  max-height: 72vh;
-  object-fit: contain;
   border: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
 }
 
-.major-event-countdown {
+.major-event-image {
   display: block;
-  margin: 0;
-  padding: 0;
+  width: min(720px, 90vw);
+  max-height: 78vh;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
   background: transparent;
-  color: #f7f3ee;
-  font-size: clamp(42px, 8vw, 72px);
-  font-weight: 500;
-  line-height: 1;
-  text-shadow: 0 3px 12px rgba(0, 0, 0, .28);
+  box-shadow: none;
 }
 
 @media (max-width: 600px) {
@@ -59,15 +44,10 @@
 
   .major-event-card {
     width: 96vw;
-    gap: 14px;
   }
 
   .major-event-image {
     width: 94vw;
-    max-height: 70vh;
-  }
-
-  .major-event-countdown {
-    font-size: clamp(40px, 14vw, 62px);
+    max-height: 76vh;
   }
 }
