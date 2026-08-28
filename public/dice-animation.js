@@ -1,6 +1,6 @@
 (() => {
-  const FRAME_MS = 85;
-  const ROLL_MS = 1500;
+  const FRAME_MS = 135;
+  const ROLL_MS = 1780;
 
   let activeImage = null;
   let rollInterval = null;
@@ -41,6 +41,7 @@
 
     const token = animationToken;
     const finalSrc = image.getAttribute('src') || '/images/dice.png';
+    const finalAlt = image.getAttribute('alt') || '骰子結果';
     const container = image.closest('.dice-result-images');
     const isDouble = Boolean(container?.classList.contains('double-dice-total'));
     const nextFrame = isDouble ? randomDoubleImage : randomSingleImage;
@@ -60,7 +61,10 @@
         clearInterval(rollInterval);
         rollInterval = null;
       }
+
+      // 最後一定回到伺服器真正擲出的結果圖，並定格到結果階段開始。
       image.src = finalSrc;
+      image.alt = finalAlt;
       image.classList.remove('dice-rolling');
       image.classList.add('dice-landed');
     }, ROLL_MS);
