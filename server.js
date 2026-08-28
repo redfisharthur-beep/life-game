@@ -46,6 +46,7 @@ const MAJOR_EVENTS = [
   { id: 'urbanRenewal', title: '都市重劃', description: '土地價格立刻 ×1.6' },
   { id: 'eraWave', title: '時代浪潮', description: '從現在開始，後續所有骰子都改為2顆' },
   { id: 'happinessBoost', title: '幸福加倍', description: '所有玩家幸福值立刻 ×1.3' },
+  { id: 'cashGrant', title: '普發現金', description: '所有玩家現金 +1000 元' },
 ];
 
 function cleanName(value) {
@@ -401,6 +402,10 @@ function applyMajorEvent(room, event) {
   } else if (event.id === 'happinessBoost') {
     room.players.forEach((player) => {
       player.happiness = round2(Number(player.happiness || 0) * 1.3);
+    });
+  } else if (event.id === 'cashGrant') {
+    room.players.forEach((player) => {
+      player.cash = Math.round(Number(player.cash || 0)) + 1000;
     });
   }
 }
