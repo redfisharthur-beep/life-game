@@ -13,6 +13,13 @@ const replacements = [
   ["  office: { name: '白領上班族', salary: 5, stock: 2.0, land: 1.0, dream: 2.975 },", "  office: { name: '白領上班族', salary: 5, stock: 2.0, land: 1.0, dream: 2.60 },"],
   ["  athlete: { name: '職棒球員', salary: 6, stock: 1.0, land: 1.5, dream: 2.70 },", "  athlete: { name: '職棒球員', salary: 6, stock: 1.0, land: 1.5, dream: 2.45 },"],
   ["  rich: { name: '企業富二代', salary: 10, stock: 1.0, land: 2.0, dream: 1.80 },", "  rich: { name: '企業富二代', salary: 10, stock: 1.0, land: 2.0, dream: 2.00 },"],
+  ['  const diceCount = forceDoubleDice || round >= 20 ? 2 : 1;', '  const diceCount = forceDoubleDice || round >= 16 ? 2 : 1;'],
+  [
+    "        roundAnnouncement: room.game.round === 20 && !room.game.forceDoubleDice\n          ? '人生加速！從現在開始每回合擲2顆骰子！'\n          : null,",
+    '        roundAnnouncement: null,'
+  ],
+  ['  if (room.game.round === 20 && !room.game.forceDoubleDice) {', '  if (room.game.round === 16 && !room.game.forceDoubleDice) {'],
+  ['      if (currentRoom.game.round !== 20 || currentRoom.game.currentPlayerId) return;', '      if (currentRoom.game.round !== 16 || currentRoom.game.currentPlayerId) return;'],
   ['  const stockUp = Math.random() < 0.65;', '  const stockUp = Math.random() < 0.60;'],
   ['  const landUp = Math.random() < 0.90;', '  const landUp = Math.random() < 0.80;'],
   ['  room.game.stockPrice = round2(room.game.stockPrice * (stockUp ? 1.10 : 0.93));', '  room.game.stockPrice = round2(room.game.stockPrice * (stockUp ? 1.12 : 0.92));'],
