@@ -33,8 +33,10 @@ const replacements = [
     '    amount: income,\n    auto,',
     '    amount: income,\n    baseSalary: salary,\n    effectiveSalary,\n    salaryRaiseFactor,\n    auto,'
   ],
-  ['    const units = round2(total * profession.stock);', '    const units = round2(total * 2 * profession.stock);'],
-  ['    const units = round2(total * profession.land);', '    const units = round2(total * 2 * profession.land);'],
+  ['    const units = round2(total * profession.stock);', '    const units = round2(total * 3 * profession.stock);'],
+  ['    const units = round2(total * profession.land);', '    const units = round2(total * 3 * profession.land);'],
+  ['    const units = round2(Math.min(total * 3, player.stocks));', '    const units = round2(Math.min(total * 5 * profession.stock, player.stocks));'],
+  ['    const units = round2(Math.min(total * 3, player.land));', '    const units = round2(Math.min(total * 5 * profession.land, player.land));'],
   ['    const after = before > 0 ? round2(before * positiveFactor) : round2(before + total);', '    const after = before > 0 ? round2(before * positiveFactor) : before;'],
   ['    const after = before > 0 ? round2(before * negativeFactor) : round2(before - (0.5 * total));', '    const after = before > 0 ? round2(before * negativeFactor) : before;'],
   ['    const after = before > 0 ? round2(before * factor) : round2(before - (0.25 * total));', '    const after = before > 0 ? round2(before * factor) : before;'],
