@@ -70,12 +70,33 @@ const replacements = [
   ]
 ];
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function flexibleWhitespacePattern(value) {
+  return new RegExp(
+    escapeRegExp(value)
+      .replace(/\\\r\\\n|\\\n|\\\r/g, '\\s*')
+      .replace(/(?:\\ |\\\t)+/g, '\\s+'),
+    'm'
+  );
+}
+
 function applyReplacement(from, to) {
+  if (source.includes(to)) return;
+
   if (source.includes(from)) {
     source = source.replace(from, to);
     return;
   }
-  if (source.includes(to)) return;
+
+  const flexiblePattern = flexibleWhitespacePattern(from);
+  if (flexiblePattern.test(source)) {
+    source = source.replace(flexiblePattern, to);
+    return;
+  }
+
   throw new Error(`Gameplay rule patch target not found: ${from.slice(0, 120)}`);
 }
 
