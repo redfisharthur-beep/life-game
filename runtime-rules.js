@@ -7,6 +7,7 @@ let source = fs.readFileSync(serverPath, 'utf8');
 
 const replacements = [
   ['const HAPPINESS_GOAL = 36;', 'const HAPPINESS_GOAL = 48;'],
+  ['const MAJOR_EVENT_CHANCE = 0.05;', 'const MAJOR_EVENT_CHANCE = 0.08;'],
   ["  doctor: { name: '醫師', salary: 7, stock: 1.5, land: 2.0, dream: 2.35 },", "  doctor: { name: '醫師', salary: 7, stock: 1.5, land: 2.0, dream: 2.25 },"],
   ["  engineer: { name: '資訊工程師', salary: 8, stock: 2.0, land: 1.0, dream: 2.10 },", "  engineer: { name: '資訊工程師', salary: 8, stock: 2.0, land: 1.0, dream: 2.20 },"],
   ["  sales: { name: '超級業務員', salary: 9, stock: 1.5, land: 1.5, dream: 1.95 },", "  sales: { name: '超級業務員', salary: 9, stock: 1.5, land: 1.5, dream: 2.05 },"],
@@ -37,9 +38,23 @@ const replacements = [
   ['    const units = round2(total * profession.land);', '    const units = round2(total * 3 * profession.land);'],
   ['    const units = round2(Math.min(total * 3, player.stocks));', '    const units = round2(Math.min(total * 5 * profession.stock, player.stocks));'],
   ['    const units = round2(Math.min(total * 3, player.land));', '    const units = round2(Math.min(total * 5 * profession.land, player.land));'],
+  [
+    '  const positiveFactor = 1 + (0.1 * total);\n  const negativeFactor = Math.max(0, 1 - (0.1 * total));',
+    '  const positiveFactor = 1 + (0.1 * total);\n  const negativeFactor = Math.max(0, 1 - (0.1 * total));\n  const assetNegativeFactor = Math.max(0, 1 - (0.05 * total));'
+  ],
+  ['    const after = Math.max(0, Math.round(before * negativeFactor));', '    const after = Math.max(0, Math.round(before * assetNegativeFactor));'],
+  ['    const after = Math.max(0, roundHalf(before * negativeFactor));', '    const after = Math.max(0, roundHalf(before * assetNegativeFactor));'],
   ['    const after = before > 0 ? round2(before * positiveFactor) : round2(before + total);', '    const after = before > 0 ? round2(before * positiveFactor) : before;'],
   ['    const after = before > 0 ? round2(before * negativeFactor) : round2(before - (0.5 * total));', '    const after = before > 0 ? round2(before * negativeFactor) : before;'],
+  [
+    "function chooseSabotageTarget(room, actorId) {\n  const others = room.players.filter((player) => player.id !== actorId);\n  if (!others.length) return null;\n  const ranked = others.map((player) => ({ player, assets: playerAssets(player, room.game) }));\n  const highestAssets = Math.max(...ranked.map((item) => item.assets));\n  return randomChoice(ranked.filter((item) => item.assets === highestAssets).map((item) => item.player));\n}",
+    "function chooseSabotageTarget(room, actorId) {\n  const others = room.players.filter((player) => player.id !== actorId);\n  if (!others.length) return null;\n  const highestHappiness = Math.max(...others.map((player) => Number(player.happiness || 0)));\n  const happiest = others.filter((player) => Number(player.happiness || 0) === highestHappiness);\n  const ranked = happiest.map((player) => ({ player, assets: playerAssets(player, room.game) }));\n  const highestAssets = Math.max(...ranked.map((item) => item.assets));\n  return randomChoice(ranked.filter((item) => item.assets === highestAssets).map((item) => item.player));\n}"
+  ],
   ['    const after = before > 0 ? round2(before * factor) : round2(before - (0.25 * total));', '    const after = before > 0 ? round2(before * factor) : before;'],
+  [
+    "function getHelpCandidates(room, actorId) {\n  const others = room.players.filter((player) => player.id !== actorId);\n  if (!others.length) return [];\n  const happinessValues = others.map((player) => Number(player.happiness || 0));\n  const maxHappiness = Math.max(...happinessValues);\n  const minHappiness = Math.min(...happinessValues);\n  const eligible = maxHappiness === minHappiness ? others : others.filter((player) => Number(player.happiness || 0) < maxHappiness);\n  const ranked = eligible.map((player) => ({ player, assets: playerAssets(player, room.game) }));\n  const lowestAssets = Math.min(...ranked.map((item) => item.assets));\n  return ranked.filter((item) => item.assets === lowestAssets).map((item) => item.player);\n}",
+    "function getHelpCandidates(room, actorId) {\n  const others = room.players.filter((player) => player.id !== actorId);\n  if (!others.length) return [];\n  const lowestHappiness = Math.min(...others.map((player) => Number(player.happiness || 0)));\n  const leastHappy = others.filter((player) => Number(player.happiness || 0) === lowestHappiness);\n  const ranked = leastHappy.map((player) => ({ player, assets: playerAssets(player, room.game) }));\n  const lowestAssets = Math.min(...ranked.map((item) => item.assets));\n  return ranked.filter((item) => item.assets === lowestAssets).map((item) => item.player);\n}"
+  ],
   ['    const after = before > 0 ? round2(before * factor) : round2(before + (0.5 * total));', '    const after = before > 0 ? round2(before * factor) : before;'],
   [
     '  player.cash = actorCashAfter;\n  player.helpCount = (player.helpCount || 0) + 1;',
