@@ -40,12 +40,12 @@ const replacements = [
   ['    const units = round2(Math.min(total * 3, player.land));', '    const units = round2(Math.min(total * 5 * profession.land, player.land));'],
   [
     '  const positiveFactor = 1 + (0.1 * total);\n  const negativeFactor = Math.max(0, 1 - (0.1 * total));',
-    '  const positiveFactor = 1 + (0.1 * total);\n  const negativeFactor = Math.max(0, 1 - (0.1 * total));\n  const assetNegativeFactor = Math.max(0, 1 - (0.05 * total));'
+    '  const positiveFactor = 1 + (0.1 * total);\n  const negativeFactor = Math.max(0, 1 - (0.1 * total));\n  const assetNegativeFactor = Math.max(0, 1 - (0.05 * total));\n  const happinessNegativeFactor = Math.max(0, 1 - (0.05 * total));'
   ],
   ['    const after = Math.max(0, Math.round(before * negativeFactor));', '    const after = Math.max(0, Math.round(before * assetNegativeFactor));'],
   ['    const after = Math.max(0, roundHalf(before * negativeFactor));', '    const after = Math.max(0, roundHalf(before * assetNegativeFactor));'],
   ['    const after = before > 0 ? round2(before * positiveFactor) : round2(before + total);', '    const after = before > 0 ? round2(before * positiveFactor) : before;'],
-  ['    const after = before > 0 ? round2(before * negativeFactor) : round2(before - (0.5 * total));', '    const after = before > 0 ? round2(before * negativeFactor) : before;'],
+  ['    const after = before > 0 ? round2(before * negativeFactor) : round2(before - (0.5 * total));', '    const after = before > 0 ? round2(before * happinessNegativeFactor) : before;'],
   [
     "function chooseSabotageTarget(room, actorId) {\n  const others = room.players.filter((player) => player.id !== actorId);\n  if (!others.length) return null;\n  const ranked = others.map((player) => ({ player, assets: playerAssets(player, room.game) }));\n  const highestAssets = Math.max(...ranked.map((item) => item.assets));\n  return randomChoice(ranked.filter((item) => item.assets === highestAssets).map((item) => item.player));\n}",
     "function chooseSabotageTarget(room, actorId) {\n  const others = room.players.filter((player) => player.id !== actorId);\n  if (!others.length) return null;\n  const highestHappiness = Math.max(...others.map((player) => Number(player.happiness || 0)));\n  const happiest = others.filter((player) => Number(player.happiness || 0) === highestHappiness);\n  const ranked = happiest.map((player) => ({ player, assets: playerAssets(player, room.game) }));\n  const highestAssets = Math.max(...ranked.map((item) => item.assets));\n  return randomChoice(ranked.filter((item) => item.assets === highestAssets).map((item) => item.player));\n}"
