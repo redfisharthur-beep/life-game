@@ -39,8 +39,21 @@
   animation: major-event-fade-out 4s ease-in both;
 }
 
+.major-event-overlay.dice-transition .major-event-image {
+  animation: dice-transition-fade-out 3s ease-in both;
+}
+
 @keyframes major-event-fade-out {
   0%, 78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes dice-transition-fade-out {
+  0%, 62% {
     opacity: 1;
   }
   100% {
