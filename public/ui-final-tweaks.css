@@ -29,6 +29,12 @@
   order: -1;
 }
 
+/* 行動展示只從九宮格選項開始覆蓋：玩家列表與上方資訊保持清晰。 */
+.action-showcase {
+  inset: auto 0 0 0 !important;
+  top: var(--showcase-top, 0px) !important;
+}
+
 /* 結算畫面：移除「人生結算／獎盃」整排，但保留 DOM 供程式讀寫。 */
 .results-heading {
   display: none !important;
