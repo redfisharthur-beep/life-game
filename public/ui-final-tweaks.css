@@ -6,6 +6,34 @@
   display: none !important;
 }
 
+/* 遊戲畫面：輪次／倒數／股價／地價固定在最上方，且高於行動霧化層。 */
+#gamePanel {
+  display: flex;
+  flex-direction: column;
+}
+
+#gamePanel.hidden {
+  display: none !important;
+}
+
+#gamePanel .game-topbar {
+  order: -2;
+  position: sticky;
+  top: max(6px, env(safe-area-inset-top));
+  z-index: 10050;
+  isolation: isolate;
+  box-shadow: 0 8px 22px rgba(84, 76, 69, .16);
+}
+
+#gamePanel #playerStatusBar {
+  order: -1;
+}
+
+/* 結算畫面：移除「人生結算／獎盃」整排，但保留 DOM 供程式讀寫。 */
+.results-heading {
+  display: none !important;
+}
+
 /* 玩家名片：總資產／現金／股票／土地稍微放大。 */
 #gamePanel .player-info-label {
   font-size: 16px !important;
@@ -79,6 +107,9 @@
 }
 
 @media (max-width: 520px) {
+  #gamePanel .game-topbar {
+    top: max(3px, env(safe-area-inset-top));
+  }
   #gamePanel .player-info-label { font-size: 13px !important; }
   #gamePanel .player-info-value { font-size: 15px !important; }
   .ranking-number { min-width: 48px !important; font-size: 22px !important; }
