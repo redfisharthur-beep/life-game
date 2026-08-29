@@ -1,5 +1,5 @@
 .dice-result-stage {
-  overflow: hidden;
+  overflow: visible;
   min-height: 250px;
 }
 
