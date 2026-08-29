@@ -81,10 +81,11 @@ const runtimeSource = fs.readFileSync(path.join(root, 'runtime-rules.js'), 'utf8
   'total * 5 * profession.stock, player.stocks',
   'total * 5 * profession.land, player.land',
   'assetNegativeFactor = Math.max(0, 1 - (0.05 * total))',
+  'happinessNegativeFactor = Math.max(0, 1 - (0.05 * total))',
   'highestHappiness = Math.max',
   'lowestHappiness = Math.min',
   'before > 0 ? round2(before * positiveFactor) : before',
-  'before > 0 ? round2(before * negativeFactor) : before',
+  'before > 0 ? round2(before * happinessNegativeFactor) : before',
   'before > 0 ? round2(before * factor) : before',
   'player.happiness = round2(Number(player.happiness || 0) + 0.7)',
 ].forEach((needle) => {
