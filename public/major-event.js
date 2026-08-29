@@ -37,11 +37,19 @@
 
   function render(room) {
     const game = room?.game;
-    const event = game?.majorEvent;
-    const until = Number(game?.majorEventUntil || 0);
-    const serverNow = Number(room?.serverTime || Date.now());
-    const remaining = until - serverNow;
+    const now = Number(room?.serverTime || Date.now());
 
+    let event = game?.majorEvent || null;
+    let until = Number(game?.majorEventUntil || 0);
+
+    // 第16回合正式切換為2顆骰子時，只顯示「時代浪潮」圖片，不顯示任何文字。
+    const transitionUntil = Number(game?.transitionUntil || 0);
+    if (!event && room?.phase === 'game' && game?.round === 16 && transitionUntil > now) {
+      event = { id: 'eraWave', round: 16 };
+      until = transitionUntil;
+    }
+
+    const remaining = until - now;
     if (!event || remaining <= 0 || room?.phase !== 'game') {
       hide();
       return;
@@ -53,11 +61,15 @@
       return;
     }
 
-    const key = `${room.code}:${event.id}:${event.round}`;
+    const key = `${room.code}:${event.id}:${event.round}:${until}`;
     if (key !== activeKey) {
       activeKey = key;
       imageEl.src = imageSrc;
       imageEl.alt = '';
+      // 重新觸發圖片淡出動畫，確保第16回合轉場也能完整播放。
+      imageEl.style.animation = 'none';
+      void imageEl.offsetWidth;
+      imageEl.style.animation = '';
       overlay.classList.remove('hidden');
     }
 
