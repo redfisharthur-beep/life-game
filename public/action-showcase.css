@@ -67,7 +67,7 @@
   background: transparent;
 }
 
-/* 骰子階段保留背景框，只隱藏文字。 */
+/* 骰子階段保留背景框，只隱藏文字。加寬避免雙骰 1.5 倍動畫被裁切。 */
 .action-showcase.dice-stage-active {
   background: rgba(77, 73, 69, .28);
   backdrop-filter: blur(3px);
@@ -76,10 +76,11 @@
 }
 
 .action-showcase.dice-stage-active .action-showcase-card {
-  width: min(520px, 92vw);
+  width: min(680px, calc(100vw - 24px));
   min-height: 330px;
   gap: 0;
-  padding: 24px;
+  padding: 24px 18px;
+  overflow: visible;
   border: 1px solid #c9c0b6;
   border-radius: 28px;
   background: #f5f0ea;
@@ -97,6 +98,7 @@
   justify-content: center;
   width: 100%;
   margin: 0;
+  overflow: visible;
 }
 
 .dice-result-images {
@@ -104,6 +106,7 @@
   align-items: center;
   justify-content: center;
   gap: 0;
+  overflow: visible;
 }
 
 .dice-result-image {
@@ -315,7 +318,7 @@
 
 @media (max-width: 520px) {
   .action-showcase {
-    padding: 10px;
+    padding: 6px;
   }
 
   .action-showcase-card {
@@ -329,9 +332,9 @@
   }
 
   .action-showcase.dice-stage-active .action-showcase-card {
-    width: min(92vw, 440px);
+    width: calc(100vw - 12px);
     min-height: 300px;
-    padding: 18px 14px;
+    padding: 18px 6px;
     border-radius: 24px;
   }
 
@@ -342,8 +345,8 @@
   }
 
   .dice-result-images.double-dice-total .dice-result-image {
-    width: min(220px, 62vw);
-    height: min(220px, 62vw);
+    width: min(220px, 58vw);
+    height: min(220px, 58vw);
   }
 
   .action-showcase.result-stage-active .action-showcase-card {
