@@ -67,6 +67,19 @@
   const titleEl = document.getElementById('actionShowcaseTitle');
   const bodyEl = document.getElementById('actionShowcaseBody');
 
+  function positionShowcaseOverActions() {
+    const actionGrid = document.getElementById('actionGrid');
+    if (!actionGrid) {
+      overlay.style.removeProperty('--showcase-top');
+      return;
+    }
+
+    const rect = actionGrid.getBoundingClientRect();
+    const minimumRemainingHeight = 220;
+    const top = Math.max(0, Math.min(rect.top - 8, window.innerHeight - minimumRemainingHeight));
+    overlay.style.setProperty('--showcase-top', `${Math.round(top)}px`);
+  }
+
   function escapeHtml(value) {
     return String(value ?? '')
       .replaceAll('&', '&amp;')
@@ -128,6 +141,7 @@
   }
 
   function showActionStage(playerName, action) {
+    positionShowcaseOverActions();
     setDiceStageMode(false);
     setChoiceStageMode(true);
     overlay.classList.remove('result-stage-active');
@@ -137,6 +151,7 @@
   }
 
   function showDiceStage(playerName, event) {
+    positionShowcaseOverActions();
     const dice = Array.isArray(event.dice) ? event.dice : [];
     const total = Number(event.diceTotal || 0);
     const diceCount = Math.max(1, Math.min(2, dice.length || 1));
@@ -336,6 +351,7 @@
   }
 
   function showResultStage(room, playerName, event) {
+    positionShowcaseOverActions();
     setChoiceStageMode(false);
     setDiceStageMode(false);
     overlay.classList.add('result-stage-active');
@@ -400,6 +416,7 @@
     const playerName = player?.name || '玩家';
     const elapsed = Math.max(0, SHOWCASE_MS - remaining);
 
+    positionShowcaseOverActions();
     overlay.classList.remove('hidden');
     if (elapsed < CHOICE_MS) {
       showActionStage(playerName, action);
@@ -425,6 +442,13 @@
 
     stageTimers.push(setTimeout(hideShowcase, remaining));
   }
+
+  window.addEventListener('resize', () => {
+    if (!overlay.classList.contains('hidden')) positionShowcaseOverActions();
+  });
+  window.addEventListener('scroll', () => {
+    if (!overlay.classList.contains('hidden')) positionShowcaseOverActions();
+  }, { passive: true });
 
   socket.on('room:update', playShowcase);
 })();
