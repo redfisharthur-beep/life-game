@@ -63,6 +63,7 @@ const serverSource = fs.readFileSync(path.join(root, 'server.js'), 'utf8');
 const runtimeSource = fs.readFileSync(path.join(root, 'runtime-rules.js'), 'utf8');
 [
   'const HAPPINESS_GOAL = 48;',
+  'const MAJOR_EVENT_CHANCE = 0.08;',
   "dream: 2.25",
   "dream: 2.20",
   "dream: 2.05",
@@ -79,6 +80,9 @@ const runtimeSource = fs.readFileSync(path.join(root, 'runtime-rules.js'), 'utf8
   'total * 3 * profession.land',
   'total * 5 * profession.stock, player.stocks',
   'total * 5 * profession.land, player.land',
+  'assetNegativeFactor = Math.max(0, 1 - (0.05 * total))',
+  'highestHappiness = Math.max',
+  'lowestHappiness = Math.min',
   'before > 0 ? round2(before * positiveFactor) : before',
   'before > 0 ? round2(before * negativeFactor) : before',
   'before > 0 ? round2(before * factor) : before',
