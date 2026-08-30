@@ -31,10 +31,10 @@
 <body>
   <main class="shell">
     <section class="card" id="lobbyCard">
-      <img id="gameLogo" class="game-logo" src="/images/logo.png?v=20260827-1610" alt="人生" />
+      <img id="gameLogo" class="game-logo" src="/images/logo.png?v=20260827-1610" alt="人生" decoding="async" />
 
       <div id="homeStage" class="home-stage">
-        <img class="front-page-image" src="/images/front%20page.png?v=20260827-1710" alt="人生首頁" />
+        <img class="front-page-image" src="/images/front%20page.png?v=20260827-1710" alt="人生首頁" decoding="async" />
 
         <div id="entryPanel" class="panel home-entry-panel">
           <label class="field entry-control">
@@ -48,7 +48,7 @@
 
       <div id="roomBrowserPanel" class="panel room-browser-panel hidden">
         <div class="room-browser-stage">
-          <img class="room-browser-bg" src="/images/Player%20List.png?v=20260827-1905" alt="房間列表" />
+          <img class="room-browser-bg" src="/images/Player%20List.png?v=20260827-1905" alt="房間列表" decoding="async" />
           <div class="room-browser-overlay">
             <div id="roomBrowserList" class="room-browser-list" aria-live="polite"></div>
             <div class="room-browser-actions">
@@ -61,7 +61,7 @@
 
       <div id="roomPanel" class="panel hidden">
         <div class="player-list-stage">
-          <img class="player-list-bg" src="/images/Player%20List.png?v=20260827-1905" alt="玩家等待畫面" />
+          <img class="player-list-bg" src="/images/Player%20List.png?v=20260827-1905" alt="玩家等待畫面" decoding="async" />
           <div class="player-list-overlay">
             <div class="players-head compact">
               <span id="playerCount">0 / 6</span>
@@ -78,7 +78,7 @@
 
       <div id="professionPanel" class="panel hidden">
         <div class="profession-stage">
-          <img class="profession-stage-image" src="/images/select.png?v=20260827-1735" alt="選擇職業" />
+          <img class="profession-stage-image" src="/images/Player%20List.png?v=20260827-1905" alt="選擇職業" loading="lazy" decoding="async" />
           <button id="professionHomeBtn" class="home-pill profession-home-pill" type="button" aria-label="回到上一頁">回到首頁</button>
           <button id="rulesOpenBtn" class="rules-pill" type="button" aria-label="遊戲規則">遊戲規則</button>
           <div id="professionGrid" class="profession-grid"></div>
@@ -101,8 +101,8 @@
             </div>
 
             <div class="market-strip" aria-label="最新市場價格">
-              <span class="market-item" title="股市"><img class="market-icon" src="/images/stock.png" alt="股市" /><b id="stockPrice" class="market-value">10.00</b></span>
-              <span class="market-item" title="地價"><img class="market-icon" src="/images/land.png" alt="地價" /><b id="landPrice" class="market-value">10.00</b></span>
+              <span class="market-item" title="股市"><img class="market-icon" src="/images/stock.png" alt="股市" loading="lazy" decoding="async" /><b id="stockPrice" class="market-value">10.00</b></span>
+              <span class="market-item" title="地價"><img class="market-icon" src="/images/land.png" alt="地價" loading="lazy" decoding="async" /><b id="landPrice" class="market-value">10.00</b></span>
             </div>
           </div>
         </div>
@@ -120,15 +120,15 @@
 
         <section class="actions-section">
           <div id="actionGrid" class="action-grid">
-            <button class="action-button" data-action="salary" type="button" aria-label="領薪"><img class="action-image" src="/images/salary.png" alt="領薪" /></button>
-            <button class="action-button" data-action="buyStock" type="button" aria-label="買股" disabled><img class="action-image" src="/images/buystock.png" alt="買股" /></button>
-            <button class="action-button" data-action="buyLand" type="button" aria-label="圈地" disabled><img class="action-image" src="/images/buyland.png" alt="圈地" /></button>
-            <button class="action-button" data-action="fate" type="button" aria-label="命運" disabled><img class="action-image" src="/images/destiny.png" alt="命運" /></button>
-            <button class="action-button" data-action="sabotage" type="button" aria-label="陷害" disabled><img class="action-image" src="/images/frame.png" alt="陷害" /></button>
-            <button class="action-button" data-action="help" type="button" aria-label="援助" disabled><img class="action-image" src="/images/assistance.png" alt="援助" /></button>
-            <button class="action-button" data-action="sellStock" type="button" aria-label="賣股" disabled><img class="action-image" src="/images/Sellstock.png" alt="賣股" /></button>
-            <button class="action-button" data-action="sellLand" type="button" aria-label="賣地" disabled><img class="action-image" src="/images/Sellland.png" alt="賣地" /></button>
-            <button class="action-button" data-action="dream" type="button" aria-label="圓夢" disabled><img class="action-image" src="/images/dream.png" alt="圓夢" /></button>
+            <button class="action-button" data-action="salary" type="button" aria-label="領薪"><img class="action-image" src="/images/salary.png" alt="領薪" loading="lazy" decoding="async" /></button>
+            <button class="action-button" data-action="buyStock" type="button" aria-label="買股" disabled><img class="action-image" src="/images/buystock.png" alt="買股" loading="lazy" decoding="async" /></button>
+            <button class="action-button" data-action="buyLand" type="button" aria-label="圈地" disabled><img class="action-image" src="/images/buyland.png" alt="圈地" loading="lazy" decoding="async" /></button>
+            <button class="action-button" data-action="fate" type="button" aria-label="命運" disabled><img class="action-image" src="/images/destiny.png" alt="命運" loading="lazy" decoding="async" /></button>
+            <button class="action-button" data-action="sabotage" type="button" aria-label="陷害" disabled><img class="action-image" src="/images/frame.png" alt="陷害" loading="lazy" decoding="async" /></button>
+            <button class="action-button" data-action="help" type="button" aria-label="援助" disabled><img class="action-image" src="/images/assistance.png" alt="援助" loading="lazy" decoding="async" /></button>
+            <button class="action-button" data-action="sellStock" type="button" aria-label="賣股" disabled><img class="action-image" src="/images/Sellstock.png" alt="賣股" loading="lazy" decoding="async" /></button>
+            <button class="action-button" data-action="sellLand" type="button" aria-label="賣地" disabled><img class="action-image" src="/images/Sellland.png" alt="賣地" loading="lazy" decoding="async" /></button>
+            <button class="action-button" data-action="dream" type="button" aria-label="圓夢" disabled><img class="action-image" src="/images/dream.png" alt="圓夢" loading="lazy" decoding="async" /></button>
           </div>
         </section>
 
@@ -144,16 +144,16 @@
   </main>
 
   <section id="roundAnnouncement" class="round-announcement hidden" aria-live="assertive">
-    <img class="round-announcement-image" src="/images/The%20tide%20of%20the%20times.png" alt="時代浪潮" />
+    <img class="round-announcement-image" src="/images/The%20tide%20of%20the%20times.png" alt="時代浪潮" loading="lazy" decoding="async" />
   </section>
 
   <section id="rulesViewer" class="rules-viewer hidden" aria-hidden="true" aria-label="遊戲規則">
     <div class="rules-viewer-card" role="dialog" aria-modal="true" aria-label="遊戲規則圖片">
       <button id="rulesCloseBtn" class="rules-viewer-close" type="button" aria-label="關閉遊戲規則">×</button>
       <div class="rules-viewer-page">
-        <img class="rules-viewer-image" src="/images/rules1.png" alt="遊戲規則第1頁" />
-        <img class="rules-viewer-image" src="/images/rules2.png" alt="遊戲規則第2頁" />
-        <img class="rules-viewer-image" src="/images/rules3.png" alt="遊戲規則第3頁" />
+        <img class="rules-viewer-image" src="/images/rules1.png" alt="遊戲規則第1頁" loading="lazy" decoding="async" />
+        <img class="rules-viewer-image" src="/images/rules2.png" alt="遊戲規則第2頁" loading="lazy" decoding="async" />
+        <img class="rules-viewer-image" src="/images/rules3.png" alt="遊戲規則第3頁" loading="lazy" decoding="async" />
       </div>
     </div>
   </section>
@@ -162,24 +162,24 @@
   <script src="/app.js?v=20260830-1245"></script>
   <script src="/lobby-disconnect.js?v=20260830-1818"></script>
   <script src="/room-browser.js?v=20260830-1930" data-room-browser-script="1"></script>
-  <script src="/room-controls.js?v=20260830-1321"></script>
-  <script src="/homepage-music.js?v=20260830-1945"></script>
+  <script src="/room-controls.js?v=20260830-2115"></script>
+  <script src="/homepage-music.js?v=20260830-2115"></script>
   <script src="/result-idle-exit.js?v=20260830-2032"></script>
   <script src="/age-display.js?v=20260830-1435"></script>
-  <script src="/player-status.js?v=20260830-1435"></script>
+  <script src="/player-status.js?v=20260830-2115"></script>
   <script src="/haptics.js?v=20260830-1500"></script>
   <script src="/cheer-feedback.js?v=20260830-1501"></script>
   <script src="/action-showcase.js?v=20260829-1301"></script>
   <script src="/action-result-head-fix.js?v=20260830-1412"></script>
   <script src="/game-ui-v2.js?v=20260830-1510"></script>
-  <script src="/dice-animation.js?v=20260830-1655"></script>
+  <script src="/dice-animation.js?v=20260830-2115"></script>
   <script src="/showcase-result-overrides.js?v=20260828-1905"></script>
-  <script src="/dream-result.js?v=20260830-1806"></script>
+  <script src="/dream-result.js?v=20260830-2115"></script>
   <script src="/major-event.js?v=20260830-1435"></script>
   <script src="/announcement-tone.js?v=20260827-2225"></script>
   <script src="/logo-visibility.js?v=20260827-1905"></script>
-  <script src="/ui-final-tweaks.js?v=20260829-1301"></script>
-  <script src="/rules-viewer.js?v=20260830-1715"></script>
+  <script src="/ui-final-tweaks.js?v=20260830-2115"></script>
+  <script src="/rules-viewer.js?v=20260830-2115"></script>
   <script src="/winner-profession.js?v=20260829-0004"></script>
 </body>
 </html>
