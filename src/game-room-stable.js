@@ -268,9 +268,21 @@ export class GameRoom extends CoreGameRoom {
     });
 
     player.connected = stillConnected;
+
+    // 玩家仍在等待名單（lobby）時，只要真的斷線就立即退出房間。
+    // 這同時會由 removePlayer() 自動把房主轉交給剩下的第一位玩家，
+    // 避免留下「房主（離線）」而讓整個房間無法啟程。
+    if (!stillConnected && room.phase === 'lobby') {
+      player.disconnectDeadline = null;
+      await this.removePlayer(room, player.id);
+      const latest = await this.getRoom();
+      await this.reschedule(latest);
+      return;
+    }
+
     if (stillConnected) {
       player.disconnectDeadline = null;
-    } else if (room.phase === 'lobby' || room.phase === 'profession') {
+    } else if (room.phase === 'profession') {
       player.disconnectDeadline = Date.now() + DISCONNECT_GRACE_MS;
     } else {
       player.disconnectDeadline = null;
