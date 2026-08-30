@@ -45,17 +45,17 @@
   display: none !important;
 }
 
-/* 四間房放在玩家列表原本的主要名單區域。 */
+/* 五間房放在玩家列表原本的主要名單區域，整組再往下 20px。 */
 .room-browser-list {
   position: absolute;
   left: 50%;
-  top: calc(20.5% + 5px);
+  top: calc(20.5% + 25px);
   width: 58%;
   height: 45.5%;
   display: grid;
-  grid-template-rows: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(5, minmax(0, 1fr));
   align-content: stretch;
-  gap: clamp(7px, 1vw, 12px);
+  gap: clamp(6px, .8vw, 9px);
   margin: 0;
   padding: 0;
   transform: translateX(-50%);
@@ -78,7 +78,7 @@
   min-height: 0;
   height: 100%;
   box-sizing: border-box;
-  padding: clamp(7px, 1vw, 11px) clamp(15px, 2.1vw, 22px);
+  padding: clamp(6px, .8vw, 9px) clamp(15px, 2.1vw, 22px);
   border: 1px solid rgba(191, 145, 75, .28);
   border-radius: 999px;
   background: rgba(255, 249, 236, .78);
@@ -111,16 +111,16 @@
 .room-browser-identity {
   display: grid;
   min-width: 0;
-  gap: 3px;
+  gap: 2px;
 }
 
 .room-browser-name {
   min-width: 0;
   overflow: hidden;
   color: #6d4b32;
-  font-size: clamp(21px, 2.8vw, 30px);
+  font-size: clamp(20px, 2.55vw, 28px);
   font-weight: 400;
-  line-height: 1.05;
+  line-height: 1.03;
   letter-spacing: .025em;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -131,9 +131,9 @@
   min-width: 0;
   overflow: hidden;
   color: #8c6e56;
-  font-size: clamp(13px, 1.8vw, 18px);
+  font-size: clamp(12px, 1.65vw, 17px);
   font-weight: 400;
-  line-height: 1.1;
+  line-height: 1.05;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -143,13 +143,13 @@
   align-items: center;
   justify-content: center;
   min-width: 0;
-  padding: .30em .78em;
+  padding: .28em .72em;
   border: 0;
   border-radius: 999px;
   background: linear-gradient(180deg, rgba(210, 167, 91, .96), rgba(185, 137, 67, .96));
   color: #fffaf0;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.30);
-  font-size: clamp(14px, 1.8vw, 19px);
+  font-size: clamp(13px, 1.65vw, 18px);
   font-weight: 400;
   letter-spacing: .035em;
   white-space: nowrap;
@@ -242,26 +242,26 @@
 
   .room-browser-list {
     width: 66%;
-    top: calc(19.8% + 5px);
+    top: calc(19.8% + 25px);
     height: 46%;
-    gap: 7px;
+    gap: 6px;
   }
 
   .room-browser-item {
-    padding: 6px 14px;
+    padding: 5px 14px;
   }
 
   .room-browser-name {
-    font-size: clamp(19px, 4.6vw, 27px);
+    font-size: clamp(18px, 4.25vw, 25px);
   }
 
   .room-browser-host {
-    font-size: clamp(12px, 3vw, 16px);
+    font-size: clamp(11px, 2.8vw, 15px);
   }
 
   .room-browser-count {
-    padding: .28em .72em;
-    font-size: clamp(13px, 3.2vw, 17px);
+    padding: .26em .68em;
+    font-size: clamp(12px, 3vw, 16px);
   }
 
   #roomBrowserBackBtn {
@@ -287,25 +287,25 @@
 
   .room-browser-list {
     width: 68%;
-    top: calc(19.4% + 5px);
+    top: calc(19.4% + 25px);
     height: 46.5%;
-    gap: 6px;
+    gap: 5px;
   }
 
   .room-browser-item {
-    padding: 5px 12px;
+    padding: 4px 12px;
   }
 
   .room-browser-name {
-    font-size: clamp(18px, 5.1vw, 24px);
+    font-size: clamp(17px, 4.7vw, 22px);
   }
 
   .room-browser-host {
-    font-size: clamp(11px, 3.4vw, 15px);
+    font-size: clamp(10px, 3.1vw, 14px);
   }
 
   .room-browser-count {
-    font-size: clamp(12px, 3.6vw, 16px);
+    font-size: clamp(11px, 3.35vw, 15px);
   }
 
   #roomBrowserBackBtn {
