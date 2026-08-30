@@ -24,6 +24,9 @@ jobs:
       - name: Cloudflare smoke checks
         run: npm run test:cf
 
+      - name: Production hardening regression
+        run: node tests/production-hardening.test.mjs
+
       - name: Round 21 triple-dice regression
         run: node tests/round21-triple-dice.test.mjs
 
