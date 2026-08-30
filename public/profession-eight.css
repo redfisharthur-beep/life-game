@@ -1,12 +1,12 @@
-/* 八職業版：2 欄 × 4 列。無膠囊框、等距排列、垂直更緊湊。 */
+/* 八職業版：2 欄 × 4 列。整組右移、垂直更緊湊、圖片與文字放大。 */
 .profession-grid {
-  left: 4.2%;
-  top: 15.2%;
-  width: 91.6%;
-  height: 72.8%;
+  left: 6.4%;
+  top: 16.4%;
+  width: 88.8%;
+  height: 67.2%;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(4, minmax(0, 1fr));
-  column-gap: 1.6%;
+  column-gap: 2.2%;
   row-gap: 0;
 }
 
@@ -15,8 +15,8 @@
 .profession-card.selected,
 .profession-card:focus,
 .profession-card:focus-visible {
-  grid-template-columns: 44% 56%;
-  padding: .8% 2.8%;
+  grid-template-columns: 46% 54%;
+  padding: .3% 1.2%;
   border: 0 !important;
   border-radius: 0 !important;
   outline: 0 !important;
@@ -31,45 +31,50 @@
   box-shadow: none !important;
 }
 
+/* 統一 8 張卡片座標，覆蓋舊 profession-position.css 對第 5、6 張的特殊位移。 */
 .profession-visual,
-.profession-card:nth-child(even) .profession-visual {
-  transform: translate(0, 0);
+.profession-card:nth-child(even) .profession-visual,
+.profession-card:nth-child(5) .profession-visual,
+.profession-card:nth-child(6) .profession-visual {
+  transform: translate(.6em, 0) !important;
 }
 
 .profession-image {
-  width: 102%;
-  height: 102%;
-  transform: scale(1.02);
+  width: 114%;
+  height: 114%;
+  transform: scale(1.08);
 }
 
 .profession-detail,
-.profession-card:nth-child(even) .profession-detail {
-  height: 94%;
-  transform: translate(.25em, 0);
+.profession-card:nth-child(even) .profession-detail,
+.profession-card:nth-child(5) .profession-detail,
+.profession-card:nth-child(6) .profession-detail {
+  height: 100%;
+  transform: translate(1em, 0) !important;
 }
 
 .profession-abilities {
-  gap: .2em;
+  gap: .26em;
 }
 
 .ability-item {
-  gap: .34em;
-  font-size: clamp(10px, 1.38vw, 14px);
+  gap: .42em;
+  font-size: clamp(11.5px, 1.58vw, 16px);
 }
 
 .ability-grade {
-  width: clamp(22px, 3.1vw, 32px);
-  height: clamp(20px, 2.7vw, 28px);
-  font-size: clamp(10px, 1.38vw, 13.6px);
+  width: clamp(24px, 3.3vw, 35px);
+  height: clamp(22px, 2.9vw, 30px);
+  font-size: clamp(11.5px, 1.56vw, 15.5px);
 }
 
 @media (max-width: 760px) {
   .profession-grid {
-    left: 4%;
-    top: 15%;
-    width: 92%;
-    height: 73.2%;
-    column-gap: 1.2%;
+    left: 6.1%;
+    top: 16.2%;
+    width: 89.2%;
+    height: 67.6%;
+    column-gap: 1.8%;
     row-gap: 0;
   }
 
@@ -78,47 +83,53 @@
   .profession-card.selected,
   .profession-card:focus,
   .profession-card:focus-visible {
-    grid-template-columns: 43% 57%;
-    padding: .6% 2%;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    grid-template-columns: 45% 55%;
+    padding: .2% .8%;
+  }
+
+  .profession-visual,
+  .profession-card:nth-child(even) .profession-visual,
+  .profession-card:nth-child(5) .profession-visual,
+  .profession-card:nth-child(6) .profession-visual {
+    transform: translate(.45em, 0) !important;
   }
 
   .profession-image {
-    width: 104%;
-    height: 104%;
-    transform: scale(1.02);
+    width: 116%;
+    height: 116%;
+    transform: scale(1.08);
   }
 
   .profession-detail,
-  .profession-card:nth-child(even) .profession-detail {
-    transform: translate(.15em, 0);
+  .profession-card:nth-child(even) .profession-detail,
+  .profession-card:nth-child(5) .profession-detail,
+  .profession-card:nth-child(6) .profession-detail {
+    transform: translate(.72em, 0) !important;
   }
 
   .profession-abilities {
-    gap: .12em;
+    gap: .18em;
   }
 
   .ability-item {
-    gap: .28em;
-    font-size: clamp(8.8px, 2.28vw, 11.8px);
+    gap: .32em;
+    font-size: clamp(9.8px, 2.5vw, 12.8px);
   }
 
   .ability-grade {
-    width: clamp(19px, 4.6vw, 27px);
-    height: clamp(18px, 4vw, 24px);
-    font-size: clamp(8.8px, 2.22vw, 11.2px);
+    width: clamp(21px, 4.9vw, 29px);
+    height: clamp(19px, 4.3vw, 25px);
+    font-size: clamp(9.8px, 2.44vw, 12.2px);
   }
 }
 
 @media (max-width: 430px) {
   .profession-grid {
-    left: 3.8%;
-    top: 14.8%;
-    width: 92.4%;
-    height: 73.6%;
-    column-gap: .8%;
+    left: 5.8%;
+    top: 16%;
+    width: 89.6%;
+    height: 68%;
+    column-gap: 1.2%;
   }
 
   .profession-card,
@@ -126,37 +137,42 @@
   .profession-card.selected,
   .profession-card:focus,
   .profession-card:focus-visible {
-    grid-template-columns: 42% 58%;
-    padding: .4% 1.4%;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    grid-template-columns: 44% 56%;
+    padding: .1% .5%;
+  }
+
+  .profession-visual,
+  .profession-card:nth-child(even) .profession-visual,
+  .profession-card:nth-child(5) .profession-visual,
+  .profession-card:nth-child(6) .profession-visual {
+    transform: translate(.3em, 0) !important;
   }
 
   .profession-image {
-    width: 106%;
-    height: 106%;
-    transform: scale(1.01);
+    width: 118%;
+    height: 118%;
+    transform: scale(1.07);
   }
 
   .profession-detail,
-  .profession-card:nth-child(even) .profession-detail {
-    transform: translate(.08em, 0);
+  .profession-card:nth-child(even) .profession-detail,
+  .profession-card:nth-child(5) .profession-detail,
+  .profession-card:nth-child(6) .profession-detail {
+    transform: translate(.5em, 0) !important;
   }
 
   .profession-abilities {
-    gap: .08em;
+    gap: .12em;
   }
 
   .ability-item {
-    gap: .22em;
-    font-size: clamp(8px, 2.48vw, 10.6px);
+    gap: .26em;
+    font-size: clamp(8.8px, 2.72vw, 11.4px);
   }
 
   .ability-grade {
-    width: clamp(18px, 4.7vw, 23px);
-    height: clamp(17px, 4.3vw, 21px);
-    border-radius: 5px;
-    font-size: clamp(8px, 2.42vw, 10.2px);
+    width: clamp(19px, 5vw, 25px);
+    height: clamp(18px, 4.5vw, 22px);
+    font-size: clamp(8.8px, 2.66vw, 11px);
   }
 }
