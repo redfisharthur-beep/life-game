@@ -66,11 +66,11 @@
   letter-spacing: .05em;
 }
 
-/* 玩家名單：整體上移並固定預留 6 個玩家列的位置。 */
+/* 玩家名單：固定預留 6 個玩家列的位置；依目前基準整體再往下 5px。 */
 .room-mode #playerList {
   position: absolute;
   left: 50%;
-  top: 20.5%;
+  top: calc(20.5% + 5px);
   width: 58%;
   height: 45.5%;
   display: grid;
@@ -203,7 +203,7 @@
 
   .room-mode #playerList {
     width: 66%;
-    top: 19.8%;
+    top: calc(19.8% + 5px);
     height: 46%;
     gap: 5px;
   }
@@ -239,7 +239,7 @@
 
   .room-mode #playerList {
     width: 68%;
-    top: 19.4%;
+    top: calc(19.4% + 5px);
     height: 46.5%;
     gap: 4px;
   }
