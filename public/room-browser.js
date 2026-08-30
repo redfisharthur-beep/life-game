@@ -73,10 +73,12 @@
     });
   }
 
-  async function fetchRooms() {
+  async function fetchRooms(background = false) {
     if (loading) return;
-    setBusy(true);
-    setBrowserMessage('');
+    if (!background) {
+      setBusy(true);
+      setBrowserMessage('');
+    }
     try {
       const response = await fetch('/api/rooms', { cache: 'no-store' });
       const result = await response.json();
@@ -84,56 +86,92 @@
       renderRooms(result.rooms || []);
     } catch (error) {
       console.error('load rooms failed', error);
-      roomBrowserList.innerHTML = '<div class="room-browser-empty">房間列表讀取失敗</div>';
+      // 背景更新失敗時保留上一份畫面，不要整頁閃成錯誤訊息。
+      if (!background && !roomBrowserList.children.length) {
+        roomBrowserList.innerHTML = '<div class="room-browser-empty">房間列表讀取失敗</div>';
+      }
     } finally {
-      setBusy(false);
+      if (!background) setBusy(false);
     }
   }
 
+  function findRoomButton(code) {
+    return Array.from(roomBrowserList.querySelectorAll('.room-browser-item'))
+      .find((button) => button.dataset.roomCode === code) || null;
+  }
+
+  function createRoomButton(code) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'room-browser-item';
+    button.dataset.roomCode = code;
+
+    const identity = document.createElement('span');
+    identity.className = 'room-browser-identity';
+
+    const title = document.createElement('strong');
+    title.className = 'room-browser-name';
+    identity.appendChild(title);
+
+    const count = document.createElement('span');
+    count.className = 'room-browser-count';
+
+    button.append(identity, count);
+    button.addEventListener('click', () => {
+      if (button.dataset.available !== 'false') joinRoom(button.dataset.roomCode);
+    });
+    return button;
+  }
+
   function renderRooms(rooms) {
-    roomBrowserList.innerHTML = '';
+    const seen = new Set();
+    roomBrowserList.querySelector('.room-browser-empty')?.remove();
 
     rooms.forEach((room) => {
+      const code = String(room.code || '');
+      if (!code) return;
+      seen.add(code);
+
       const available = room.available !== false;
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'room-browser-item';
-      button.dataset.roomCode = room.code;
+      const button = findRoomButton(code) || createRoomButton(code);
+      const identity = button.querySelector('.room-browser-identity');
+      const title = button.querySelector('.room-browser-name');
+      const count = button.querySelector('.room-browser-count');
+
+      button.dataset.roomCode = code;
       button.dataset.available = String(available);
       button.disabled = !available;
-      if (!available) button.classList.add('unavailable');
+      button.classList.toggle('unavailable', !available);
 
-      const identity = document.createElement('span');
-      identity.className = 'room-browser-identity';
-
-      const title = document.createElement('strong');
-      title.className = 'room-browser-name';
-      title.textContent = `${room.icon || '✨'} ${room.name || room.code}`;
-      identity.appendChild(title);
+      const nextTitle = `${room.icon || '✨'} ${room.name || room.code}`;
+      if (title && title.textContent !== nextTitle) title.textContent = nextTitle;
 
       let hostText = '';
-      if (room.started) {
-        hostText = '遊戲進行中';
-      } else if (room.full) {
-        hostText = '房間已滿';
-      } else if (room.hostName) {
-        hostText = `房主：${room.hostName}`;
-      }
+      if (room.started) hostText = '遊戲進行中';
+      else if (room.full) hostText = '房間已滿';
+      else if (room.hostName) hostText = `房主：${room.hostName}`;
 
+      let host = identity?.querySelector('.room-browser-host');
       if (hostText) {
-        const host = document.createElement('span');
-        host.className = 'room-browser-host';
-        host.textContent = hostText;
-        identity.appendChild(host);
+        if (!host && identity) {
+          host = document.createElement('span');
+          host.className = 'room-browser-host';
+          identity.appendChild(host);
+        }
+        if (host && host.textContent !== hostText) host.textContent = hostText;
+      } else {
+        host?.remove();
       }
 
-      const count = document.createElement('span');
-      count.className = 'room-browser-count';
-      count.textContent = `${Number(room.count || 0)} / ${Number(room.maxPlayers || 6)}`;
+      const nextCount = `${Number(room.count || 0)} / ${Number(room.maxPlayers || 6)}`;
+      if (count && count.textContent !== nextCount) count.textContent = nextCount;
 
-      button.append(identity, count);
-      if (available) button.addEventListener('click', () => joinRoom(room.code));
+      // appendChild 對既有節點只會維持/調整順序，不會銷毀重建，因此沒有閃爍。
       roomBrowserList.appendChild(button);
+    });
+
+    roomBrowserList.querySelectorAll('.room-browser-item').forEach((button) => {
+      if (!seen.has(button.dataset.roomCode)) button.remove();
     });
   }
 
@@ -239,6 +277,6 @@
   roomRulesOpenBtn?.setAttribute('title', '遊戲規則');
 
   setInterval(() => {
-    if (!roomBrowserPanel.classList.contains('hidden') && !loading) fetchRooms();
+    if (!roomBrowserPanel.classList.contains('hidden') && !loading) fetchRooms(true);
   }, 4000);
 })();
