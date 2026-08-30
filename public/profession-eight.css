@@ -31,7 +31,6 @@
   box-shadow: none !important;
 }
 
-/* 統一 8 張卡片座標，覆蓋舊 profession-position.css 對第 5、6 張的特殊位移。 */
 .profession-visual,
 .profession-card:nth-child(even) .profession-visual,
 .profession-card:nth-child(5) .profession-visual,
@@ -45,13 +44,13 @@
   transform: scale(1.08);
 }
 
-/* 評級區往左約 30px，讓文字與人物圖片的視覺間距更接近 30px。 */
+/* 薪資／選股／圈地／圓夢與 SABC 評級整排，在目前基準上往右 30px。 */
 .profession-detail,
 .profession-card:nth-child(even) .profession-detail,
 .profession-card:nth-child(5) .profession-detail,
 .profession-card:nth-child(6) .profession-detail {
   height: 100%;
-  transform: translate(-.9em, 0) !important;
+  transform: translate(calc(-.9em + 30px), 0) !important;
 }
 
 .profession-abilities {
@@ -105,7 +104,7 @@
   .profession-card:nth-child(even) .profession-detail,
   .profession-card:nth-child(5) .profession-detail,
   .profession-card:nth-child(6) .profession-detail {
-    transform: translate(-.8em, 0) !important;
+    transform: translate(calc(-.8em + 30px), 0) !important;
   }
 
   .profession-abilities {
@@ -159,7 +158,7 @@
   .profession-card:nth-child(even) .profession-detail,
   .profession-card:nth-child(5) .profession-detail,
   .profession-card:nth-child(6) .profession-detail {
-    transform: translate(-.65em, 0) !important;
+    transform: translate(calc(-.65em + 30px), 0) !important;
   }
 
   .profession-abilities {
