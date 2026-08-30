@@ -123,6 +123,28 @@ const PROFESSIONS = [
       { label: '圓夢', grade: 'C' },
     ],
   },
+  {
+    id: 'civilServant',
+    name: '公務員',
+    image: '/images/civil%20servant.png',
+    abilities: [
+      { label: '薪資', grade: 'B' },
+      { label: '選股', grade: 'A' },
+      { label: '圈地', grade: 'A' },
+      { label: '圓夢', grade: 'A' },
+    ],
+  },
+  {
+    id: 'artist',
+    name: '藝人',
+    image: '/images/artist.png',
+    abilities: [
+      { label: '薪資', grade: 'A' },
+      { label: '選股', grade: 'B' },
+      { label: '圈地', grade: 'C' },
+      { label: '圓夢', grade: 'S' },
+    ],
+  },
 ];
 
 const PROFESSION_BY_ID = Object.fromEntries(
@@ -181,7 +203,7 @@ function clearSession({ keepName = true } = {}) {
   myPlayerId = null;
 }
 
-function getStoredSession() {
+function getSavedSession() {
   const roomCode = localStorage.getItem(SESSION_KEYS.roomCode);
   const playerId = localStorage.getItem(SESSION_KEYS.playerId);
   const reconnectToken = localStorage.getItem(SESSION_KEYS.reconnectToken);
@@ -189,73 +211,34 @@ function getStoredSession() {
   return { roomCode, playerId, reconnectToken };
 }
 
-function getPlayerName() {
-  return playerNameInput.value.trim();
+function showPanel(panel) {
+  [entryPanel, roomPanel, professionPanel, gamePanel].forEach((candidate) => {
+    candidate.classList.toggle('hidden', candidate !== panel);
+  });
 }
 
-function hideAllPanels() {
-  entryPanel.classList.add('hidden');
-  roomPanel.classList.add('hidden');
-  professionPanel.classList.add('hidden');
-  gamePanel.classList.add('hidden');
-}
-
-function showEntry(message = '', type = '') {
-  currentRoom = null;
-  hideAllPanels();
-  entryPanel.classList.remove('hidden');
-  setMessage(message, type);
-  setLaunchMessage('');
-  setProfessionMessage('');
-}
-
-function showLobby(room) {
-  currentRoom = room;
-  hideAllPanels();
-  roomPanel.classList.remove('hidden');
-  renderRoom(room);
-}
-
-function showProfession(room) {
-  currentRoom = room;
-  hideAllPanels();
-  professionPanel.classList.remove('hidden');
-  renderProfessions(room);
-}
-
-function showGame(room) {
-  currentRoom = room;
-  hideAllPanels();
-  gamePanel.classList.remove('hidden');
-  renderGame(room);
-}
-
-function applyRoomView(room) {
+function updateServerState(room) {
   if (!room) return;
   updateServerClock(room);
   currentRoom = room;
-
+  const lobbyCard = document.getElementById('lobbyCard');
   if (room.phase === 'game' || room.phase === 'finished') {
-    showGame(room);
-  } else if (room.phase === 'profession') {
-    showProfession(room);
+    lobbyCard?.classList.add('game-mode');
   } else {
-    showLobby(room);
+    lobbyCard?.classList.remove('game-mode');
   }
 }
 
 function renderRoom(room) {
   if (!room) return;
-
-  updateServerClock(room);
-  currentRoom = room;
+  updateServerState(room);
   playerCountEl.textContent = `${room.players.length} / ${room.maxPlayers}`;
-
   playerListEl.innerHTML = '';
+
   room.players.forEach((player) => {
-    const row = document.createElement('div');
+    const row = document.createElement('li');
     row.className = 'player-row';
-    if (!player.connected) row.classList.add('offline');
+    if (player.id === myPlayerId) row.classList.add('me');
 
     const name = document.createElement('span');
     name.className = 'player-name';
@@ -429,265 +412,204 @@ function renderResults(room) {
 
 function renderAcceleration(room) {
   if (!roundAnnouncementEl) return;
-  if (accelerationTimer) {
-    clearTimeout(accelerationTimer);
-    accelerationTimer = null;
-  }
+  const shouldShow = room?.phase === 'game'
+    && Number(room?.game?.round || 0) === 16
+    && Number(room?.game?.transitionUntil || 0) > serverNow();
 
-  const until = Number(room?.game?.transitionUntil || 0);
-  const remaining = until - serverNow();
-  if (room?.game?.round !== 20 || remaining <= 0) {
-    roundAnnouncementEl.classList.add('hidden');
-    return;
-  }
-
-  roundAnnouncementEl.classList.remove('hidden');
-  accelerationTimer = setTimeout(() => {
-    roundAnnouncementEl.classList.add('hidden');
-  }, Math.max(0, remaining));
+  roundAnnouncementEl.classList.toggle('hidden', !shouldShow);
+  if (shouldShow) roundAnnouncementEl.textContent = '人生加速！從現在開始每回合擲2顆骰子！';
 }
 
 function renderGame(room) {
   if (!room?.game) return;
-
-  updateServerClock(room);
-  currentRoom = room;
+  updateServerState(room);
   const game = room.game;
   const me = room.players.find((player) => player.id === myPlayerId);
+
+  stageNameEl.textContent = game.stageName || '';
+  roundLabelEl.textContent = `${game.round} / ${game.totalRounds}`;
+  stockPriceEl.textContent = Number(game.stockPrice || 0).toFixed(2);
+  landPriceEl.textContent = Number(game.landPrice || 0).toFixed(2);
+  myNameEl.textContent = me?.name || '';
+  myProfessionEl.textContent = PROFESSION_BY_ID[me?.profession]?.name || '';
+  myCashEl.textContent = formatAsset(me?.cash);
+  myStocksEl.textContent = formatAsset(me?.stocks);
+  myLandEl.textContent = formatAsset(me?.land);
+  myHappinessEl.textContent = Number(me?.happiness || 0).toFixed(2);
+
   const currentPlayer = room.players.find((player) => player.id === game.currentPlayerId);
-  const finished = room.phase === 'finished' || game.finished;
-
-  gamePanel.classList.toggle('finished-mode', finished);
-  stageNameEl.textContent = game.stageName;
-  roundLabelEl.textContent = `${game.round}/${game.totalRounds}`;
-  stockPriceEl.textContent = Number(game.stockPrice).toFixed(2);
-  landPriceEl.textContent = Number(game.landPrice).toFixed(2);
-
-  if (me) {
-    myNameEl.textContent = me.name;
-    myProfessionEl.textContent = PROFESSION_BY_ID[me.profession]?.name || '未選職業';
-    myCashEl.textContent = Math.round(me.cash || 0);
-    myStocksEl.textContent = Number(me.stocks || 0).toLocaleString('zh-TW', { maximumFractionDigits: 1 });
-    myLandEl.textContent = Number(me.land || 0).toLocaleString('zh-TW', { maximumFractionDigits: 1 });
-    myHappinessEl.textContent = Number(me.happiness || 0).toFixed(2);
-  }
-
-  turnOrderEl.innerHTML = '';
-  game.turnOrder.forEach((playerId, index) => {
-    const player = room.players.find((item) => item.id === playerId);
-    if (!player) return;
-
-    const chip = document.createElement('span');
-    chip.className = 'turn-chip';
-    chip.textContent = player.name;
-    if (playerId === game.currentPlayerId) chip.classList.add('current');
-    if (index < game.turnIndex) chip.classList.add('done');
-    if (playerId === myPlayerId) chip.classList.add('me');
-    turnOrderEl.appendChild(chip);
-  });
-
-  const isMyTurn = game.currentPlayerId === myPlayerId && room.phase === 'game' && !game.finished;
-
-  if (finished) {
-    turnNoticeEl.textContent = '30 回合完成';
-  } else if (isMyTurn) {
-    turnNoticeEl.textContent = '輪到你了！請選擇行動';
-  } else {
-    turnNoticeEl.textContent = currentPlayer ? `等待 ${currentPlayer.name} 行動…` : '等待下一回合…';
-  }
+  const myTurn = game.currentPlayerId === myPlayerId && room.phase === 'game';
+  const busy = Number(game.showcaseUntil || 0) > serverNow()
+    || Number(game.transitionUntil || 0) > serverNow()
+    || Number(game.majorEventUntil || 0) > serverNow();
 
   actionButtons.forEach((button) => {
     const action = button.dataset.action;
-    let available = ACTIVE_ACTIONS.has(action);
-    if ((action === 'sabotage' || action === 'help') && room.players.length < 2) available = false;
-    button.disabled = !(available && isMyTurn && !game.showcaseUntil && !game.transitionUntil);
+    button.disabled = !myTurn || busy || !ACTIVE_ACTIONS.has(action);
   });
 
-  if (actionHintEl) actionHintEl.textContent = '';
-  gameEventEl.textContent = game.lastEvent?.text || '人生旅程進行中…';
-
-  if (finished) {
-    renderResults(room);
-  } else if (gameResultsEl) {
-    gameResultsEl.classList.add('hidden');
+  if (room.phase === 'finished') {
+    turnNoticeEl.textContent = '人生旅程完成';
+    turnTimerEl.textContent = '0';
+  } else if (busy) {
+    turnNoticeEl.textContent = '結果揭曉中…';
+  } else if (myTurn) {
+    turnNoticeEl.textContent = '輪到你行動！';
+  } else {
+    turnNoticeEl.textContent = currentPlayer ? `等待 ${currentPlayer.name} 行動…` : '準備下一回合…';
   }
 
+  turnOrderEl.innerHTML = '';
+  (game.turnOrder || []).forEach((playerId, index) => {
+    const player = room.players.find((item) => item.id === playerId);
+    if (!player) return;
+    const item = document.createElement('span');
+    item.textContent = player.name;
+    if (index === game.turnIndex) item.classList.add('active');
+    turnOrderEl.appendChild(item);
+  });
+
+  const event = game.lastEvent;
+  gameEventEl.textContent = event?.text || '';
+  renderResults(room);
   renderAcceleration(room);
-  updateCountdown();
 }
 
-function updateCountdown() {
-  if (!currentRoom?.game || currentRoom.phase !== 'game' || !currentRoom.game.deadline) {
-    turnTimerEl.textContent = '--';
+function renderByPhase(room) {
+  if (!room) return;
+  if (room.phase === 'lobby') {
+    showPanel(roomPanel);
+    renderRoom(room);
+  } else if (room.phase === 'profession') {
+    showPanel(professionPanel);
+    renderProfessions(room);
+  } else if (room.phase === 'game' || room.phase === 'finished') {
+    showPanel(gamePanel);
+    renderGame(room);
+  }
+}
+
+async function joinGame() {
+  const name = playerNameInput.value.trim();
+  if (!name) {
+    setMessage('請先輸入名字', 'error');
     return;
   }
 
-  const remainingMs = Math.max(0, Number(currentRoom.game.deadline) - serverNow());
-  turnTimerEl.textContent = String(Math.ceil(remainingMs / 1000));
-}
+  joinGameBtn.disabled = true;
+  setMessage('正在尋找人生夥伴…');
 
-function chooseProfession(professionId) {
-  if (currentRoom?.phase !== 'profession') return;
-
-  setProfessionMessage('');
-  socket.emit('room:chooseProfession', { profession: professionId }, (result) => {
+  socket.emit('room:autoJoin', { name }, (result) => {
+    joinGameBtn.disabled = false;
     if (!result?.ok) {
-      setProfessionMessage(result?.message || '目前無法選擇這個職業。', 'error');
+      setMessage(result?.message || '加入失敗，請稍後再試', 'error');
       return;
     }
-    applyRoomView(result.room);
+    saveSession(result.session);
+    setMessage('');
+    renderByPhase(result.room);
   });
 }
 
-function submitGameAction(action) {
-  if (!currentRoom?.game || currentRoom.phase !== 'game') return;
-
-  socket.emit('game:action', {
-    action,
-    turnId: currentRoom.game.turnId,
-  }, (result) => {
+function startGame() {
+  startGameBtn.disabled = true;
+  socket.emit('room:start', {}, (result) => {
     if (!result?.ok) {
-      gameEventEl.textContent = result?.message || '目前無法完成這個行動。';
-      if (result?.room) applyRoomView(result.room);
+      startGameBtn.disabled = false;
+      setLaunchMessage(result?.message || '無法啟程', 'error');
       return;
     }
-    applyRoomView(result.room);
+    setLaunchMessage('');
+    renderByPhase(result.room);
   });
 }
 
-function withBusy(button, task) {
-  if (button.disabled) return;
-  button.disabled = true;
-  Promise.resolve(task()).finally(() => {
-    if (currentRoom && currentRoom.phase === 'lobby') renderRoom(currentRoom);
+function chooseProfession(profession) {
+  socket.emit('room:chooseProfession', { profession }, (result) => {
+    if (!result?.ok) {
+      setProfessionMessage(result?.message || '選擇職業失敗', 'error');
+      return;
+    }
+    renderByPhase(result.room);
   });
 }
 
-function tryResumeSession() {
-  const stored = getStoredSession();
-  if (!stored || !socket.connected || resumeInFlight) return;
-  if (lastResumeSocketId === socket.id) return;
+function performAction(action) {
+  if (!currentRoom?.game?.turnId) return;
+  socket.emit('game:action', { action, turnId: currentRoom.game.turnId }, (result) => {
+    if (!result?.ok) {
+      if (result?.message) gameEventEl.textContent = result.message;
+      return;
+    }
+    renderByPhase(result.room);
+  });
+}
 
-  lastResumeSocketId = socket.id;
+function restartGame() {
+  socket.emit('game:restart', {}, (result) => {
+    if (!result?.ok) {
+      if (result?.message) gameEventEl.textContent = result.message;
+      return;
+    }
+    renderByPhase(result.room);
+  });
+}
+
+function leaveRoom() {
+  socket.emit('room:leave', {}, () => {
+    clearSession();
+    currentRoom = null;
+    showPanel(entryPanel);
+    setMessage('已離開房間');
+  });
+}
+
+function tryResume() {
+  if (resumeInFlight) return;
+  const session = getSavedSession();
+  if (!session) return;
   resumeInFlight = true;
-  socket.emit('room:resume', stored, (result) => {
+
+  socket.emit('room:resume', session, (result) => {
     resumeInFlight = false;
     if (!result?.ok) {
       clearSession();
-      showEntry('上一局已結束或伺服器已重新啟動，請重新加入。', 'error');
+      showPanel(entryPanel);
       return;
     }
-
-    saveSession(result.session);
-    applyRoomView(result.room);
+    saveSession(result.session || { ...session, name: localStorage.getItem(SESSION_KEYS.playerName) });
+    renderByPhase(result.room);
   });
 }
+
+joinGameBtn.addEventListener('click', joinGame);
+playerNameInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') joinGame();
+});
+startGameBtn.addEventListener('click', startGame);
+leaveRoomBtn.addEventListener('click', leaveRoom);
+restartGameBtn?.addEventListener('click', restartGame);
+leaveGameBtn?.addEventListener('click', leaveRoom);
+actionButtons.forEach((button) => {
+  button.addEventListener('click', () => performAction(button.dataset.action));
+});
 
 socket.on('connect', () => {
-  lastResumeSocketId = null;
-  setTimeout(tryResumeSession, 0);
+  if (socket.id === lastResumeSocketId) return;
+  lastResumeSocketId = socket.id;
+  tryResume();
 });
 
-socket.on('server:ready', () => {
-  tryResumeSession();
-});
+socket.on('room:update', (room) => renderByPhase(room));
+socket.on('room:started', (room) => renderByPhase(room));
 
-socket.on('room:update', (room) => {
-  if (currentRoom && room.code === currentRoom.code) applyRoomView(room);
-});
+setInterval(() => {
+  if (!currentRoom?.game || currentRoom.phase !== 'game') return;
+  const deadline = Number(currentRoom.game.deadline || 0);
+  const remaining = Math.max(0, Math.ceil((deadline - serverNow()) / 1000));
+  turnTimerEl.textContent = String(remaining);
+  renderAcceleration(currentRoom);
+}, 250);
 
-socket.on('room:started', (room) => {
-  if (currentRoom && room.code === currentRoom.code) applyRoomView(room);
-});
-
-joinGameBtn.addEventListener('click', () => {
-  const name = getPlayerName();
-  setMessage('');
-
-  if (!name) {
-    setMessage('請輸入暱稱', 'error');
-    playerNameInput.focus();
-    return;
-  }
-
-  localStorage.setItem(SESSION_KEYS.playerName, name);
-  withBusy(joinGameBtn, () => new Promise((resolve) => {
-    socket.emit('room:autoJoin', { name }, (result) => {
-      if (!result?.ok) {
-        setMessage(result?.message || '加入遊戲失敗。', 'error');
-        resolve();
-        return;
-      }
-
-      saveSession(result.session);
-      showLobby(result.room);
-      resolve();
-    });
-  }));
-});
-
-startGameBtn.addEventListener('click', () => {
-  if (!currentRoom || myPlayerId !== currentRoom.hostId) return;
-
-  if (currentRoom.players.length < 2) {
-    setLaunchMessage('至少需要2位玩家才能啟程。', 'error');
-    return;
-  }
-
-  withBusy(startGameBtn, () => new Promise((resolve) => {
-    setLaunchMessage('');
-    socket.emit('room:start', (result) => {
-      if (!result?.ok) {
-        setLaunchMessage(result?.message || '目前無法啟程。', 'error');
-        renderRoom(currentRoom);
-        resolve();
-        return;
-      }
-      applyRoomView(result.room);
-      resolve();
-    });
-  }));
-});
-
-playerNameInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter') joinGameBtn.click();
-});
-
-leaveRoomBtn.addEventListener('click', () => {
-  socket.emit('room:leave', () => {
-    clearSession();
-    showEntry();
-  });
-});
-
-if (leaveGameBtn) {
-  leaveGameBtn.addEventListener('click', () => {
-    socket.emit('room:leave', () => {
-      clearSession();
-      showEntry();
-    });
-  });
-}
-
-if (restartGameBtn) {
-  restartGameBtn.addEventListener('click', () => {
-    if (!currentRoom || myPlayerId !== currentRoom.hostId) return;
-    restartGameBtn.disabled = true;
-    socket.emit('game:restart', (result) => {
-      if (!result?.ok) {
-        restartGameBtn.disabled = false;
-        gameEventEl.textContent = result?.message || '目前無法重新開始。';
-        return;
-      }
-      applyRoomView(result.room);
-    });
-  });
-}
-
-actionButtons.forEach((button) => {
-  button.addEventListener('click', () => submitGameAction(button.dataset.action));
-});
-
-setInterval(updateCountdown, 200);
-
-if (socket.connected) setTimeout(tryResumeSession, 0);
+showPanel(entryPanel);
+if (socket.connected) tryResume();
