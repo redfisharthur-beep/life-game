@@ -18,6 +18,8 @@
     office: '/images/officehead.png',
     athlete: '/images/athleteghead.png',
     rich: '/images/richghead.png',
+    civilServant: '/images/civil%20servanthead.png',
+    artist: '/images/artisthead.png',
   };
 
   const FALLBACK_IMAGES = {
@@ -27,18 +29,22 @@
     office: '/images/office.png',
     athlete: '/images/athlete.png',
     rich: '/images/rich.png',
+    civilServant: '/images/civil%20servant.png',
+    artist: '/images/artist.png',
   };
 
-  const FATE_RESULTS = [
-    { label: '中樂透', image: '/images/Lotto.png' },
+  const NEGATIVE_FATE_IMAGES = [
     { label: '花錢消災', image: '/images/Spendmoney.png' },
-    { label: '股神降臨', image: '/images/Investment%20Guru.png' },
     { label: '黑天鵝', image: '/images/Black%20Swan.png' },
-    { label: '政策利多', image: '/images/Favorable%20policies.png' },
     { label: '打房政策', image: '/images/measures%20to%20curb%20the%20property%20market.png' },
-    { label: '社福救濟', image: '/images/Social%20welfare.png' },
-    { label: '幸福降臨', image: '/images/Unbelievable.png' },
     { label: '人生低潮', image: '/images/Unlucky.png' },
+  ];
+
+  const POSITIVE_FATE_IMAGES = [
+    { label: '中樂透', image: '/images/Lotto.png' },
+    { label: '股神降臨', image: '/images/Investment%20Guru.png' },
+    { label: '政策利多', image: '/images/Favorable%20policies.png' },
+    { label: '幸福降臨', image: '/images/Unbelievable.png' },
   ];
 
   const CHOICE_MS = 1500;
@@ -73,7 +79,6 @@
       overlay.style.removeProperty('--showcase-top');
       return;
     }
-
     const rect = actionGrid.getBoundingClientRect();
     const minimumRemainingHeight = 220;
     const top = Math.max(0, Math.min(rect.top - 8, window.innerHeight - minimumRemainingHeight));
@@ -101,9 +106,7 @@
   function hideShowcase() {
     clearStageTimers();
     overlay.classList.add('hidden');
-    setChoiceStageMode(false);
-    setDiceStageMode(false);
-    overlay.classList.remove('result-stage-active');
+    overlay.classList.remove('choice-stage-active', 'dice-stage-active', 'result-stage-active');
     restoreCurrentTurnIfReady();
   }
 
@@ -113,278 +116,104 @@
     });
   }
 
-  function setDiceStageMode(enabled) {
-    overlay.classList.toggle('dice-stage-active', Boolean(enabled));
-  }
-
-  function setChoiceStageMode(enabled) {
-    overlay.classList.toggle('choice-stage-active', Boolean(enabled));
-  }
-
   function getPlayerHead(player) {
     if (!player) return '/images/logo.png';
-    return HEAD_IMAGES[player.profession]
-      || FALLBACK_IMAGES[player.profession]
-      || '/images/logo.png';
+    return HEAD_IMAGES[player.profession] || FALLBACK_IMAGES[player.profession] || '/images/logo.png';
   }
 
   function getSingleDieImage(value) {
     const point = Number(value);
-    if (Number.isInteger(point) && point >= 1 && point <= 6) return `/images/${point}.png`;
-    return '/images/dice.png';
+    return Number.isInteger(point) && point >= 1 && point <= 6 ? `/images/${point}.png` : '/images/dice.png';
   }
 
   function getDoubleDiceImage(total) {
     const point = Number(total);
-    if (Number.isInteger(point) && point >= 2 && point <= 12) return `/images/2-${point}.png`;
-    return '/images/dice.png';
+    return Number.isInteger(point) && point >= 2 && point <= 12 ? `/images/2-${point}.png` : '/images/dice.png';
+  }
+
+  function getTripleDiceImage(total) {
+    const point = Number(total);
+    return Number.isInteger(point) && point >= 3 && point <= 18 ? `/images/3-${point}.png` : '/images/dice.png';
   }
 
   function showActionStage(playerName, action) {
     positionShowcaseOverActions();
-    setDiceStageMode(false);
-    setChoiceStageMode(true);
-    overlay.classList.remove('result-stage-active');
+    overlay.classList.add('choice-stage-active');
+    overlay.classList.remove('dice-stage-active', 'result-stage-active');
     kickerEl.textContent = `${playerName} 選擇`;
     titleEl.textContent = '';
-    bodyEl.innerHTML = `<img class="action-showcase-image" src="${action.image}" alt="${action.label}" />`;
+    bodyEl.innerHTML = `<img class="action-showcase-image" src="${action.image}" alt="${action.label}" decoding="async" />`;
   }
 
-  function showDiceStage(playerName, event) {
+  function showDiceStage(event) {
     positionShowcaseOverActions();
     const dice = Array.isArray(event.dice) ? event.dice : [];
     const total = Number(event.diceTotal || 0);
-    const diceCount = Math.max(1, Math.min(2, dice.length || 1));
+    const diceCount = Math.max(1, Math.min(3, dice.length || 1));
 
-    setChoiceStageMode(false);
-    setDiceStageMode(true);
-    overlay.classList.remove('result-stage-active');
+    overlay.classList.add('dice-stage-active');
+    overlay.classList.remove('choice-stage-active', 'result-stage-active');
     kickerEl.textContent = '';
     titleEl.textContent = '';
 
-    let diceImage = '/images/dice.png';
-    let imageAlt = `骰子結果 ${total}`;
+    let diceImage = getSingleDieImage(Number(dice[0] || total || 0));
+    let imageAlt = `骰子 ${Number(dice[0] || total || 0)} 點`;
     let imageClass = 'single-dice';
 
-    if (diceCount === 1) {
-      const point = Number(dice[0] || total || 0);
-      diceImage = getSingleDieImage(point);
-      imageAlt = `${point}`;
-    } else {
+    if (diceCount === 2) {
       diceImage = getDoubleDiceImage(total);
       imageAlt = `雙骰合計 ${total}`;
       imageClass = 'double-dice-total';
+    } else if (diceCount === 3) {
+      diceImage = getTripleDiceImage(total);
+      imageAlt = `三骰合計 ${total}`;
+      imageClass = 'triple-dice-total';
     }
 
     bodyEl.innerHTML = `
       <div class="dice-result-stage" aria-label="骰子結果 ${total}">
         <div class="dice-result-images ${imageClass}">
-          <img class="dice-result-image" src="${diceImage}" alt="${imageAlt}" />
+          <img class="dice-result-image" src="${diceImage}" alt="${imageAlt}" decoding="async" />
         </div>
       </div>
     `;
   }
 
-  function signed(value) {
-    const number = Number(value || 0);
-    if (Math.abs(number) < 0.000001) return '0';
-    return `${number > 0 ? '+' : '-'}${Math.abs(number)}`;
-  }
-
-  function makeEffect(label, value) {
-    const normalizedLabel = label === '幸福' ? '幸福值' : label;
-    return `${normalizedLabel} ${signed(value)}`;
-  }
-
-  function firstSignedEffect(text) {
-    const match = String(text || '').match(/(現金|股票|土地|幸福)\s*([+-])\s*(\d+(?:\.\d+)?)/);
-    if (!match) return null;
-    const value = Number(match[3]) * (match[2] === '-' ? -1 : 1);
-    return makeEffect(match[1], value);
-  }
-
-  function pushResult(rows, player, fallbackName, effects) {
-    const cleanEffects = effects.filter(Boolean).filter((item) => !item.endsWith(' 0'));
-    if (!cleanEffects.length) cleanEffects.push('無資產變動');
-    rows.push({
-      player,
-      name: player?.name || fallbackName || '玩家',
-      effects: cleanEffects,
-    });
-  }
-
-  function buildResultRows(room, event, actor) {
-    const rows = [];
-    const target = room.players.find((item) => item.id === event.targetId);
-    const total = Number(event.diceTotal || 0);
-    const playerName = actor?.name || '玩家';
-
-    if (event.type === 'salary') {
-      pushResult(rows, actor, playerName, [makeEffect('現金', event.amount)]);
-    } else if (event.type === 'buyStock') {
-      const cash = Number(event.salaryIncome || 0) - (event.success ? Number(event.cost || 0) : 0);
-      pushResult(rows, actor, playerName, [
-        makeEffect('現金', cash),
-        event.success ? makeEffect('股票', event.units) : null,
-      ]);
-    } else if (event.type === 'buyLand') {
-      const cash = Number(event.salaryIncome || 0) - (event.success ? Number(event.cost || 0) : 0);
-      pushResult(rows, actor, playerName, [
-        makeEffect('現金', cash),
-        event.success ? makeEffect('土地', event.units) : null,
-      ]);
-    } else if (event.type === 'sellStock') {
-      pushResult(rows, actor, playerName, [
-        makeEffect('現金', Number(event.salaryIncome || 0) + Number(event.proceeds || 0)),
-        Number(event.units || 0) ? makeEffect('股票', -Number(event.units || 0)) : null,
-      ]);
-    } else if (event.type === 'sellLand') {
-      pushResult(rows, actor, playerName, [
-        makeEffect('現金', Number(event.salaryIncome || 0) + Number(event.proceeds || 0)),
-        Number(event.units || 0) ? makeEffect('土地', -Number(event.units || 0)) : null,
-      ]);
-    } else if (event.type === 'dream') {
-      if (event.success) {
-        const liquidation = event.liquidation || {};
-        pushResult(rows, actor, playerName, [
-          makeEffect('現金', Number(event.salaryIncome || 0) + Number(liquidation.proceeds || 0) - Number(event.fee || 0)),
-          Number(liquidation.stocks || 0) ? makeEffect('股票', -Number(liquidation.stocks || 0)) : null,
-          Number(liquidation.land || 0) ? makeEffect('土地', -Number(liquidation.land || 0)) : null,
-          makeEffect('幸福', event.happinessGain),
-        ]);
-      } else {
-        pushResult(rows, actor, playerName, [
-          '圓夢失敗：資金不足',
-          '保留30%薪資',
-          makeEffect('現金', event.salaryIncome),
-        ]);
-      }
-    } else if (event.type === 'sabotage') {
-      if (target) pushResult(rows, target, target.name, [firstSignedEffect(event.text)]);
-      pushResult(rows, actor, playerName, [makeEffect('現金', event.bonus)]);
-    } else if (event.type === 'help') {
-      if (target) pushResult(rows, target, target.name, [firstSignedEffect(event.text)]);
-      pushResult(rows, actor, playerName, [makeEffect('現金', event.bonus)]);
-    } else if (event.type === 'fate') {
-      const fateIndex = Number(event.fateIndex);
-      if (fateIndex === 0) {
-        pushResult(rows, actor, playerName, [makeEffect('現金', 150 * total)]);
-      } else if (fateIndex === 2) {
-        pushResult(rows, actor, playerName, [makeEffect('股票', 5 * total)]);
-      } else if (fateIndex === 4) {
-        pushResult(rows, actor, playerName, [makeEffect('土地', 5 * total)]);
-      } else if (fateIndex === 6) {
-        const received = Number(String(event.text || '').match(/共支付\s*(\d+(?:\.\d+)?)/)?.[1] || 0);
-        pushResult(rows, actor, playerName, [makeEffect('現金', received)]);
-      } else if (fateIndex === 7) {
-        pushResult(rows, actor, playerName, [makeEffect('幸福', total)]);
-      } else if (fateIndex === 8) {
-        pushResult(rows, actor, playerName, [makeEffect('幸福', -(0.5 * total))]);
-      } else {
-        pushResult(rows, actor, playerName, [firstSignedEffect(event.text)]);
-      }
-    } else {
-      pushResult(rows, actor, playerName, [firstSignedEffect(event.text)]);
+  function secondaryFateVisual(event) {
+    if (event.type === 'sabotage') {
+      return NEGATIVE_FATE_IMAGES[Math.max(0, Math.min(3, Number(event.effectIndex) || 0))];
     }
-
-    return rows;
-  }
-
-  function getSpecialResultImage(event) {
-    if (event.type === 'fate') {
-      return FATE_RESULTS[Number(event.fateIndex)] || ACTIONS.fate;
+    if (event.type === 'help') {
+      return POSITIVE_FATE_IMAGES[Math.max(0, Math.min(3, Number(event.effectIndex) || 0))];
     }
-    if (event.type === 'sabotage') return ACTIONS.sabotage;
-    if (event.type === 'help') return ACTIONS.help;
     return null;
   }
 
-  function renderResultVisual(actor, target, event) {
-    const actorHead = getPlayerHead(actor);
-    const special = getSpecialResultImage(event);
-    const targetHead = target ? getPlayerHead(target) : null;
-    const isDual = (event.type === 'sabotage' || event.type === 'help') && target;
-
-    if (event.type === 'dream' && !event.success) {
-      return `
-        <div class="result-visual result-visual-dream-fail">
-          <div class="result-person">
-            <img class="result-person-head" src="${actorHead}" alt="${escapeHtml(actor?.name || '玩家')}" />
-          </div>
-          <div class="dream-fail-visual" aria-label="圓夢失敗">
-            <img class="dream-fail-image" src="/images/cry.png" alt="哭哭" />
-            <strong class="dream-fail-label">圓夢失敗</strong>
-            <span class="dream-fail-reason">資金不足，無法支付圓夢費用</span>
-          </div>
-        </div>
-      `;
-    }
-
-    if (!special) {
-      return `
-        <div class="result-visual result-visual-single">
-          <div class="result-person">
-            <img class="result-person-head" src="${actorHead}" alt="${escapeHtml(actor?.name || '玩家')}" />
-          </div>
-        </div>
-      `;
-    }
-
-    return `
-      <div class="result-visual ${isDual ? 'result-visual-dual' : 'result-visual-special'}">
-        <div class="result-person result-person-special">
-          <img class="result-person-head result-person-head-small" src="${actorHead}" alt="${escapeHtml(actor?.name || '玩家')}" />
-          <span class="result-person-name">${escapeHtml(actor?.name || '玩家')}</span>
-        </div>
-        <div class="result-event-visual">
-          <img class="result-event-image" src="${special.image}" alt="${escapeHtml(special.label)}" />
-          <strong class="result-event-label">${escapeHtml(special.label)}</strong>
-        </div>
-        ${isDual ? `
-          <div class="result-person result-person-special">
-            <img class="result-person-head result-person-head-small" src="${targetHead}" alt="${escapeHtml(target.name)}" />
-            <span class="result-person-name">${escapeHtml(target.name)}</span>
-          </div>
-        ` : ''}
-      </div>
-    `;
-  }
-
-  function showResultStage(room, playerName, event) {
+  function showResultStage(room, playerName, event, action) {
     positionShowcaseOverActions();
-    setChoiceStageMode(false);
-    setDiceStageMode(false);
     overlay.classList.add('result-stage-active');
+    overlay.classList.remove('choice-stage-active', 'dice-stage-active');
     kickerEl.textContent = '';
     titleEl.textContent = '';
 
-    const actor = room.players.find((item) => item.id === event.playerId);
-    const target = room.players.find((item) => item.id === event.targetId);
-    const rows = buildResultRows(room, event, actor || { name: playerName });
+    const actor = room.players.find((item) => item.id === event.playerId) || { name: playerName };
+    const actorName = actor?.name || playerName || '玩家';
+    const fateVisual = secondaryFateVisual(event);
 
     bodyEl.innerHTML = `
-      <div class="simple-result">
-        ${renderResultVisual(actor || { name: playerName }, target, event)}
-        <div class="simple-result-list">
-          ${rows.map((row) => `
-            <div class="simple-result-row">
-              <strong class="simple-result-player">${escapeHtml(row.name)}</strong>
-              <div class="simple-result-effects">
-                ${row.effects.map((effect) => `<span class="simple-result-effect">${escapeHtml(effect)}</span>`).join('')}
-              </div>
-            </div>
-          `).join('')}
+      <div class="simple-choice-result">
+        <div class="simple-choice-player">
+          <img class="simple-choice-head" src="${getPlayerHead(actor)}" alt="${escapeHtml(actorName)}" decoding="async" />
+          <strong class="simple-choice-name">${escapeHtml(actorName)}</strong>
         </div>
+        <img class="simple-choice-action" src="${action.image}" alt="${escapeHtml(action.label)}" decoding="async" />
+        ${fateVisual ? `<img class="simple-choice-fate" src="${fateVisual.image}" alt="${escapeHtml(fateVisual.label)}" decoding="async" />` : ''}
       </div>
     `;
   }
 
   function restoreCurrentTurnIfReady() {
-    if (
-      typeof currentRoom !== 'undefined'
-      && currentRoom?.game?.deadline
-      && typeof renderGame === 'function'
-    ) {
+    if (typeof currentRoom !== 'undefined' && currentRoom?.game?.deadline && typeof renderGame === 'function') {
       renderGame(currentRoom);
     }
   }
@@ -398,9 +227,7 @@
     const remaining = showcaseUntil - now;
 
     if (!game || !event || !action || !Array.isArray(event.dice) || !game.turnId || remaining <= 0) {
-      if (!overlay.classList.contains('hidden') && (!showcaseUntil || remaining <= 0 || game?.deadline)) {
-        hideShowcase();
-      }
+      if (!overlay.classList.contains('hidden') && (!showcaseUntil || remaining <= 0 || game?.deadline)) hideShowcase();
       return;
     }
 
@@ -410,7 +237,7 @@
 
     clearStageTimers();
     lockActionButtons();
-    lockTimer = setInterval(lockActionButtons, 80);
+    lockTimer = setInterval(lockActionButtons, 250);
 
     const player = room.players.find((item) => item.id === event.playerId);
     const playerName = player?.name || '玩家';
@@ -418,25 +245,21 @@
 
     positionShowcaseOverActions();
     overlay.classList.remove('hidden');
-    if (elapsed < CHOICE_MS) {
-      showActionStage(playerName, action);
-    } else if (elapsed < RESULT_START_MS) {
-      showDiceStage(playerName, event);
-    } else {
-      showResultStage(room, playerName, event);
-    }
+    if (elapsed < CHOICE_MS) showActionStage(playerName, action);
+    else if (elapsed < RESULT_START_MS) showDiceStage(event);
+    else showResultStage(room, playerName, event, action);
 
     if (elapsed < CHOICE_MS) {
       stageTimers.push(setTimeout(() => {
         lockActionButtons();
-        showDiceStage(playerName, event);
+        showDiceStage(event);
       }, CHOICE_MS - elapsed));
     }
 
     if (elapsed < RESULT_START_MS) {
       stageTimers.push(setTimeout(() => {
         lockActionButtons();
-        showResultStage(room, playerName, event);
+        showResultStage(room, playerName, event, action);
       }, RESULT_START_MS - elapsed));
     }
 
