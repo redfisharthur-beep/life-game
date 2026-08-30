@@ -93,10 +93,17 @@
     if (!images || !image) return;
 
     const total = Number(event.diceTotal || 0);
+    const patchKey = `${currentRoom?.game?.turnId || ''}:${total}`;
+
+    // 三骰只修正一次。dice-animation.js 之後會接管 image.src 播放 3roll1~5，
+    // 不能在動畫 class 變化時反覆把 src 改回最終結果，否則手機端容易產生 observer 競態。
+    if (image.dataset.tripleDicePatchKey === patchKey) return;
+
     images.classList.remove('double-dice-total', 'single-dice');
     images.classList.add('triple-dice-total');
     image.src = `/images/3-${total}.png`;
     image.alt = `三骰合計 ${total}`;
+    image.dataset.tripleDicePatchKey = patchKey;
   }
 
   function patchSpecialResult() {
@@ -155,6 +162,8 @@
     attributeFilter: ['class'],
   });
 
-  socket.on('room:update', () => requestAnimationFrame(sync));
+  // action-showcase 的 room:update listener 比這支檔案更早註冊，
+  // 所以這裡同步執行可在 dice-animation MutationObserver 開始前先完成三骰修正。
+  socket.on('room:update', sync);
   window.addEventListener('pageshow', sync);
 })();
