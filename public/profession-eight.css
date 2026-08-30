@@ -155,11 +155,12 @@
     transform: scale(1.07);
   }
 
+  /* 手機版限定：能力與 SABC 評級依目前位置再左移 10px、下移 3px。 */
   .profession-detail,
   .profession-card:nth-child(even) .profession-detail,
   .profession-card:nth-child(5) .profession-detail,
   .profession-card:nth-child(6) .profession-detail {
-    transform: translate(calc(-.65em + 60px), 25px) !important;
+    transform: translate(calc(-.65em + 50px), 28px) !important;
   }
 
   .profession-abilities {
