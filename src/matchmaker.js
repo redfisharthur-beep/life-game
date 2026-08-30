@@ -37,6 +37,15 @@ export class Matchmaker {
     });
   }
 
+  rememberResult(rooms, code, result) {
+    if (!result?.ok || !result?.room) return;
+    rooms[code] = {
+      count: Number(result.room.players?.length || 0),
+      started: Boolean(result.room.started),
+      updatedAt: Date.now(),
+    };
+  }
+
   async autoJoin(name) {
     const rooms = await this.getRegistry();
     const candidates = Object.entries(rooms)
@@ -46,8 +55,14 @@ export class Matchmaker {
     for (const [code] of candidates) {
       const response = await this.joinRoom(code, name);
       const result = await response.json();
-      if (result.ok) return result;
+      if (result.ok) {
+        this.rememberResult(rooms, code, result);
+        await this.saveRegistry(rooms);
+        return result;
+      }
+      if (result.reason === 'full' || result.reason === 'started') delete rooms[code];
       if (result.reason !== 'nameTaken' && result.reason !== 'full' && result.reason !== 'started') {
+        await this.saveRegistry(rooms);
         return result;
       }
     }
@@ -57,7 +72,10 @@ export class Matchmaker {
     if (rooms[code]) return { ok: false, message: '目前無法建立新房間，請稍後再試。' };
 
     const response = await this.joinRoom(code, name);
-    return response.json();
+    const result = await response.json();
+    this.rememberResult(rooms, code, result);
+    await this.saveRegistry(rooms);
+    return result;
   }
 
   async fetch(request) {
