@@ -8,10 +8,11 @@
   const roomBrowserBackBtn = document.getElementById('roomBrowserBackBtn');
   const joinGameBtn = document.getElementById('joinGameBtn');
   const playerNameInput = document.getElementById('playerName');
+  const homeStage = document.getElementById('homeStage');
+  const lobbyCard = document.getElementById('lobbyCard');
 
   if (!entryPanel || !roomBrowserPanel || !roomBrowserList || !joinGameBtn || !playerNameInput) return;
 
-  let refreshTimer = null;
   let loading = false;
 
   function currentName() {
@@ -31,6 +32,8 @@
 
   function showBrowser() {
     hideGamePanels();
+    homeStage?.classList.remove('home-visible');
+    lobbyCard?.classList.remove('home-mode');
     roomBrowserPanel.classList.remove('hidden');
   }
 
@@ -41,6 +44,8 @@
   function showEntry() {
     hideBrowser();
     entryPanel.classList.remove('hidden');
+    homeStage?.classList.add('home-visible');
+    lobbyCard?.classList.add('home-mode');
   }
 
   function setBusy(busy) {
@@ -201,10 +206,6 @@
   roomBrowserBackBtn.addEventListener('click', () => {
     setBrowserMessage('');
     showEntry();
-  });
-
-  roomBrowserPanel.addEventListener('transitionend', () => {
-    if (roomBrowserPanel.classList.contains('hidden')) clearTimeout(refreshTimer);
   });
 
   // 房間列表開啟時每 4 秒更新一次，讓新房間與人數變化自然出現。
