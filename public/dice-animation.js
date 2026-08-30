@@ -26,7 +26,7 @@
 
   const singleRollAudio = new Audio('/music/Dice_Roll.mp3');
   const multiRollAudio = new Audio('/music/2Dice_Roll.mp3');
-  singleRollAudio.preload = 'none';
+  singleRollAudio.preload = 'metadata';
   multiRollAudio.preload = 'none';
   singleRollAudio.volume = 0.7;
   multiRollAudio.volume = 0.7;
@@ -82,24 +82,17 @@
 
   function removeFinalHold() {
     document.querySelectorAll('.dice-final-hold-layer').forEach((layer) => layer.remove());
-    const overlay = document.querySelector('.action-showcase');
-    overlay?.classList.remove('dice-final-hold-active');
+    document.querySelector('.action-showcase')?.classList.remove('dice-final-hold-active');
   }
 
   function clearAnimation() {
     animationToken += 1;
-    if (rollInterval) {
-      clearInterval(rollInterval);
-      rollInterval = null;
-    }
-    if (settleTimer) {
-      clearTimeout(settleTimer);
-      settleTimer = null;
-    }
-    if (holdTimer) {
-      clearTimeout(holdTimer);
-      holdTimer = null;
-    }
+    if (rollInterval) clearInterval(rollInterval);
+    if (settleTimer) clearTimeout(settleTimer);
+    if (holdTimer) clearTimeout(holdTimer);
+    rollInterval = null;
+    settleTimer = null;
+    holdTimer = null;
     stopDiceAudio();
     removeFinalHold();
     if (activeImage) {
@@ -113,16 +106,13 @@
     const overlay = document.querySelector('.action-showcase');
     const card = overlay?.querySelector('.action-showcase-card');
     if (!overlay || !card) return;
-
     removeFinalHold();
     overlay.classList.add('dice-final-hold-active');
-
     const layer = document.createElement('div');
     layer.className = 'dice-final-hold-layer';
     layer.setAttribute('aria-label', finalAlt);
     layer.innerHTML = `<img class="dice-final-hold-image" src="${finalSrc}" alt="${finalAlt}" decoding="async" />`;
     card.appendChild(layer);
-
     holdTimer = setTimeout(() => {
       layer.remove();
       overlay.classList.remove('dice-final-hold-active');
@@ -135,7 +125,6 @@
       const dice = typeof currentRoom !== 'undefined' ? currentRoom?.game?.lastEvent?.dice : null;
       if (Array.isArray(dice) && dice.length >= 1 && dice.length <= 3) return dice.length;
     } catch (_) {}
-
     if (image?.closest('.triple-dice-total')) return 3;
     if (image?.closest('.double-dice-total')) return 2;
     return 1;
@@ -143,7 +132,6 @@
 
   function startAnimation(image) {
     if (!image || image.dataset.diceAnimating === '1') return;
-
     clearAnimation();
     activeImage = image;
     image.dataset.diceAnimating = '1';
@@ -174,10 +162,8 @@
 
     settleTimer = setTimeout(() => {
       if (token !== animationToken || !image.isConnected) return;
-      if (rollInterval) {
-        clearInterval(rollInterval);
-        rollInterval = null;
-      }
+      if (rollInterval) clearInterval(rollInterval);
+      rollInterval = null;
       stopDiceAudio();
       image.src = finalSrc;
       image.alt = finalAlt;
@@ -189,23 +175,18 @@
 
   function syncDiceAnimation() {
     const overlay = document.querySelector('.action-showcase');
-    const isDiceStage = Boolean(
-      overlay
-      && !overlay.classList.contains('hidden')
-      && overlay.classList.contains('dice-stage-active')
-    );
-
+    const isDiceStage = Boolean(overlay && !overlay.classList.contains('hidden') && overlay.classList.contains('dice-stage-active'));
     if (!isDiceStage) {
       if (activeImage && !holdTimer) clearAnimation();
       return;
     }
-
     const image = overlay.querySelector('.dice-result-image');
     if (!image) return;
-    if (image !== activeImage || image.dataset.diceAnimating !== '1') {
-      startAnimation(image);
-    }
+    if (image !== activeImage || image.dataset.diceAnimating !== '1') startAnimation(image);
   }
+
+  // 第一階段一定使用單骰，先只預熱 roll1~roll5，避免第一次擲骰時動畫圖片尚未載入。
+  preloadFrames(1);
 
   const showcase = document.querySelector('.action-showcase');
   if (showcase) {
