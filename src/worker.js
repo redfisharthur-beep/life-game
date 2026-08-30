@@ -16,16 +16,13 @@ export default {
       return json({ ok: true, service: 'life-game' });
     }
 
-    if (
-      ['/api/auto-join', '/api/rooms', '/api/create-room', '/api/join-room'].includes(url.pathname)
-    ) {
+    if (['/api/auto-join', '/api/rooms', '/api/join-room'].includes(url.pathname)) {
       const id = env.MATCHMAKER.idFromName('global');
       const matchmaker = env.MATCHMAKER.get(id);
       const target = new URL(request.url);
       const paths = {
         '/api/auto-join': '/auto-join',
         '/api/rooms': '/rooms',
-        '/api/create-room': '/create-room',
         '/api/join-room': '/join-room',
       };
       target.pathname = paths[url.pathname];
