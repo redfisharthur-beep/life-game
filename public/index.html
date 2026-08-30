@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/market-icons.css?v=20260827-2312" />
   <link rel="stylesheet" href="/profession-layout.css?v=20260828-1230" />
   <link rel="stylesheet" href="/profession-position.css?v=20260828-1324" />
-  <link rel="stylesheet" href="/profession-eight.css?v=20260830-1400" />
+  <link rel="stylesheet" href="/profession-eight.css?v=20260830-1341" />
   <link rel="stylesheet" href="/action-showcase.css?v=20260829-1251" />
   <link rel="stylesheet" href="/dice-animation.css?v=20260829-1251" />
   <link rel="stylesheet" href="/showcase-result-overrides.css?v=20260827-2045" />
@@ -18,11 +18,11 @@
   <link rel="stylesheet" href="/game-complete.css?v=20260829-0004" />
   <link rel="stylesheet" href="/logo-display.css?v=20260827-1610" />
   <link rel="stylesheet" href="/front-page.css?v=20260827-2055" />
-  <link rel="stylesheet" href="/player-list.css?v=20260830-1400" />
+  <link rel="stylesheet" href="/player-list.css?v=20260830-1341" />
   <link rel="stylesheet" href="/major-event.css?v=20260828-1905" />
   <link rel="stylesheet" href="/announcement-tone.css?v=20260827-2225" />
   <link rel="stylesheet" href="/ui-final-tweaks.css?v=20260829-1301" />
-  <link rel="stylesheet" href="/rules-viewer.css?v=20260830-1400" />
+  <link rel="stylesheet" href="/rules-viewer.css?v=20260830-1341" />
   <link rel="stylesheet" href="/room-controls.css?v=20260830-1400" />
 </head>
 <body>
@@ -85,37 +85,21 @@
             </div>
 
             <div class="market-strip" aria-label="最新市場價格">
-              <span class="market-item" title="股市">
-                <img class="market-icon" src="/images/stock.png" alt="股市" />
-                <b id="stockPrice" class="market-value">10.00</b>
-              </span>
-              <span class="market-item" title="地價">
-                <img class="market-icon" src="/images/land.png" alt="地價" />
-                <b id="landPrice" class="market-value">10.00</b>
-              </span>
+              <span class="market-item" title="股市"><img class="market-icon" src="/images/stock.png" alt="股市" /><b id="stockPrice" class="market-value">10.00</b></span>
+              <span class="market-item" title="地價"><img class="market-icon" src="/images/land.png" alt="地價" /><b id="landPrice" class="market-value">10.00</b></span>
             </div>
           </div>
         </div>
 
         <section class="me-card">
-          <div class="me-head">
-            <div>
-              <span id="myName" class="me-name">玩家</span>
-              <span id="myProfession" class="me-profession">職業</span>
-            </div>
-          </div>
+          <div class="me-head"><div><span id="myName" class="me-name">玩家</span><span id="myProfession" class="me-profession">職業</span></div></div>
           <div class="asset-grid">
-            <span>現金 <b id="myCash">0</b></span>
-            <span>股票 <b id="myStocks">0</b></span>
-            <span>土地 <b id="myLand">0</b></span>
-            <span>幸福 <b id="myHappiness">0.00</b></span>
+            <span>現金 <b id="myCash">0</b></span><span>股票 <b id="myStocks">0</b></span><span>土地 <b id="myLand">0</b></span><span>幸福 <b id="myHappiness">0.00</b></span>
           </div>
         </section>
 
         <section class="turn-section hidden" aria-hidden="true">
-          <div class="turn-title">本輪順序</div>
-          <div id="turnOrder" class="turn-order"></div>
-          <p id="turnNotice" class="turn-notice">等待回合開始…</p>
+          <div class="turn-title">本輪順序</div><div id="turnOrder" class="turn-order"></div><p id="turnNotice" class="turn-notice">等待回合開始…</p>
         </section>
 
         <section class="actions-section">
@@ -132,35 +116,23 @@
           </div>
         </section>
 
-        <section class="event-box">
-          <span class="event-label">最新事件</span>
-          <p id="gameEvent">職業選擇完成，人生啟程！</p>
-        </section>
+        <section class="event-box"><span class="event-label">最新事件</span><p id="gameEvent">職業選擇完成，人生啟程！</p></section>
 
         <section id="gameResults" class="game-results hidden" aria-live="polite">
           <div class="results-heading"><span>人生結算</span><strong id="resultWinner">🏆</strong></div>
           <div id="rankingList" class="ranking-list"></div>
-          <div class="results-actions">
-            <button id="restartGameBtn" class="start-button" type="button">再來一局</button>
-            <button id="leaveGameBtn" class="home-pill" type="button">回到首頁</button>
-          </div>
+          <div class="results-actions"><button id="restartGameBtn" class="start-button" type="button">再來一局</button><button id="leaveGameBtn" class="home-pill" type="button">回到首頁</button></div>
         </section>
       </div>
     </section>
   </main>
 
-  <section id="roundAnnouncement" class="round-announcement hidden" aria-live="assertive">
-    <strong>人生加速！</strong>
-    <span>從現在開始每回合擲2顆骰子！</span>
-  </section>
+  <section id="roundAnnouncement" class="round-announcement hidden" aria-live="assertive"><strong>人生加速！</strong><span>從現在開始每回合擲2顆骰子！</span></section>
 
   <section id="rulesViewer" class="rules-viewer hidden" aria-hidden="true" aria-label="遊戲規則">
     <div class="rules-viewer-card" role="dialog" aria-modal="true" aria-label="遊戲規則圖片">
       <button id="rulesCloseBtn" class="rules-viewer-close" type="button" aria-label="關閉遊戲規則">×</button>
-      <div class="rules-viewer-page">
-        <img class="rules-viewer-image" src="/images/rules1.png" alt="遊戲規則第1頁" />
-        <img class="rules-viewer-image" src="/images/rules2.png" alt="遊戲規則第2頁" />
-      </div>
+      <div class="rules-viewer-page"><img class="rules-viewer-image" src="/images/rules1.png" alt="遊戲規則第1頁" /><img class="rules-viewer-image" src="/images/rules2.png" alt="遊戲規則第2頁" /></div>
     </div>
   </section>
 
