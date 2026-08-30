@@ -1,0 +1,142 @@
+/* 等待玩家頁：以圖片取代返回、啟程、等待中、遊戲說明膠囊按鈕。 */
+.room-mode #leaveRoomBtn,
+.room-mode #roomRulesOpenBtn,
+.room-mode #startGameBtn {
+  appearance: none;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-width: 0;
+  min-height: 0;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 1;
+}
+
+/* 左下：回到上一頁。 */
+.room-mode #leaveRoomBtn {
+  display: block !important;
+  position: absolute;
+  left: 4.2%;
+  right: auto;
+  top: auto;
+  bottom: 4.2%;
+  z-index: 20;
+  width: 13%;
+  height: 9%;
+  background-image: url('/images/back.png') !important;
+}
+
+/* 右下：遊戲說明。 */
+.room-mode #roomRulesOpenBtn {
+  display: block !important;
+  position: absolute;
+  right: 4.2%;
+  left: auto;
+  top: auto;
+  bottom: 4.2%;
+  z-index: 20;
+  width: 16%;
+  height: 9%;
+  background-image: url('/images/Game%20Rules.png') !important;
+}
+
+/* 中央：房主顯示 go，其他玩家顯示 wait。 */
+.room-mode #startGameBtn {
+  display: block !important;
+  position: absolute;
+  left: 50%;
+  top: 72.2%;
+  z-index: 18;
+  width: 25%;
+  height: 11%;
+  transform: translateX(-50%) !important;
+}
+
+.room-mode #startGameBtn[data-room-role='host'] {
+  background-image: url('/images/go.png') !important;
+}
+
+.room-mode #startGameBtn[data-room-role='guest'] {
+  background-image: url('/images/wait.png') !important;
+  cursor: default;
+}
+
+.room-mode #startGameBtn:disabled {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.room-mode #startGameBtn[data-room-role='host']:disabled {
+  opacity: .55 !important;
+  cursor: not-allowed;
+}
+
+.room-mode #launchMessage {
+  display: none !important;
+}
+
+.room-mode #leaveRoomBtn:hover,
+.room-mode #roomRulesOpenBtn:hover,
+.room-mode #startGameBtn[data-room-role='host']:not(:disabled):hover {
+  transform: scale(1.04);
+}
+
+.room-mode #startGameBtn[data-room-role='host']:not(:disabled):hover {
+  transform: translateX(-50%) scale(1.04) !important;
+}
+
+.room-mode #leaveRoomBtn:active,
+.room-mode #roomRulesOpenBtn:active {
+  transform: scale(.97);
+}
+
+.room-mode #startGameBtn[data-room-role='host']:not(:disabled):active {
+  transform: translateX(-50%) scale(.97) !important;
+}
+
+@media (max-width: 760px) {
+  .room-mode #leaveRoomBtn {
+    left: 3.6%;
+    bottom: 3.6%;
+    width: 15%;
+    height: 9.5%;
+  }
+
+  .room-mode #roomRulesOpenBtn {
+    right: 3.6%;
+    bottom: 3.6%;
+    width: 18%;
+    height: 9.5%;
+  }
+
+  .room-mode #startGameBtn {
+    top: 72.5%;
+    width: 29%;
+    height: 11.5%;
+  }
+}
+
+@media (max-width: 430px) {
+  .room-mode #leaveRoomBtn {
+    width: 17%;
+  }
+
+  .room-mode #roomRulesOpenBtn {
+    width: 20%;
+  }
+
+  .room-mode #startGameBtn {
+    width: 32%;
+  }
+}
