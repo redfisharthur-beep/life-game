@@ -77,6 +77,6 @@ room.game.stockPrice = 10;
 room.game.landPrice = 10;
 assert.equal(engine.playerAssets(markedPlayer, room.game), 5000);
 engine.applyHappinessMilestones(room, [markedPlayer]);
-assert.equal(markedPlayer.happiness, 16, 'market-valued assets 5000 plus stock/land 200 thresholds should all award once');
+assert.equal(markedPlayer.happiness, 19, 'market-valued assets 5000 plus stock/land 100 and 200 thresholds should all award once');
 
 console.log('Happiness milestone regression passed.');
