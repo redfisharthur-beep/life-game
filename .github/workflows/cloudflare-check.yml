@@ -1,0 +1,28 @@
+name: Cloudflare Migration Check
+
+on:
+  push:
+    branches:
+      - cloudflare
+  pull_request:
+    branches:
+      - cloudflare
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cloudflare smoke checks
+        run: npm run test:cf
+
+      - name: Wrangler compile dry run
+        run: npx --yes wrangler@4 deploy --dry-run --outdir .wrangler-dry-run
