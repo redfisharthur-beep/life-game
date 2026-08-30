@@ -9,6 +9,7 @@ const wrangler = read('wrangler.jsonc');
 const worker = read('src/worker.js');
 const gameRoom = read('src/game-room.js');
 const gameRoomEight = read('src/game-room-eight.js');
+const gameRoomRulesV2 = read('src/game-room-rules-v2.js');
 const matchmaker = read('src/matchmaker.js');
 const socketCompat = read('public/cloudflare-socket.js');
 const app = read('public/app.js');
@@ -25,17 +26,19 @@ assert.match(worker, /\/api\/auto-join/, 'Worker auto-join route is missing');
 assert.match(worker, /const wsMatch = url\.pathname\.match/, 'Worker WebSocket route is missing');
 assert.match(worker, /target\.pathname = '\/ws'/, 'Worker WebSocket Durable Object forwarding is missing');
 assert.match(worker, /env\.ASSETS\.fetch/, 'Static asset fallback is missing');
-assert.match(worker, /game-room-eight\.js/, 'Worker must use eight-profession GameRoom');
+assert.match(worker, /game-room-rules-v2\.js/, 'Worker must use updated 30-round GameRoom rules');
 
 assert.match(gameRoom, /const TOTAL_ROUNDS = 30;/, 'Game must stay at 30 rounds');
 assert.match(gameRoom, /const HAPPINESS_GOAL = 48;/, 'Happiness goal must stay at 48');
-assert.match(gameRoom, /round >= 16 \? 2 : 1/, 'Two-dice acceleration must begin at round 16');
 assert.match(gameRoom, /const MAJOR_EVENT_CHANCE = 0\.08;/, 'Major-event chance must stay at 8%');
 assert.match(gameRoom, /setAlarm\(/, 'Durable Object Alarm scheduling is missing');
 assert.match(gameRoom, /async alarm\(\)/, 'Durable Object Alarm handler is missing');
 assert.match(gameRoom, /async webSocketMessage\(/, 'Durable Object WebSocket handler is missing');
 assert.match(gameRoom, /game:restart/, 'Restart flow is missing');
 assert.match(gameRoom, /this\.calculateResults\(room\)/, 'Final ranking calculation is missing');
+
+assert.match(gameRoomRulesV2, /normalizedRound <= 10 \? 1 : normalizedRound <= 20 \? 2 : 3/, 'Dice progression must be 1/2/3 dice across rounds 1-10/11-20/21-30');
+assert.match(gameRoomRulesV2, /room\.game\.round === 11 \|\| room\.game\.round === 21/, 'Dice transition announcements must occur at rounds 11 and 21');
 
 assert.match(gameRoomEight, /civilServant: \{ name: '公務員'/, 'Civil servant gameplay definition is missing');
 assert.match(gameRoomEight, /artist: \{ name: '藝人'/, 'Artist gameplay definition is missing');
@@ -56,6 +59,8 @@ assert.match(professionEight, /grid-template-columns: repeat\(2/, 'Profession gr
 
 assert.match(index, /cloudflare-socket\.js/, 'Cloudflare socket compatibility script is not loaded');
 assert.match(index, /profession-eight\.css/, '2x4 profession layout is not loaded');
+assert.match(index, /game-ui-v2\.js/, 'Updated special result UI script is not loaded');
+assert.match(index, /game-ui-v2\.css/, 'Updated special result UI styles are not loaded');
 assert.doesNotMatch(index, /socket\.io\/socket\.io\.js/, 'Legacy Socket.IO browser client must not be loaded on Cloudflare');
 
 console.log('Cloudflare smoke checks passed');
