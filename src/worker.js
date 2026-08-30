@@ -1,4 +1,4 @@
-export { GameRoom } from './game-room.js';
+export { GameRoom } from './game-room-stable.js';
 export { Matchmaker } from './matchmaker.js';
 
 function json(data, status = 200) {
