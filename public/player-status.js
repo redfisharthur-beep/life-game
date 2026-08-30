@@ -83,21 +83,36 @@
     return item;
   }
 
-  function sortPlayers(players) {
+  function compareRanking(a, b) {
+    const happinessDiff = Number(b.happiness || 0) - Number(a.happiness || 0);
+    if (Math.abs(happinessDiff) > 0.000001) return happinessDiff;
+
+    const assetDiff = Number(b.totalAssets || 0) - Number(a.totalAssets || 0);
+    if (Math.abs(assetDiff) > 0.000001) return assetDiff;
+
+    return String(a.name || '').localeCompare(String(b.name || ''), 'zh-Hant');
+  }
+
+  function selectVisiblePlayers(players) {
     const mine = typeof myPlayerId !== 'undefined' ? myPlayerId : null;
-    return [...players].sort((a, b) => {
-      const aIsMe = mine && a.id === mine;
-      const bIsMe = mine && b.id === mine;
-      if (aIsMe !== bIsMe) return aIsMe ? -1 : 1;
+    const me = players.find((player) => mine && player.id === mine) || null;
+    const others = players.filter((player) => !me || player.id !== me.id).sort(compareRanking);
+    const selected = [];
+    const seen = new Set();
 
-      const happinessDiff = Number(b.happiness || 0) - Number(a.happiness || 0);
-      if (Math.abs(happinessDiff) > 0.000001) return happinessDiff;
+    const add = (player) => {
+      if (!player || seen.has(player.id) || selected.length >= 4) return;
+      seen.add(player.id);
+      selected.push(player);
+    };
 
-      const assetDiff = Number(b.totalAssets || 0) - Number(a.totalAssets || 0);
-      if (Math.abs(assetDiff) > 0.000001) return assetDiff;
+    add(me);
+    add(others[0]);
+    add(others[1]);
+    add(others[others.length - 1]);
 
-      return String(a.name || '').localeCompare(String(b.name || ''), 'zh-Hant');
-    });
+    others.forEach(add);
+    return selected.slice(0, 4);
   }
 
   function renderPlayerStatus(room) {
@@ -115,7 +130,7 @@
 
     bar.innerHTML = '';
 
-    sortPlayers(room.players || []).forEach((player) => {
+    selectVisiblePlayers(room.players || []).forEach((player) => {
       const professionId = player.profession || '';
       const card = document.createElement('article');
       card.className = 'player-status-card';
