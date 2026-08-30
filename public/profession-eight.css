@@ -1,0 +1,146 @@
+/* 八職業版：2 欄 × 4 列。覆蓋舊 2×3 座標，維持手機可讀性。 */
+.profession-grid {
+  left: 3.2%;
+  top: 11.8%;
+  width: 92.6%;
+  height: 80.8%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  column-gap: 1%;
+  row-gap: .8%;
+}
+
+.profession-card,
+.profession-card:hover:not(:disabled),
+.profession-card.selected,
+.profession-card:focus,
+.profession-card:focus-visible {
+  grid-template-columns: 44% 56%;
+  padding: 1.5% 3.2%;
+  border-radius: 14px;
+  background: rgba(255, 253, 249, .86) !important;
+  box-shadow: 0 2px 8px rgba(83, 71, 57, .08) !important;
+}
+
+.profession-card.taken,
+.profession-card.taken:disabled {
+  background: rgba(245, 243, 239, .74) !important;
+}
+
+.profession-visual,
+.profession-card:nth-child(even) .profession-visual {
+  transform: translate(.15em, .15em);
+}
+
+.profession-image {
+  width: 106%;
+  height: 106%;
+  transform: scale(1.05);
+}
+
+.profession-detail,
+.profession-card:nth-child(even) .profession-detail {
+  height: 98%;
+  transform: translate(.45em, .15em);
+}
+
+.profession-abilities {
+  gap: .28em;
+}
+
+.ability-item {
+  gap: .38em;
+  font-size: clamp(10px, 1.42vw, 14.4px);
+}
+
+.ability-grade {
+  width: clamp(23px, 3.25vw, 34px);
+  height: clamp(21px, 2.85vw, 30px);
+  font-size: clamp(10px, 1.42vw, 14px);
+}
+
+@media (max-width: 760px) {
+  .profession-grid {
+    left: 3.2%;
+    top: 11.4%;
+    width: 92.6%;
+    height: 81.4%;
+    row-gap: .65%;
+  }
+
+  .profession-card,
+  .profession-card:hover:not(:disabled),
+  .profession-card.selected,
+  .profession-card:focus,
+  .profession-card:focus-visible {
+    grid-template-columns: 43% 57%;
+    padding: 1.2% 2.4%;
+    border-radius: 10px;
+  }
+
+  .profession-image {
+    width: 108%;
+    height: 108%;
+    transform: scale(1.05);
+  }
+
+  .profession-detail,
+  .profession-card:nth-child(even) .profession-detail {
+    transform: translate(.25em, .1em);
+  }
+
+  .profession-abilities {
+    gap: .18em;
+  }
+
+  .ability-item {
+    gap: .3em;
+    font-size: clamp(8.8px, 2.35vw, 12px);
+  }
+
+  .ability-grade {
+    width: clamp(20px, 4.8vw, 28px);
+    height: clamp(18px, 4.3vw, 25px);
+    font-size: clamp(8.8px, 2.28vw, 11.5px);
+  }
+}
+
+@media (max-width: 430px) {
+  .profession-grid {
+    top: 11.2%;
+    height: 81.6%;
+  }
+
+  .profession-card,
+  .profession-card:hover:not(:disabled),
+  .profession-card.selected,
+  .profession-card:focus,
+  .profession-card:focus-visible {
+    grid-template-columns: 42% 58%;
+    padding: 1% 1.8%;
+    border-radius: 8px;
+  }
+
+  .profession-image {
+    width: 110%;
+    height: 110%;
+    transform: scale(1.04);
+  }
+
+  .profession-detail,
+  .profession-card:nth-child(even) .profession-detail {
+    transform: translate(.12em, .05em);
+  }
+
+  .ability-item {
+    gap: .24em;
+    font-size: clamp(8px, 2.55vw, 10.8px);
+  }
+
+  .ability-grade {
+    width: clamp(18px, 4.9vw, 24px);
+    height: clamp(17px, 4.5vw, 22px);
+    border-radius: 5px;
+    font-size: clamp(8px, 2.48vw, 10.4px);
+  }
+}
