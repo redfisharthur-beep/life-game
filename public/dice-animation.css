@@ -16,9 +16,9 @@
   transform-origin: 50% 50%;
 }
 
-/* 只有兩顆骰子的 2roll1～2roll5 動畫整體放大為原本 1.5 倍 */
-.dice-result-images.double-dice-total .dice-result-image.dice-rolling {
-  animation: double-dice-grow-150 1500ms cubic-bezier(.18, .72, .2, 1) both;
+.dice-result-images.double-dice-total .dice-result-image.dice-rolling,
+.dice-result-images.triple-dice-total .dice-result-image.dice-rolling {
+  animation: multi-dice-grow-150 1500ms cubic-bezier(.18, .72, .2, 1) both;
   filter: none !important;
   transform-origin: 50% 50%;
 }
@@ -56,41 +56,17 @@
 }
 
 @keyframes dice-grow {
-  0% {
-    transform: scale(.46);
-    opacity: .72;
-  }
-  33% {
-    transform: scale(.62);
-    opacity: .84;
-  }
-  66% {
-    transform: scale(.82);
-    opacity: .94;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(.46); opacity: .72; }
+  33% { transform: scale(.62); opacity: .84; }
+  66% { transform: scale(.82); opacity: .94; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes double-dice-grow-150 {
-  0% {
-    transform: scale(.69);
-    opacity: .72;
-  }
-  33% {
-    transform: scale(.93);
-    opacity: .84;
-  }
-  66% {
-    transform: scale(1.23);
-    opacity: .94;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 1;
-  }
+@keyframes multi-dice-grow-150 {
+  0% { transform: scale(.69); opacity: .72; }
+  33% { transform: scale(.93); opacity: .84; }
+  66% { transform: scale(1.23); opacity: .94; }
+  100% { transform: scale(1.5); opacity: 1; }
 }
 
 @media (max-width: 520px) {
