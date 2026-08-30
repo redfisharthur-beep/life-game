@@ -19,6 +19,7 @@ const FIXED_ROOMS = [
   { code: 'HAPPY', name: '幸福人生館', icon: '💖' },
   { code: 'DESTINY', name: '命運轉折站', icon: '🎲' },
   { code: 'TURNAROUND', name: '人生逆轉局', icon: '🔥' },
+  { code: 'SUMMIT', name: '人生巔峰局', icon: '🏆' },
 ];
 
 const FIXED_ROOM_BY_CODE = Object.fromEntries(FIXED_ROOMS.map((room) => [room.code, room]));
@@ -116,7 +117,7 @@ export class Matchmaker {
       if (!['nameTaken', 'full', 'started'].includes(result.reason)) return result;
     }
 
-    return { ok: false, message: '目前五個房間都在遊戲中或已滿，請稍後再試。' };
+    return { ok: false, message: '目前六個房間都在遊戲中或已滿，請稍後再試。' };
   }
 
   async fetch(request) {
