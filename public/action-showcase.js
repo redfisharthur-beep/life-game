@@ -211,7 +211,7 @@
   function pushRow(rows, player, fallbackName, effects) {
     const clean = effects.filter(Boolean).filter((item) => !item.endsWith(' 0'));
     if (!clean.length) clean.push('無資產變動');
-    rows.push({ name: player?.name || fallbackName || '玩家', effects: clean });
+    rows.push({ player, name: player?.name || fallbackName || '玩家', effects: clean });
   }
 
   function buildResultRows(room, event, actor) {
@@ -244,12 +244,9 @@
       } else {
         pushRow(rows, actor, playerName, [makeEffect('現金', event.salaryIncome)]);
       }
-    } else if (event.type === 'sabotage') {
+    } else if (event.type === 'sabotage' || event.type === 'help') {
       if (target) pushRow(rows, target, target.name, [firstSignedEffect(event.text)]);
-      pushRow(rows, actor, playerName, [makeEffect('現金', event.bonus)]);
-    } else if (event.type === 'help') {
-      if (target) pushRow(rows, target, target.name, [firstSignedEffect(event.text)]);
-      pushRow(rows, actor, playerName, [makeEffect('現金', event.bonus)]);
+      else pushRow(rows, actor, playerName, [firstSignedEffect(event.text)]);
     } else if (event.type === 'fate') {
       const index = Number(event.fateIndex);
       if (index === 0) pushRow(rows, actor, playerName, [makeEffect('現金', 150 * total)]);
@@ -286,30 +283,24 @@
     titleEl.textContent = '';
 
     const actor = room.players.find((item) => item.id === event.playerId) || { name: playerName };
-    const actorName = actor?.name || playerName || '玩家';
+    const target = room.players.find((item) => item.id === event.targetId);
     const rows = buildResultRows(room, event, actor);
+    const primaryRow = rows[0] || { player: actor, name: actor?.name || playerName || '玩家', effects: ['無資產變動'] };
+    const resultPlayer = (event.type === 'sabotage' || event.type === 'help') && target ? target : (primaryRow.player || actor);
+    const resultName = resultPlayer?.name || primaryRow.name || playerName || '玩家';
     const fateVisual = fateVisualFor(event);
 
     bodyEl.innerHTML = `
-      <div class="simple-result">
-        <div class="result-visual result-visual-single">
-          <div class="result-person">
-            <img class="result-person-head" src="${getPlayerHead(actor)}" alt="${escapeHtml(actorName)}" decoding="async" />
-            <span class="result-person-name">${escapeHtml(actorName)}</span>
-          </div>
+      <div class="simple-result simple-result-plain">
+        <div class="result-person result-person-plain">
+          <img class="result-person-head" src="${getPlayerHead(resultPlayer)}" alt="${escapeHtml(resultName)}" decoding="async" />
+          <span class="result-person-name">${escapeHtml(resultName)}</span>
         </div>
-        <div class="simple-result-list">
-          ${rows.map((row) => `
-            <div class="simple-result-row">
-              <strong class="simple-result-player">${escapeHtml(row.name)}</strong>
-              <div class="simple-result-effects">
-                ${row.effects.map((effect) => `<span class="simple-result-effect">${escapeHtml(effect)}</span>`).join('')}
-              </div>
-            </div>
-          `).join('')}
+        <div class="simple-result-effects simple-result-effects-plain">
+          ${primaryRow.effects.map((effect) => `<span class="simple-result-effect">${escapeHtml(effect)}</span>`).join('')}
         </div>
         ${fateVisual ? `
-          <div class="result-event-visual">
+          <div class="result-event-visual result-event-visual-plain">
             <img class="result-event-image" src="${fateVisual.image}" alt="${escapeHtml(fateVisual.label)}" decoding="async" />
           </div>
         ` : ''}
