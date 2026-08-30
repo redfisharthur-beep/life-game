@@ -1,37 +1,13 @@
 (() => {
   const DREAM_IMAGES = {
-    doctor: {
-      happy: '/images/doctorhappy.png',
-      cry: '/images/doctorcry.png',
-    },
-    engineer: {
-      happy: '/images/engineerhappy.png',
-      cry: '/images/engineercry.png',
-    },
-    sales: {
-      happy: '/images/saleshappy.png',
-      cry: '/images/salescry.png',
-    },
-    office: {
-      happy: '/images/officehappy.png',
-      cry: '/images/officecry.png',
-    },
-    athlete: {
-      happy: '/images/athletehappy.png',
-      cry: '/images/athletecry.png',
-    },
-    rich: {
-      happy: '/images/richhappy.png',
-      cry: '/images/richcry.png',
-    },
-    civilServant: {
-      happy: '/images/civil%20servanthappy.png',
-      cry: '/images/civil%20servantcry.png',
-    },
-    artist: {
-      happy: '/images/artisthappy.png',
-      cry: '/images/artistcry.png',
-    },
+    doctor: { happy: '/images/doctorhappy.png', cry: '/images/doctorcry.png' },
+    engineer: { happy: '/images/engineerhappy.png', cry: '/images/engineercry.png' },
+    sales: { happy: '/images/saleshappy.png', cry: '/images/salescry.png' },
+    office: { happy: '/images/officehappy.png', cry: '/images/officecry.png' },
+    athlete: { happy: '/images/athletehappy.png', cry: '/images/athletecry.png' },
+    rich: { happy: '/images/richhappy.png', cry: '/images/richcry.png' },
+    civilServant: { happy: '/images/civil%20servanthappy.png', cry: '/images/civil%20servantcry.png' },
+    artist: { happy: '/images/artisthappy.png', cry: '/images/artistcry.png' },
   };
 
   function escapeHtml(value) {
@@ -62,8 +38,7 @@
     if (!overlay || !body) return;
 
     const actor = room.players?.find((player) => player.id === event.playerId);
-    const profession = actor?.profession;
-    const imageSet = DREAM_IMAGES[profession];
+    const imageSet = DREAM_IMAGES[actor?.profession];
     if (!imageSet) return;
 
     const success = Boolean(event.success);
@@ -79,7 +54,7 @@
 
     body.innerHTML = `
       <div class="dream-result-layout ${success ? 'dream-result-success' : 'dream-result-fail'}">
-        <img class="dream-result-image" src="${image}" alt="${escapeHtml(name)} ${title}" />
+        <img class="dream-result-image" src="${image}" alt="${escapeHtml(name)} ${title}" decoding="async" />
         <div class="dream-result-copy">
           <strong class="dream-result-title">${escapeHtml(name)} ${title}</strong>
           <span class="dream-result-detail">${escapeHtml(detail)}</span>
@@ -89,16 +64,16 @@
     body.dataset.dreamResultKey = key;
   }
 
-  const observer = new MutationObserver(() => {
-    requestAnimationFrame(applyDreamResult);
-  });
-
-  observer.observe(document.body, {
-    subtree: true,
-    childList: true,
-    attributes: true,
-    attributeFilter: ['class'],
-  });
+  const showcase = document.querySelector('.action-showcase');
+  if (showcase) {
+    const observer = new MutationObserver(() => requestAnimationFrame(applyDreamResult));
+    observer.observe(showcase, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+  }
 
   socket.on('room:update', () => requestAnimationFrame(applyDreamResult));
 })();
