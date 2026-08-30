@@ -56,6 +56,12 @@
     scrollArea.scrollLeft = 0;
   }
 
+  function resetTouchState() {
+    touchMode = null;
+    pinchStartDistance = 0;
+    scrollArea?.classList.remove('is-dragging');
+  }
+
   function touchDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
@@ -106,8 +112,7 @@
     viewer.classList.add('hidden');
     viewer.setAttribute('aria-hidden', 'true');
     document.documentElement.style.overflow = '';
-    touchMode = null;
-    scrollArea?.classList.remove('is-dragging');
+    resetTouchState();
     openBtn.focus({ preventScroll: true });
   }
 
@@ -170,8 +175,7 @@
 
     scrollArea.addEventListener('touchend', (event) => {
       if (event.touches.length === 0) {
-        touchMode = null;
-        scrollArea.classList.remove('is-dragging');
+        resetTouchState();
       } else if (event.touches.length === 1) {
         touchMode = 'drag';
         dragStartX = event.touches[0].clientX;
@@ -181,5 +185,9 @@
         scrollArea.classList.add('is-dragging');
       }
     }, { passive: false });
+
+    // Android / iOS 在系統手勢、來電或瀏覽器接管觸控時可能只發 touchcancel。
+    // 沒有清理會讓頁面殘留 dragging 狀態，後續滑動看似卡住。
+    scrollArea.addEventListener('touchcancel', resetTouchState, { passive: true });
   }
 })();
