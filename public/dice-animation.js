@@ -26,16 +26,42 @@
 
   const singleRollAudio = new Audio('/music/Dice_Roll.mp3');
   const multiRollAudio = new Audio('/music/2Dice_Roll.mp3');
-  singleRollAudio.preload = 'auto';
-  multiRollAudio.preload = 'auto';
+  singleRollAudio.preload = 'none';
+  multiRollAudio.preload = 'none';
   singleRollAudio.volume = 0.7;
   multiRollAudio.volume = 0.7;
 
+  const preloadedDiceCounts = new Set();
   let activeImage = null;
   let rollInterval = null;
   let settleTimer = null;
   let holdTimer = null;
   let animationToken = 0;
+
+  function framesForCount(diceCount) {
+    if (diceCount === 3) return TRIPLE_ROLL_FRAMES;
+    if (diceCount === 2) return DOUBLE_ROLL_FRAMES;
+    return SINGLE_ROLL_FRAMES;
+  }
+
+  function preloadFrames(diceCount) {
+    const normalized = Math.max(1, Math.min(3, Number(diceCount || 1)));
+    if (preloadedDiceCounts.has(normalized)) return;
+    preloadedDiceCounts.add(normalized);
+    framesForCount(normalized).forEach((src) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = src;
+    });
+  }
+
+  function preloadCurrentDice(room) {
+    const dice = room?.game?.lastEvent?.dice;
+    const showcaseUntil = Number(room?.game?.showcaseUntil || 0);
+    const now = Number(room?.serverTime || Date.now());
+    if (!Array.isArray(dice) || !dice.length || showcaseUntil <= now) return;
+    preloadFrames(dice.length);
+  }
 
   function stopDiceAudio() {
     [singleRollAudio, multiRollAudio].forEach((audio) => {
@@ -94,7 +120,7 @@
     const layer = document.createElement('div');
     layer.className = 'dice-final-hold-layer';
     layer.setAttribute('aria-label', finalAlt);
-    layer.innerHTML = `<img class="dice-final-hold-image" src="${finalSrc}" alt="${finalAlt}" />`;
+    layer.innerHTML = `<img class="dice-final-hold-image" src="${finalSrc}" alt="${finalAlt}" decoding="async" />`;
     card.appendChild(layer);
 
     holdTimer = setTimeout(() => {
@@ -126,13 +152,10 @@
     const finalSrc = image.getAttribute('src') || '/images/dice.png';
     const finalAlt = image.getAttribute('alt') || '骰子結果';
     const diceCount = getCurrentDiceCount(image);
-    const frames = diceCount === 3
-      ? TRIPLE_ROLL_FRAMES
-      : diceCount === 2
-        ? DOUBLE_ROLL_FRAMES
-        : SINGLE_ROLL_FRAMES;
+    const frames = framesForCount(diceCount);
     let frameIndex = 0;
 
+    preloadFrames(diceCount);
     image.classList.remove('dice-landed');
     image.classList.add('dice-rolling');
     image.src = frames[0];
@@ -184,18 +207,21 @@
     }
   }
 
-  [...SINGLE_ROLL_FRAMES, ...DOUBLE_ROLL_FRAMES, ...TRIPLE_ROLL_FRAMES].forEach((src) => {
-    const img = new Image();
-    img.src = src;
-  });
+  const showcase = document.querySelector('.action-showcase');
+  if (showcase) {
+    const observer = new MutationObserver(syncDiceAnimation);
+    observer.observe(showcase, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+  }
 
-  const observer = new MutationObserver(syncDiceAnimation);
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['class'],
-  });
+  if (typeof socket !== 'undefined') {
+    socket.on('room:update', preloadCurrentDice);
+    socket.on('room:started', preloadCurrentDice);
+  }
 
   window.addEventListener('pageshow', syncDiceAnimation);
   document.addEventListener('visibilitychange', () => {
