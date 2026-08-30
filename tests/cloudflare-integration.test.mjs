@@ -151,3 +151,5 @@ try {
   peer1.close();
   peer2.close();
 }
+
+process.exit(0);
