@@ -47,6 +47,18 @@
     { label: '幸福降臨', image: '/images/Unbelievable.png' },
   ];
 
+  const FATE_IMAGES = [
+    POSITIVE_FATE_IMAGES[0],
+    NEGATIVE_FATE_IMAGES[0],
+    POSITIVE_FATE_IMAGES[1],
+    NEGATIVE_FATE_IMAGES[1],
+    POSITIVE_FATE_IMAGES[2],
+    NEGATIVE_FATE_IMAGES[2],
+    { label: '社福救濟', image: '/images/Social%20welfare.png' },
+    POSITIVE_FATE_IMAGES[3],
+    NEGATIVE_FATE_IMAGES[3],
+  ];
+
   const CHOICE_MS = 1500;
   const DICE_MS = 3000;
   const RESULT_MS = 3500;
@@ -140,7 +152,7 @@
     positionShowcaseOverActions();
     overlay.classList.add('choice-stage-active');
     overlay.classList.remove('dice-stage-active', 'result-stage-active');
-    kickerEl.textContent = `${playerName} 選擇`;
+    kickerEl.textContent = playerName;
     titleEl.textContent = '';
     bodyEl.innerHTML = `<img class="action-showcase-image" src="${action.image}" alt="${action.label}" decoding="async" />`;
   }
@@ -179,7 +191,84 @@
     `;
   }
 
-  function secondaryFateVisual(event) {
+  function signed(value) {
+    const number = Number(value || 0);
+    if (Math.abs(number) < 0.000001) return '0';
+    return `${number > 0 ? '+' : '-'}${Math.abs(number)}`;
+  }
+
+  function makeEffect(label, value) {
+    const normalized = label === '幸福' ? '幸福值' : label;
+    return `${normalized} ${signed(value)}`;
+  }
+
+  function firstSignedEffect(text) {
+    const match = String(text || '').match(/(現金|股票|土地|幸福)\s*([+-])\s*(\d+(?:\.\d+)?)/);
+    if (!match) return null;
+    return makeEffect(match[1], Number(match[3]) * (match[2] === '-' ? -1 : 1));
+  }
+
+  function pushRow(rows, player, fallbackName, effects) {
+    const clean = effects.filter(Boolean).filter((item) => !item.endsWith(' 0'));
+    if (!clean.length) clean.push('無資產變動');
+    rows.push({ name: player?.name || fallbackName || '玩家', effects: clean });
+  }
+
+  function buildResultRows(room, event, actor) {
+    const rows = [];
+    const target = room.players.find((item) => item.id === event.targetId);
+    const total = Number(event.diceTotal || 0);
+    const playerName = actor?.name || '玩家';
+
+    if (event.type === 'salary') {
+      pushRow(rows, actor, playerName, [makeEffect('現金', event.amount)]);
+    } else if (event.type === 'buyStock') {
+      const cash = Number(event.salaryIncome || 0) - (event.success ? Number(event.cost || 0) : 0);
+      pushRow(rows, actor, playerName, [makeEffect('現金', cash), event.success ? makeEffect('股票', event.units) : null]);
+    } else if (event.type === 'buyLand') {
+      const cash = Number(event.salaryIncome || 0) - (event.success ? Number(event.cost || 0) : 0);
+      pushRow(rows, actor, playerName, [makeEffect('現金', cash), event.success ? makeEffect('土地', event.units) : null]);
+    } else if (event.type === 'sellStock') {
+      pushRow(rows, actor, playerName, [makeEffect('現金', Number(event.salaryIncome || 0) + Number(event.proceeds || 0)), Number(event.units || 0) ? makeEffect('股票', -Number(event.units || 0)) : null]);
+    } else if (event.type === 'sellLand') {
+      pushRow(rows, actor, playerName, [makeEffect('現金', Number(event.salaryIncome || 0) + Number(event.proceeds || 0)), Number(event.units || 0) ? makeEffect('土地', -Number(event.units || 0)) : null]);
+    } else if (event.type === 'dream') {
+      if (event.success) {
+        const liquidation = event.liquidation || {};
+        pushRow(rows, actor, playerName, [
+          makeEffect('現金', Number(event.salaryIncome || 0) + Number(liquidation.proceeds || 0) - Number(event.fee || 0)),
+          Number(liquidation.stocks || 0) ? makeEffect('股票', -Number(liquidation.stocks || 0)) : null,
+          Number(liquidation.land || 0) ? makeEffect('土地', -Number(liquidation.land || 0)) : null,
+          makeEffect('幸福', event.happinessGain),
+        ]);
+      } else {
+        pushRow(rows, actor, playerName, [makeEffect('現金', event.salaryIncome)]);
+      }
+    } else if (event.type === 'sabotage') {
+      if (target) pushRow(rows, target, target.name, [firstSignedEffect(event.text)]);
+      pushRow(rows, actor, playerName, [makeEffect('現金', event.bonus)]);
+    } else if (event.type === 'help') {
+      if (target) pushRow(rows, target, target.name, [firstSignedEffect(event.text)]);
+      pushRow(rows, actor, playerName, [makeEffect('現金', event.bonus)]);
+    } else if (event.type === 'fate') {
+      const index = Number(event.fateIndex);
+      if (index === 0) pushRow(rows, actor, playerName, [makeEffect('現金', 150 * total)]);
+      else if (index === 2) pushRow(rows, actor, playerName, [makeEffect('股票', 5 * total)]);
+      else if (index === 4) pushRow(rows, actor, playerName, [makeEffect('土地', 5 * total)]);
+      else if (index === 6) pushRow(rows, actor, playerName, [makeEffect('現金', event.received)]);
+      else if (index === 7) pushRow(rows, actor, playerName, [makeEffect('幸福', event.happinessChange || total)]);
+      else if (index === 8) pushRow(rows, actor, playerName, [makeEffect('幸福', event.happinessChange || -(0.5 * total))]);
+      else pushRow(rows, actor, playerName, [firstSignedEffect(event.text)]);
+    } else {
+      pushRow(rows, actor, playerName, [firstSignedEffect(event.text)]);
+    }
+    return rows;
+  }
+
+  function fateVisualFor(event) {
+    if (event.type === 'fate') {
+      return FATE_IMAGES[Math.max(0, Math.min(FATE_IMAGES.length - 1, Number(event.fateIndex) || 0))];
+    }
     if (event.type === 'sabotage') {
       return NEGATIVE_FATE_IMAGES[Math.max(0, Math.min(3, Number(event.effectIndex) || 0))];
     }
@@ -189,7 +278,7 @@
     return null;
   }
 
-  function showResultStage(room, playerName, event, action) {
+  function showResultStage(room, playerName, event) {
     positionShowcaseOverActions();
     overlay.classList.add('result-stage-active');
     overlay.classList.remove('choice-stage-active', 'dice-stage-active');
@@ -198,16 +287,32 @@
 
     const actor = room.players.find((item) => item.id === event.playerId) || { name: playerName };
     const actorName = actor?.name || playerName || '玩家';
-    const fateVisual = secondaryFateVisual(event);
+    const rows = buildResultRows(room, event, actor);
+    const fateVisual = fateVisualFor(event);
 
     bodyEl.innerHTML = `
-      <div class="simple-choice-result">
-        <div class="simple-choice-player">
-          <img class="simple-choice-head" src="${getPlayerHead(actor)}" alt="${escapeHtml(actorName)}" decoding="async" />
-          <strong class="simple-choice-name">${escapeHtml(actorName)}</strong>
+      <div class="simple-result">
+        <div class="result-visual result-visual-single">
+          <div class="result-person">
+            <img class="result-person-head" src="${getPlayerHead(actor)}" alt="${escapeHtml(actorName)}" decoding="async" />
+            <span class="result-person-name">${escapeHtml(actorName)}</span>
+          </div>
         </div>
-        <img class="simple-choice-action" src="${action.image}" alt="${escapeHtml(action.label)}" decoding="async" />
-        ${fateVisual ? `<img class="simple-choice-fate" src="${fateVisual.image}" alt="${escapeHtml(fateVisual.label)}" decoding="async" />` : ''}
+        <div class="simple-result-list">
+          ${rows.map((row) => `
+            <div class="simple-result-row">
+              <strong class="simple-result-player">${escapeHtml(row.name)}</strong>
+              <div class="simple-result-effects">
+                ${row.effects.map((effect) => `<span class="simple-result-effect">${escapeHtml(effect)}</span>`).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        ${fateVisual ? `
+          <div class="result-event-visual">
+            <img class="result-event-image" src="${fateVisual.image}" alt="${escapeHtml(fateVisual.label)}" decoding="async" />
+          </div>
+        ` : ''}
       </div>
     `;
   }
@@ -247,7 +352,7 @@
     overlay.classList.remove('hidden');
     if (elapsed < CHOICE_MS) showActionStage(playerName, action);
     else if (elapsed < RESULT_START_MS) showDiceStage(event);
-    else showResultStage(room, playerName, event, action);
+    else showResultStage(room, playerName, event);
 
     if (elapsed < CHOICE_MS) {
       stageTimers.push(setTimeout(() => {
@@ -259,7 +364,7 @@
     if (elapsed < RESULT_START_MS) {
       stageTimers.push(setTimeout(() => {
         lockActionButtons();
-        showResultStage(room, playerName, event, action);
+        showResultStage(room, playerName, event);
       }, RESULT_START_MS - elapsed));
     }
 
