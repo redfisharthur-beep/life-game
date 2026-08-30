@@ -59,6 +59,27 @@
     return `${target?.name || '玩家'} ${label} ${signed(event.targetChange)}`;
   }
 
+  function patchRoundAnnouncement() {
+    if (typeof currentRoom === 'undefined') return;
+    const announcement = document.getElementById('roundAnnouncement');
+    if (!announcement) return;
+
+    const game = currentRoom?.game;
+    const now = Number(currentRoom?.serverTime || Date.now());
+    const round = Number(game?.round || 0);
+    const shouldShow = currentRoom?.phase === 'game'
+      && (round === 11 || round === 21)
+      && Number(game?.transitionUntil || 0) > now;
+
+    announcement.classList.toggle('hidden', !shouldShow);
+    if (!shouldShow) return;
+
+    const image = announcement.querySelector('.round-announcement-image');
+    if (!image || announcement.childElementCount !== 1) {
+      announcement.innerHTML = '<img class="round-announcement-image" src="/images/The%20tide%20of%20the%20times.png" alt="時代浪潮" />';
+    }
+  }
+
   function patchTripleDice() {
     if (typeof currentRoom === 'undefined') return;
     const event = currentRoom?.game?.lastEvent;
@@ -121,6 +142,7 @@
   }
 
   function sync() {
+    patchRoundAnnouncement();
     patchTripleDice();
     patchSpecialResult();
   }
