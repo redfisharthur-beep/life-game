@@ -23,43 +23,46 @@
   opacity: 1;
 }
 
-/* 左下：回到上一頁。 */
+/* 左下：回到上一頁。強制覆蓋舊版右上角膠囊定位。 */
 .room-mode #leaveRoomBtn {
   display: block !important;
-  position: absolute;
-  left: 4.2%;
-  right: auto;
-  top: auto;
-  bottom: 4.2%;
-  z-index: 20;
-  width: 13%;
-  height: 9%;
+  position: absolute !important;
+  left: 4.2% !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: 4.2% !important;
+  z-index: 40 !important;
+  width: 13% !important;
+  height: 9% !important;
   background-image: url('/images/back.png') !important;
+  background-color: transparent !important;
 }
 
 /* 右下：遊戲說明。 */
 .room-mode #roomRulesOpenBtn {
   display: block !important;
-  position: absolute;
-  right: 4.2%;
-  left: auto;
-  top: auto;
-  bottom: 4.2%;
-  z-index: 20;
-  width: 16%;
-  height: 9%;
+  position: absolute !important;
+  right: 4.2% !important;
+  left: auto !important;
+  top: auto !important;
+  bottom: 4.2% !important;
+  z-index: 40 !important;
+  width: 16% !important;
+  height: 9% !important;
   background-image: url('/images/Game%20Rules.png') !important;
 }
 
 /* 中央：房主顯示 go，其他玩家顯示 wait。兩張圖以中心點放大 1.5 倍。 */
 .room-mode #startGameBtn {
   display: block !important;
-  position: absolute;
-  left: 50%;
-  top: 72.2%;
-  z-index: 18;
-  width: 25%;
-  height: 11%;
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  top: 72.2% !important;
+  bottom: auto !important;
+  z-index: 30 !important;
+  width: 25% !important;
+  height: 11% !important;
   transform: translateX(-50%) scale(1.5) !important;
   transform-origin: center center;
 }
@@ -107,36 +110,36 @@
 
 @media (max-width: 760px) {
   .room-mode #leaveRoomBtn {
-    left: 3.6%;
-    bottom: 3.6%;
-    width: 15%;
-    height: 9.5%;
+    left: 3.6% !important;
+    bottom: 3.6% !important;
+    width: 15% !important;
+    height: 9.5% !important;
   }
 
   .room-mode #roomRulesOpenBtn {
-    right: 3.6%;
-    bottom: 3.6%;
-    width: 18%;
-    height: 9.5%;
+    right: 3.6% !important;
+    bottom: 3.6% !important;
+    width: 18% !important;
+    height: 9.5% !important;
   }
 
   .room-mode #startGameBtn {
-    top: 72.5%;
-    width: 29%;
-    height: 11.5%;
+    top: 72.5% !important;
+    width: 29% !important;
+    height: 11.5% !important;
   }
 }
 
 @media (max-width: 430px) {
   .room-mode #leaveRoomBtn {
-    width: 17%;
+    width: 17% !important;
   }
 
   .room-mode #roomRulesOpenBtn {
-    width: 20%;
+    width: 20% !important;
   }
 
   .room-mode #startGameBtn {
-    width: 32%;
+    width: 32% !important;
   }
 }
