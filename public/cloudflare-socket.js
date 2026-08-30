@@ -43,6 +43,20 @@
       });
     }
 
+    abandonRoom() {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+      this.activeSession = null;
+      this.pending.clear();
+      this.intentionalClose = true;
+      if (this.ws && this.ws.readyState < WebSocket.CLOSING) {
+        try { this.ws.close(1000, 'abandon room'); } catch (_) {}
+      }
+      this.ws = null;
+      this.connected = false;
+      setTimeout(() => { this.intentionalClose = false; }, 0);
+    }
+
     parseEmitArgs(args) {
       const values = [...args];
       let callback = null;
@@ -216,8 +230,15 @@
     handleClose(closedSocket) {
       if (this.ws !== closedSocket) return;
       this.ws = null;
+      this.connected = false;
 
       if (this.intentionalClose || !this.activeSession) return;
+
+      this.dispatch('disconnect', {
+        roomCode: this.activeSession.roomCode,
+        playerId: this.activeSession.playerId,
+      });
+
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = setTimeout(async () => {
         if (!this.activeSession) return;
@@ -230,7 +251,7 @@
             }
           });
         } catch (_) {
-          this.handleClose(this.ws);
+          if (this.activeSession) this.handleClose(this.ws);
         }
       }, 1000);
     }
