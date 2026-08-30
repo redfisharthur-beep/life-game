@@ -13,6 +13,7 @@
   tracks.game.volume = 0.20;
 
   const entryPanel = document.getElementById('entryPanel');
+  const roomBrowserPanel = document.getElementById('roomBrowserPanel');
   const roomPanel = document.getElementById('roomPanel');
   const professionPanel = document.getElementById('professionPanel');
   const gamePanel = document.getElementById('gamePanel');
@@ -29,7 +30,8 @@
     if (isVisible(gamePanel)) {
       return isVisible(gameResults) ? null : 'game';
     }
-    if (isVisible(roomPanel) || isVisible(professionPanel)) return 'lobby';
+    // 房間列表與玩家列表使用完全相同的 lobby 背景音樂。
+    if (isVisible(roomBrowserPanel) || isVisible(roomPanel) || isVisible(professionPanel)) return 'lobby';
     if (isVisible(entryPanel)) return 'homepage';
     return null;
   }
@@ -94,7 +96,7 @@
   document.addEventListener('keydown', unlockFromGesture, true);
   document.addEventListener('touchstart', unlockFromGesture, true);
 
-  [entryPanel, roomPanel, professionPanel, gamePanel, gameResults].filter(Boolean).forEach((panel) => {
+  [entryPanel, roomBrowserPanel, roomPanel, professionPanel, gamePanel, gameResults].filter(Boolean).forEach((panel) => {
     new MutationObserver(syncMusic).observe(panel, {
       attributes: true,
       attributeFilter: ['class'],
