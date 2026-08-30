@@ -1,0 +1,27 @@
+name: 10000 Game Stress Check
+
+on:
+  push:
+    paths:
+      - 'tests/stress-10000-games.mjs'
+      - '.github/workflows/stress-10000.yml'
+      - 'src/game-room-auto-action.js'
+      - 'src/game-room-era-wave.js'
+      - 'src/game-room-recovery.js'
+      - 'src/game-room-rules-v2.js'
+      - 'src/game-room-eight.js'
+      - 'src/game-room-stable.js'
+      - 'src/game-room.js'
+  workflow_dispatch:
+
+jobs:
+  stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run 10,000 four-player games
+        run: node tests/stress-10000-games.mjs
