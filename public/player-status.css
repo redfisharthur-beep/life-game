@@ -165,6 +165,17 @@
   text-align: center;
 }
 
+/* 離線只保留在玩家名字後方，不在幸福值區或卡片右側重複顯示。 */
+.player-status-card.offline::before,
+.player-status-card.offline::after,
+.player-status-card.offline .player-status-happiness::before,
+.player-status-card.offline .player-status-happiness::after,
+.player-status-card.offline .offline-badge,
+.player-status-card.offline .player-status-offline {
+  display: none !important;
+  content: none !important;
+}
+
 .player-status-turn-badge {
   position: absolute;
   top: -5px;
