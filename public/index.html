@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/market-icons.css?v=20260827-2312" />
   <link rel="stylesheet" href="/profession-layout.css?v=20260828-1230" />
   <link rel="stylesheet" href="/profession-position.css?v=20260828-1324" />
-  <link rel="stylesheet" href="/profession-eight.css?v=20260830-1243" />
+  <link rel="stylesheet" href="/profession-eight.css?v=20260830-1400" />
   <link rel="stylesheet" href="/action-showcase.css?v=20260829-1251" />
   <link rel="stylesheet" href="/dice-animation.css?v=20260829-1251" />
   <link rel="stylesheet" href="/showcase-result-overrides.css?v=20260827-2045" />
@@ -18,12 +18,12 @@
   <link rel="stylesheet" href="/game-complete.css?v=20260829-0004" />
   <link rel="stylesheet" href="/logo-display.css?v=20260827-1610" />
   <link rel="stylesheet" href="/front-page.css?v=20260827-2055" />
-  <link rel="stylesheet" href="/player-list.css?v=20260827-2341" />
+  <link rel="stylesheet" href="/player-list.css?v=20260830-1400" />
   <link rel="stylesheet" href="/major-event.css?v=20260828-1905" />
   <link rel="stylesheet" href="/announcement-tone.css?v=20260827-2225" />
   <link rel="stylesheet" href="/ui-final-tweaks.css?v=20260829-1301" />
-  <link rel="stylesheet" href="/rules-viewer.css?v=20260830-1321" />
-  <link rel="stylesheet" href="/room-controls.css?v=20260830-1340" />
+  <link rel="stylesheet" href="/rules-viewer.css?v=20260830-1400" />
+  <link rel="stylesheet" href="/room-controls.css?v=20260830-1400" />
 </head>
 <body>
   <main class="shell">
@@ -63,8 +63,8 @@
       <div id="professionPanel" class="panel hidden">
         <div class="profession-stage">
           <img class="profession-stage-image" src="/images/select.png?v=20260827-1735" alt="選擇職業" />
-          <button id="professionHomeBtn" class="home-pill profession-home-pill" type="button">回到首頁</button>
-          <button id="rulesOpenBtn" class="rules-pill" type="button">遊戲規則</button>
+          <button id="professionHomeBtn" class="home-pill profession-home-pill" type="button" aria-label="回到上一頁">回到首頁</button>
+          <button id="rulesOpenBtn" class="rules-pill" type="button" aria-label="遊戲規則">遊戲規則</button>
           <div id="professionGrid" class="profession-grid"></div>
         </div>
         <p id="professionMessage" class="profession-message" aria-live="polite"></p>
@@ -120,33 +120,15 @@
 
         <section class="actions-section">
           <div id="actionGrid" class="action-grid">
-            <button class="action-button" data-action="salary" type="button" aria-label="領薪">
-              <img class="action-image" src="/images/salary.png" alt="領薪" />
-            </button>
-            <button class="action-button" data-action="buyStock" type="button" aria-label="買股" disabled>
-              <img class="action-image" src="/images/buystock.png" alt="買股" />
-            </button>
-            <button class="action-button" data-action="buyLand" type="button" aria-label="圈地" disabled>
-              <img class="action-image" src="/images/buyland.png" alt="圈地" />
-            </button>
-            <button class="action-button" data-action="fate" type="button" aria-label="命運" disabled>
-              <img class="action-image" src="/images/destiny.png" alt="命運" />
-            </button>
-            <button class="action-button" data-action="sabotage" type="button" aria-label="陷害" disabled>
-              <img class="action-image" src="/images/frame.png" alt="陷害" />
-            </button>
-            <button class="action-button" data-action="help" type="button" aria-label="援助" disabled>
-              <img class="action-image" src="/images/assistance.png" alt="援助" />
-            </button>
-            <button class="action-button" data-action="sellStock" type="button" aria-label="賣股" disabled>
-              <img class="action-image" src="/images/Sellstock.png" alt="賣股" />
-            </button>
-            <button class="action-button" data-action="sellLand" type="button" aria-label="賣地" disabled>
-              <img class="action-image" src="/images/Sellland.png" alt="賣地" />
-            </button>
-            <button class="action-button" data-action="dream" type="button" aria-label="圓夢" disabled>
-              <img class="action-image" src="/images/dream.png" alt="圓夢" />
-            </button>
+            <button class="action-button" data-action="salary" type="button" aria-label="領薪"><img class="action-image" src="/images/salary.png" alt="領薪" /></button>
+            <button class="action-button" data-action="buyStock" type="button" aria-label="買股" disabled><img class="action-image" src="/images/buystock.png" alt="買股" /></button>
+            <button class="action-button" data-action="buyLand" type="button" aria-label="圈地" disabled><img class="action-image" src="/images/buyland.png" alt="圈地" /></button>
+            <button class="action-button" data-action="fate" type="button" aria-label="命運" disabled><img class="action-image" src="/images/destiny.png" alt="命運" /></button>
+            <button class="action-button" data-action="sabotage" type="button" aria-label="陷害" disabled><img class="action-image" src="/images/frame.png" alt="陷害" /></button>
+            <button class="action-button" data-action="help" type="button" aria-label="援助" disabled><img class="action-image" src="/images/assistance.png" alt="援助" /></button>
+            <button class="action-button" data-action="sellStock" type="button" aria-label="賣股" disabled><img class="action-image" src="/images/Sellstock.png" alt="賣股" /></button>
+            <button class="action-button" data-action="sellLand" type="button" aria-label="賣地" disabled><img class="action-image" src="/images/Sellland.png" alt="賣地" /></button>
+            <button class="action-button" data-action="dream" type="button" aria-label="圓夢" disabled><img class="action-image" src="/images/dream.png" alt="圓夢" /></button>
           </div>
         </section>
 
@@ -156,10 +138,7 @@
         </section>
 
         <section id="gameResults" class="game-results hidden" aria-live="polite">
-          <div class="results-heading">
-            <span>人生結算</span>
-            <strong id="resultWinner">🏆</strong>
-          </div>
+          <div class="results-heading"><span>人生結算</span><strong id="resultWinner">🏆</strong></div>
           <div id="rankingList" class="ranking-list"></div>
           <div class="results-actions">
             <button id="restartGameBtn" class="start-button" type="button">再來一局</button>
