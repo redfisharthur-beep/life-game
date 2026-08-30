@@ -1,4 +1,4 @@
-/* 職業選擇頁規則按鈕、規則圖片檢視器，以及回到首頁膠囊按鈕。 */
+/* 職業選擇頁規則按鈕、規則圖片檢視器，以及回到首頁按鈕。 */
 .profession-stage {
   position: relative;
 }
@@ -18,89 +18,67 @@
   transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease;
 }
 
-.rules-pill:hover,
-.home-pill:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 7px 17px rgba(95, 73, 53, .18);
-}
-
-.rules-pill:active,
-.home-pill:active {
-  transform: translateY(0);
-}
-
-/* 遊戲規則：職業選擇頁右上方扁平橢圓膠囊。 */
-.rules-pill {
+/* 職業選擇頁：左下 back.png、右下 Game Rules.png，取代上方文字膠囊。 */
+#professionPanel .profession-home-pill,
+#professionPanel .rules-pill {
+  appearance: none;
   position: absolute;
-  top: 3.2%;
-  right: 3.2%;
-  left: auto;
-  z-index: 30;
-  width: 6.1em;
+  top: auto !important;
+  bottom: 4.2% !important;
+  z-index: 40;
   min-width: 0;
   min-height: 0;
-  height: 1.75em;
-  padding: 0 .72em;
-  border-radius: 999px;
-  font-size: clamp(12px, 1.42vw, 15px);
-  font-weight: 400;
-  letter-spacing: .02em;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
+  margin: 0;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+  line-height: 0;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+#professionPanel .profession-home-pill {
+  display: block !important;
+  left: 4.2% !important;
+  right: auto !important;
+  width: 13% !important;
+  height: 9% !important;
+  background-image: url('/images/back.png') !important;
+}
+
+#professionPanel .rules-pill {
+  display: block !important;
+  right: 4.2% !important;
+  left: auto !important;
+  width: 16% !important;
+  height: 9% !important;
+  background-image: url('/images/Game%20Rules.png') !important;
+}
+
+#professionPanel .profession-home-pill:hover,
+#professionPanel .rules-pill:hover {
+  transform: scale(1.04);
+  box-shadow: none !important;
+}
+
+#professionPanel .profession-home-pill:active,
+#professionPanel .rules-pill:active {
+  transform: scale(.97);
 }
 
 .home-pill {
   margin-top: 8px;
   padding: 8px 18px;
   font-size: 14px;
-}
-
-/* 玩家等待列表：右上角小型「回到首頁」，盡量不遮住房子底圖。 */
-.room-mode #leaveRoomBtn {
-  display: block !important;
-  position: absolute;
-  top: 3.0%;
-  right: 3.0%;
-  left: auto;
-  z-index: 12;
-  width: 5.5em;
-  min-width: 0;
-  min-height: 0;
-  height: 1.65em;
-  margin: 0;
-  padding: 0 .45em;
-  border-radius: 999px;
-  font-size: clamp(11px, 1.35vw, 14px);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-  pointer-events: auto;
-}
-
-/* 職業選擇：左上角三個人物上方放「回到首頁」。 */
-#professionPanel .profession-home-pill {
-  position: absolute;
-  top: 3.2%;
-  left: 3.2%;
-  right: auto;
-  z-index: 30;
-  display: block;
-  width: 5.5em;
-  min-width: 0;
-  min-height: 0;
-  height: 1.75em;
-  margin: 0;
-  padding: 0 .45em;
-  border-radius: 999px;
-  font-size: clamp(12px, 1.42vw, 15px);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
 }
 
 .results-actions .start-button,
@@ -177,7 +155,6 @@
   margin-top: 0;
 }
 
-/* 關閉鍵只顯示叉叉，不要圓形／膠囊底。 */
 .rules-viewer-close {
   position: fixed;
   top: 10px;
@@ -208,36 +185,18 @@
 }
 
 @media (max-width: 600px) {
-  .rules-pill {
-    top: 2.2%;
-    right: 2.8%;
-    left: auto;
-    width: 5.9em;
-    min-height: 0;
-    height: 1.7em;
-    padding: 0 .65em;
-    border-radius: 999px;
-    font-size: 11.5px;
-    font-weight: 400;
-    line-height: 1;
-  }
-
-  .room-mode #leaveRoomBtn {
-    top: 2.2%;
-    right: 2.8%;
-    width: 5.35em;
-    height: 1.55em;
-    padding: 0 .35em;
-    font-size: 10.5px;
-  }
-
   #professionPanel .profession-home-pill {
-    top: 2.2%;
-    left: 2.8%;
-    width: 5.35em;
-    height: 1.7em;
-    padding: 0 .35em;
-    font-size: 11.5px;
+    left: 3.6% !important;
+    bottom: 3.6% !important;
+    width: 15% !important;
+    height: 9.5% !important;
+  }
+
+  #professionPanel .rules-pill {
+    right: 3.6% !important;
+    bottom: 3.6% !important;
+    width: 18% !important;
+    height: 9.5% !important;
   }
 
   .rules-viewer-card {
