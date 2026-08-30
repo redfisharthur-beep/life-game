@@ -27,6 +27,9 @@ jobs:
       - name: Round 21 triple-dice regression
         run: node tests/round21-triple-dice.test.mjs
 
+      - name: Happiness milestone regression
+        run: node tests/happiness-milestones.test.mjs
+
       - name: Wrangler compile dry run
         run: npx --yes wrangler@4 deploy --dry-run --outdir .wrangler-dry-run
 
