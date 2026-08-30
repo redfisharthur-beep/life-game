@@ -1,24 +1,9 @@
-/* 遊戲進行介面：統一使用較細字重。 */
-#gamePanel .round-label,
-#gamePanel .topbar-timer strong,
-#gamePanel .market-value,
-#gamePanel .player-status-name,
-#gamePanel .player-info-label,
-#gamePanel .player-info-value,
-#gamePanel .player-status-happiness-value,
-#gamePanel .player-status-turn-badge,
-#gamePanel .me-name,
-#gamePanel .me-profession,
-#gamePanel .asset-grid,
-#gamePanel .asset-grid b,
-#gamePanel .turn-title,
-#gamePanel .turn-chip,
-#gamePanel .turn-notice,
-#gamePanel .game-results,
-#gamePanel .game-results strong,
-#gamePanel .game-results b,
-#gamePanel .game-results button {
-  font-weight: 400 !important;
+/* 遊戲進行介面：所有可見文字統一使用細體。 */
+#gamePanel,
+#gamePanel *,
+.action-showcase,
+.action-showcase * {
+  font-weight: 300 !important;
 }
 
 #gamePanel .round-label { font-size: 23px !important; }
@@ -32,16 +17,6 @@
 #gamePanel .player-status-happiness-value { font-size: 19px !important; }
 #gamePanel .player-status-turn-badge { font-size: 12px !important; }
 
-.action-showcase .action-showcase-kicker,
-.action-showcase .action-showcase-title,
-.action-showcase .result-person-name,
-.action-showcase .result-event-label,
-.action-showcase .dream-fail-label,
-.action-showcase .simple-result-player,
-.action-showcase .simple-result-effect {
-  font-weight: 400 !important;
-}
-
 .action-showcase.choice-stage-active .action-showcase-kicker {
   font-size: clamp(30px, 6.8vw, 44px) !important;
 }
@@ -52,14 +27,59 @@
 .action-showcase .simple-result-player { font-size: clamp(24px, 5.7vw, 34px) !important; }
 .action-showcase .simple-result-effect { font-size: clamp(20px, 4.8vw, 27px) !important; }
 
+/*
+ * 行動選擇後的所有視覺統一縮為原本 80%。
+ * 不影響 9 選 1 按鈕本身，只影響：選擇圖、骰子動畫／結果、行動結果圖。
+ */
+.action-showcase .action-showcase-image {
+  width: min(152px, 36.8vw) !important;
+  height: min(152px, 36.8vw) !important;
+}
+
 .action-showcase .dice-result-image {
-  width: min(190px, 42vw) !important;
-  height: min(190px, 42vw) !important;
+  width: min(152px, 33.6vw) !important;
+  height: min(152px, 33.6vw) !important;
 }
 
 .action-showcase .dice-result-images.double-dice-total .dice-result-image {
-  width: min(214px, 48vw) !important;
-  height: min(214px, 48vw) !important;
+  width: min(171px, 38.4vw) !important;
+  height: min(171px, 38.4vw) !important;
+}
+
+.action-showcase .dice-result-images.triple-dice-total .dice-result-image {
+  width: min(204px, 44.8vw) !important;
+  height: min(204px, 44.8vw) !important;
+}
+
+.action-showcase .dice-final-hold-image {
+  width: min(196px, 43.2vw) !important;
+  height: min(196px, 43.2vw) !important;
+}
+
+.action-showcase .result-person-head,
+.action-showcase .result-person-head-small {
+  width: 74px !important;
+  height: 74px !important;
+}
+
+.action-showcase .result-event-image {
+  width: 168px !important;
+  height: 168px !important;
+}
+
+.action-showcase .dream-fail-image {
+  width: 152px !important;
+  height: 152px !important;
+}
+
+.action-showcase .special-result-head {
+  width: 83px !important;
+  height: 83px !important;
+}
+
+.action-showcase .special-result-event-image {
+  width: min(200px, 46.4vw) !important;
+  height: min(200px, 46.4vw) !important;
 }
 
 @media (max-width: 760px) {
@@ -93,14 +113,55 @@
   .action-showcase .simple-result-player { font-size: clamp(23px, 7.2vw, 31px) !important; }
   .action-showcase .simple-result-effect { font-size: clamp(19px, 5.5vw, 24px) !important; }
 
+  .action-showcase .action-showcase-image {
+    width: min(152px, 36.8vw) !important;
+    height: min(152px, 36.8vw) !important;
+  }
+
   .action-showcase .dice-result-image {
-    width: min(175px, 49vw) !important;
-    height: min(175px, 49vw) !important;
+    width: min(140px, 39.2vw) !important;
+    height: min(140px, 39.2vw) !important;
   }
 
   .action-showcase .dice-result-images.double-dice-total .dice-result-image {
-    width: min(195px, 55vw) !important;
-    height: min(195px, 55vw) !important;
+    width: min(156px, 44vw) !important;
+    height: min(156px, 44vw) !important;
+  }
+
+  .action-showcase .dice-result-images.triple-dice-total .dice-result-image {
+    width: min(184px, 51.2vw) !important;
+    height: min(184px, 51.2vw) !important;
+  }
+
+  .action-showcase .dice-final-hold-image {
+    width: min(176px, 49.6vw) !important;
+    height: min(176px, 49.6vw) !important;
+  }
+
+  .action-showcase .result-person-head,
+  .action-showcase .result-person-head-small {
+    width: 61px !important;
+    height: 61px !important;
+  }
+
+  .action-showcase .result-event-image {
+    width: 139px !important;
+    height: 139px !important;
+  }
+
+  .action-showcase .dream-fail-image {
+    width: 128px !important;
+    height: 128px !important;
+  }
+
+  .action-showcase .special-result-head {
+    width: 67px !important;
+    height: 67px !important;
+  }
+
+  .action-showcase .special-result-event-image {
+    width: min(176px, 49.6vw) !important;
+    height: min(176px, 49.6vw) !important;
   }
 }
 
