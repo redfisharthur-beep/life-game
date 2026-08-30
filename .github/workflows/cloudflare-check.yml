@@ -36,7 +36,7 @@ jobs:
             wait "$WRANGLER_PID" 2>/dev/null || true
           }
           trap cleanup EXIT
-          node tests/cloudflare-integration.test.mjs
+          timeout 45s node tests/cloudflare-integration.test.mjs
 
       - name: Show Wrangler log on failure
         if: failure()
