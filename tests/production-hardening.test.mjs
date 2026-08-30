@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const read = (path) => fs.readFileSync(path, 'utf8');
+
+const worker = read('src/worker.js');
+const hardening = read('src/game-room-hardening.js');
+const playerStatus = read('public/player-status.js');
+const roomControls = read('public/room-controls.js');
+const uiTweaks = read('public/ui-final-tweaks.js');
+const diceAnimation = read('public/dice-animation.js');
+const dreamResult = read('public/dream-result.js');
+
+assert.match(worker, /game-room-hardening\.js/, 'Production worker must export the hardened GameRoom chain');
+assert.match(hardening, /PROFESSION_AUTO_PICK_MS\s*=\s*60_000/, 'Profession auto-pick must be capped at 60 seconds');
+assert.match(hardening, /hostName:\s*host\?\.name\s*\|\|\s*''/, 'Matchmaker sync must include the current host name');
+
+assert.doesNotMatch(playerStatus, /setInterval\s*\(/, 'Player status must not continuously rebuild on a polling interval');
+assert.doesNotMatch(roomControls, /setInterval\s*\(/, 'Lobby controls must not poll continuously');
+assert.doesNotMatch(uiTweaks, /setInterval\s*\(/, 'UI tweaks must not poll continuously');
+
+assert.match(diceAnimation, /preloadFrames\(diceCount\)/, 'Dice frames should be loaded by the active dice count');
+assert.doesNotMatch(diceAnimation, /\[\.\.\.SINGLE_ROLL_FRAMES,\s*\.\.\.DOUBLE_ROLL_FRAMES,\s*\.\.\.TRIPLE_ROLL_FRAMES\]\.forEach/, 'All 15 dice frames must not be preloaded on page load');
+assert.doesNotMatch(diceAnimation, /observer\.observe\(document\.body/, 'Dice observer should not watch the entire document body');
+assert.doesNotMatch(dreamResult, /observer\.observe\(document\.body/, 'Dream result observer should not watch the entire document body');
+
+console.log('Production hardening regression checks passed');
