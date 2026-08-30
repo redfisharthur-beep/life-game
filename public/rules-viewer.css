@@ -127,20 +127,26 @@
   overflow: hidden;
 }
 
-/* 3 張規則圖由上往下排列，固定為原圖顯示尺寸 1.5 倍，可上下左右自由滑動。 */
+/* 三張規則圖預設 1 倍，由上往下排列；縮放後仍可上下左右拖動。 */
 .rules-viewer-page {
   width: 100%;
   height: 100%;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  touch-action: pan-x pan-y;
+  touch-action: none;
   background: #f6efe8;
+  cursor: grab;
+}
+
+.rules-viewer-page.is-dragging {
+  cursor: grabbing;
 }
 
 .rules-viewer-image {
   display: block;
-  width: 150%;
+  width: calc(100% * var(--rules-zoom, 1));
+  min-width: calc(100% * var(--rules-zoom, 1));
   max-width: none;
   height: auto;
   max-height: none;
@@ -149,6 +155,7 @@
   border-radius: 0;
   user-select: none;
   -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 .rules-viewer-image + .rules-viewer-image {
