@@ -162,33 +162,41 @@
   margin-top: 0;
 }
 
+/* 規則視窗右上角：正圓形膠囊關閉按鈕。 */
 .rules-viewer-close {
   position: fixed;
-  top: 10px;
+  top: 12px;
   right: 14px;
   z-index: 12020;
-  width: auto;
-  height: auto;
-  min-width: 0;
-  min-height: 0;
-  padding: 2px 6px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  padding: 0;
+  border: 1px solid rgba(122, 96, 73, .30);
+  border-radius: 50%;
+  background: rgba(255, 250, 241, .96);
   color: #5f5149;
-  box-shadow: none;
-  font-size: 38px;
+  box-shadow: 0 5px 14px rgba(95, 73, 53, .18);
+  font-size: 32px;
   font-weight: 300;
   line-height: 1;
   cursor: pointer;
-  text-shadow: 0 1px 4px rgba(255, 255, 255, .9);
+  text-shadow: none;
+  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
 }
 
-.rules-viewer-close:hover,
+.rules-viewer-close:hover {
+  background: #fffdf8;
+  box-shadow: 0 7px 18px rgba(95, 73, 53, .22);
+  transform: scale(1.04);
+}
+
 .rules-viewer-close:active {
-  background: transparent;
-  box-shadow: none;
-  transform: none;
+  transform: scale(.96);
 }
 
 @media (max-width: 600px) {
@@ -212,9 +220,12 @@
   }
 
   .rules-viewer-close {
-    top: 8px;
+    top: 10px;
     right: 10px;
-    padding: 2px 5px;
-    font-size: 34px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 30px;
   }
 }
