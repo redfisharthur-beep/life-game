@@ -29,7 +29,7 @@
     socket.on('room:started', (room) => requestAnimationFrame(() => syncRoomControls(room)));
   }
 
-  setInterval(() => {
+  window.addEventListener('pageshow', () => requestAnimationFrame(() => {
     try { syncRoomControls(); } catch (_) {}
-  }, 400);
+  }));
 })();
