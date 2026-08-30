@@ -158,7 +158,6 @@ export class GameRoom {
     room.players.push(player);
     if (!room.hostId) room.hostId = player.id;
     await this.saveRoom(room);
-    await this.syncMatchmaker(room);
 
     return {
       ok: true,
@@ -171,8 +170,8 @@ export class GameRoom {
     const event = String(message?.event || '');
     const payload = message?.payload || {};
     const requestId = message?.requestId || null;
-    let room = await this.getRoom();
-    let player = this.findPlayer(room, attachment.playerId, attachment.reconnectToken);
+    const room = await this.getRoom();
+    const player = this.findPlayer(room, attachment.playerId, attachment.reconnectToken);
 
     if (!player) {
       this.ack(socket, requestId, { ok: false, message: '玩家驗證失敗，請重新加入。' });
