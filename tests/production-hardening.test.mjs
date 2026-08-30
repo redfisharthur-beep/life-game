@@ -9,7 +9,8 @@ const playerStatus = read('public/player-status.js');
 const roomControls = read('public/room-controls.js');
 const uiTweaks = read('public/ui-final-tweaks.js');
 const diceAnimation = read('public/dice-animation.js');
-const dreamResult = read('public/dream-result.js');
+const actionShowcase = read('public/action-showcase.js');
+const index = read('public/index.html');
 
 assert.match(worker, /game-room-hardening\.js/, 'Production worker must export the hardened GameRoom chain');
 assert.match(hardening, /PROFESSION_AUTO_PICK_MS\s*=\s*60_000/, 'Profession auto-pick must be capped at 60 seconds');
@@ -20,8 +21,10 @@ assert.doesNotMatch(roomControls, /setInterval\s*\(/, 'Lobby controls must not p
 assert.doesNotMatch(uiTweaks, /setInterval\s*\(/, 'UI tweaks must not poll continuously');
 
 assert.match(diceAnimation, /preloadFrames\(diceCount\)/, 'Dice frames should be loaded by the active dice count');
+assert.match(diceAnimation, /preloadFrames\(1\)/, 'Single-die roll frames must be warmed up for reliable first-roll animation');
 assert.doesNotMatch(diceAnimation, /\[\.\.\.SINGLE_ROLL_FRAMES,\s*\.\.\.DOUBLE_ROLL_FRAMES,\s*\.\.\.TRIPLE_ROLL_FRAMES\]\.forEach/, 'All 15 dice frames must not be preloaded on page load');
 assert.doesNotMatch(diceAnimation, /observer\.observe\(document\.body/, 'Dice observer should not watch the entire document body');
-assert.doesNotMatch(dreamResult, /observer\.observe\(document\.body/, 'Dream result observer should not watch the entire document body');
+assert.match(actionShowcase, /simple-choice-result/, 'Result stage should use the simplified result layout');
+assert.doesNotMatch(index, /action-result-head-fix\.js|game-ui-v2\.js|showcase-result-overrides\.js|dream-result\.js/, 'Obsolete result patch scripts must stay unloaded');
 
 console.log('Production hardening regression checks passed');
