@@ -51,18 +51,35 @@
   margin-top: -4px;
 }
 
-/* 骰完後結果：頭像＋人名＋純文字數據，不使用膠囊框。 */
+/* 骰完後：放大頭像在左、人名在右，數據獨立放下方。 */
 .simple-result-plain {
   display: grid;
   justify-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
 .result-person-plain {
-  display: grid;
-  justify-items: center;
-  gap: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.result-person-plain .result-person-head {
+  width: 128px;
+  height: 128px;
+  flex: 0 0 128px;
+  object-fit: contain;
+}
+
+.result-person-plain .result-person-name {
+  max-width: 220px;
+  font-size: clamp(27px, 6vw, 36px);
+  line-height: 1.05;
+  text-align: left;
+  white-space: normal;
 }
 
 .simple-result-effects-plain {
@@ -102,6 +119,35 @@
   height: min(190px, 46vw);
 }
 
+/* 圓夢：只顯示 happy / cry 圖、成功或失敗、以及現金增加。 */
+.dream-outcome-result {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.dream-outcome-head {
+  display: block;
+  width: min(245px, 58vw);
+  height: min(245px, 58vw);
+  object-fit: contain;
+  background: transparent;
+  filter: drop-shadow(0 12px 20px rgba(71, 62, 55, .2));
+}
+
+.dream-outcome-title {
+  color: #554e49;
+  font-size: clamp(27px, 6vw, 36px);
+  line-height: 1.05;
+}
+
+.dream-outcome-cash {
+  color: #665d56;
+  font-size: clamp(21px, 5vw, 28px);
+  line-height: 1.1;
+}
+
 .dice-result-images.triple-dice-total .dice-result-image {
   width: min(260px, 58vw);
   height: min(260px, 58vw);
@@ -123,6 +169,21 @@
     height: min(155px, 46vw);
   }
 
+  .result-person-plain {
+    gap: 12px;
+  }
+
+  .result-person-plain .result-person-head {
+    width: 108px;
+    height: 108px;
+    flex-basis: 108px;
+  }
+
+  .result-person-plain .result-person-name {
+    max-width: 175px;
+    font-size: clamp(24px, 7vw, 31px);
+  }
+
   .simple-result-effects-plain {
     gap: 5px 10px;
   }
@@ -134,5 +195,18 @@
   .result-event-visual-plain .result-event-image {
     width: min(165px, 48vw);
     height: min(165px, 48vw);
+  }
+
+  .dream-outcome-head {
+    width: min(215px, 62vw);
+    height: min(215px, 62vw);
+  }
+
+  .dream-outcome-title {
+    font-size: clamp(25px, 7vw, 32px);
+  }
+
+  .dream-outcome-cash {
+    font-size: clamp(20px, 5.8vw, 25px);
   }
 }
