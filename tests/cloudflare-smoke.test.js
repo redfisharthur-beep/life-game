@@ -10,6 +10,7 @@ const worker = read('src/worker.js');
 const gameRoom = read('src/game-room.js');
 const gameRoomEight = read('src/game-room-eight.js');
 const gameRoomRulesV2 = read('src/game-room-rules-v2.js');
+const gameRoomRecovery = read('src/game-room-recovery.js');
 const matchmaker = read('src/matchmaker.js');
 const socketCompat = read('public/cloudflare-socket.js');
 const app = read('public/app.js');
@@ -26,7 +27,7 @@ assert.match(worker, /\/api\/auto-join/, 'Worker auto-join route is missing');
 assert.match(worker, /const wsMatch = url\.pathname\.match/, 'Worker WebSocket route is missing');
 assert.match(worker, /target\.pathname = '\/ws'/, 'Worker WebSocket Durable Object forwarding is missing');
 assert.match(worker, /env\.ASSETS\.fetch/, 'Static asset fallback is missing');
-assert.match(worker, /game-room-rules-v2\.js/, 'Worker must use updated 30-round GameRoom rules');
+assert.match(worker, /game-room-recovery\.js/, 'Worker must use stalled-room recovery wrapper');
 
 assert.match(gameRoom, /const TOTAL_ROUNDS = 30;/, 'Game must stay at 30 rounds');
 assert.match(gameRoom, /const HAPPINESS_GOAL = 48;/, 'Happiness goal must stay at 48');
@@ -39,6 +40,14 @@ assert.match(gameRoom, /this\.calculateResults\(room\)/, 'Final ranking calculat
 
 assert.match(gameRoomRulesV2, /normalizedRound <= 10 \? 1 : normalizedRound <= 20 \? 2 : 3/, 'Dice progression must be 1/2/3 dice across rounds 1-10/11-20/21-30');
 assert.match(gameRoomRulesV2, /room\.game\.round === 11 \|\| room\.game\.round === 21/, 'Dice transition announcements must occur at rounds 11 and 21');
+
+assert.match(gameRoomRecovery, /recoverExpiredGameState/, 'Stalled-room recovery routine is missing');
+assert.match(gameRoomRecovery, /room:resume/, 'Room resume must trigger stalled-room recovery');
+assert.match(gameRoomRecovery, /showcaseUntil/, 'Expired showcase recovery is missing');
+assert.match(gameRoomRecovery, /transitionUntil/, 'Expired transition recovery is missing');
+assert.match(gameRoomRecovery, /majorEventUntil/, 'Expired major-event recovery is missing');
+assert.match(gameRoomRecovery, /deadline/, 'Expired turn deadline recovery is missing');
+assert.match(gameRoomRecovery, /async alarm\(\)/, 'Alarm recovery fallback is missing');
 
 assert.match(gameRoomEight, /civilServant: \{ name: '公務員'/, 'Civil servant gameplay definition is missing');
 assert.match(gameRoomEight, /artist: \{ name: '藝人'/, 'Artist gameplay definition is missing');
