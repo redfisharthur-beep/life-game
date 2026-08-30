@@ -12,6 +12,7 @@ const gameRoomEight = read('src/game-room-eight.js');
 const gameRoomRulesV2 = read('src/game-room-rules-v2.js');
 const gameRoomRecovery = read('src/game-room-recovery.js');
 const gameRoomEraWave = read('src/game-room-era-wave.js');
+const gameRoomAutoAction = read('src/game-room-auto-action.js');
 const matchmaker = read('src/matchmaker.js');
 const socketCompat = read('public/cloudflare-socket.js');
 const app = read('public/app.js');
@@ -28,7 +29,7 @@ assert.match(worker, /\/api\/auto-join/, 'Worker auto-join route is missing');
 assert.match(worker, /const wsMatch = url\.pathname\.match/, 'Worker WebSocket route is missing');
 assert.match(worker, /target\.pathname = '\/ws'/, 'Worker WebSocket Durable Object forwarding is missing');
 assert.match(worker, /env\.ASSETS\.fetch/, 'Static asset fallback is missing');
-assert.match(worker, /game-room-era-wave\.js/, 'Worker must use era-wave three-dice wrapper');
+assert.match(worker, /game-room-auto-action\.js/, 'Worker must use random automatic-action wrapper');
 
 assert.match(gameRoom, /const TOTAL_ROUNDS = 30;/, 'Game must stay at 30 rounds');
 assert.match(gameRoom, /const HAPPINESS_GOAL = 48;/, 'Happiness goal must stay at 48');
@@ -55,6 +56,12 @@ assert.match(gameRoomEraWave, /forceTripleDice = true/, 'Era wave must enable pe
 assert.match(gameRoomEraWave, /forceDoubleDice = false/, 'Era wave must disable the legacy double-dice flag');
 assert.match(gameRoomEraWave, /後續所有骰子都改為3顆/, 'Era wave public description must say three dice');
 assert.match(gameRoomEraWave, /withTripleDice/, 'Era wave three-dice action wrapper is missing');
+
+assert.match(gameRoomAutoAction, /const AUTO_ACTIONS = \[/, 'Automatic action pool is missing');
+assert.match(gameRoomAutoAction, /settleRandomAutoAction/, 'Random automatic action routine is missing');
+assert.match(gameRoomAutoAction, /if \(!auto\) return super\.settleSalary/, 'Manual salary action must remain unchanged');
+assert.match(gameRoomAutoAction, /player\?\.connected \? 'timeout' : 'offline'/, 'Timeout and offline auto-action reasons must be supported');
+assert.match(gameRoomAutoAction, /if \(!player \|\| player\.connected\) return;/, 'Offline players must auto-act when their turn begins');
 
 assert.match(gameRoomEight, /civilServant: \{ name: '公務員'/, 'Civil servant gameplay definition is missing');
 assert.match(gameRoomEight, /artist: \{ name: '藝人'/, 'Artist gameplay definition is missing');
