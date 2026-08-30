@@ -147,6 +147,7 @@
       avatar.className = 'player-status-avatar';
       avatar.src = HEAD_IMAGES[professionId] || FALLBACK_IMAGES[professionId] || '/images/logo.png';
       avatar.alt = PROFESSION_NAMES[professionId] || '職業';
+      avatar.decoding = 'async';
       avatar.addEventListener('error', () => {
         const fallback = FALLBACK_IMAGES[professionId];
         if (fallback && avatar.src !== fallback) avatar.src = fallback;
@@ -179,12 +180,7 @@
 
   socket.on('room:update', renderPlayerStatus);
   socket.on('room:started', renderPlayerStatus);
-
-  setInterval(() => {
-    try {
-      renderPlayerStatus(currentRoom);
-    } catch (_) {
-      // app.js 尚未建立狀態時略過。
-    }
-  }, 800);
+  window.addEventListener('pageshow', () => {
+    try { renderPlayerStatus(currentRoom); } catch (_) {}
+  });
 })();
