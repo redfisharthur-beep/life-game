@@ -14,7 +14,6 @@
 
   if (!entryPanel || !roomBrowserPanel || !roomBrowserList || !roomBrowserBackBtn || !joinGameBtn || !playerNameInput) return;
 
-  // 房間列表下方沿用等待玩家頁的兩個圖示：左下上一頁、右下遊戲規則。
   let roomBrowserRulesBtn = document.getElementById('roomBrowserRulesBtn');
   if (!roomBrowserRulesBtn && roomBrowserActions) {
     roomBrowserRulesBtn = document.createElement('button');
@@ -47,18 +46,21 @@
   function showBrowser() {
     hideGamePanels();
     homeStage?.classList.remove('home-visible');
-    lobbyCard?.classList.remove('home-mode');
+    lobbyCard?.classList.remove('home-mode', 'room-mode', 'game-mode');
+    lobbyCard?.classList.add('room-browser-mode');
     roomBrowserPanel.classList.remove('hidden');
   }
 
   function hideBrowser() {
     roomBrowserPanel.classList.add('hidden');
+    lobbyCard?.classList.remove('room-browser-mode');
   }
 
   function showEntry() {
     hideBrowser();
     entryPanel.classList.remove('hidden');
     homeStage?.classList.add('home-visible');
+    lobbyCard?.classList.remove('room-mode', 'game-mode');
     lobbyCard?.classList.add('home-mode');
   }
 
@@ -118,7 +120,6 @@
         hostText = `房主：${room.hostName}`;
       }
 
-      // 空房不再顯示「等待第一位房主」，只保留房名與人數。
       if (hostText) {
         const host = document.createElement('span');
         host.className = 'room-browser-host';
@@ -202,7 +203,6 @@
     fetchRooms();
   }
 
-  // 玩家列表左下「上一頁」：先退出目前房間，再回固定四間房列表。
   function leaveLobbyToRoomBrowser(event) {
     if (typeof currentRoom === 'undefined' || currentRoom?.phase !== 'lobby') return;
     event?.preventDefault();
@@ -225,7 +225,6 @@
     openRoomBrowser(event);
   }, true);
 
-  // capture 階段攔截 app.js 原本「回首頁」的處理，只在玩家列表 lobby 生效。
   leaveRoomBtn?.addEventListener('click', leaveLobbyToRoomBrowser, true);
 
   roomBrowserBackBtn.addEventListener('click', () => {
@@ -237,10 +236,8 @@
     document.getElementById('rulesOpenBtn')?.click();
   });
 
-  // 玩家列表的遊戲說明仍維持原本功能。
   roomRulesOpenBtn?.setAttribute('title', '遊戲規則');
 
-  // 固定四間房每 4 秒在背景同步人數與遊戲狀態，不需要手動重新整理。
   setInterval(() => {
     if (!roomBrowserPanel.classList.contains('hidden') && !loading) fetchRooms();
   }, 4000);
