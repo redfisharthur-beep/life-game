@@ -6,8 +6,8 @@
     office: '/images/officehead.png',
     athlete: '/images/athleteghead.png',
     rich: '/images/richghead.png',
-    civilServant: '/images/civil%20servant.png',
-    artist: '/images/artist.png',
+    civilServant: '/images/civil%20servanthead.png',
+    artist: '/images/artisthead.png',
   };
 
   const FALLBACK_IMAGES = {
