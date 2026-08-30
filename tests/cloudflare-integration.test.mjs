@@ -124,10 +124,13 @@ try {
   assert.equal(start.ok, true, start.message);
   assert.equal(start.room.phase, 'profession');
 
-  const pick1 = await peer1.request('room:chooseProfession', { profession: 'doctor' });
+  const pick1 = await peer1.request('room:chooseProfession', { profession: 'civilServant' });
   assert.equal(pick1.ok, true, pick1.message);
-  const pick2 = await peer2.request('room:chooseProfession', { profession: 'engineer' });
+  assert.equal(pick1.room.players.find((player) => player.id === first.session.playerId)?.profession, 'civilServant');
+
+  const pick2 = await peer2.request('room:chooseProfession', { profession: 'artist' });
   assert.equal(pick2.ok, true, pick2.message);
+  assert.equal(pick2.room.players.find((player) => player.id === second.session.playerId)?.profession, 'artist');
   assert.equal(pick2.room.phase, 'game');
   assert.equal(pick2.room.game.round, 1);
   assert.equal(pick2.room.game.stockPrice, 10);
@@ -137,16 +140,18 @@ try {
 
   const currentId = pick2.room.game.currentPlayerId;
   const currentPeer = currentId === first.session.playerId ? peer1 : peer2;
+  const expectedSalary = currentId === first.session.playerId ? 6.5 : 8;
   const action = await currentPeer.request('game:action', {
     action: 'salary',
     turnId: pick2.room.game.turnId,
   });
   assert.equal(action.ok, true, action.message);
   assert.equal(action.room.game.lastEvent.type, 'salary');
+  assert.equal(action.room.game.lastEvent.baseSalary, expectedSalary);
   assert.ok(action.room.game.lastEvent.diceTotal >= 1);
   assert.ok(action.room.game.showcaseUntil > Date.now());
 
-  console.log(`Cloudflare integration passed in room ${first.session.roomCode}`);
+  console.log(`Cloudflare eight-profession integration passed in room ${first.session.roomCode}`);
 } finally {
   peer1.close();
   peer2.close();
