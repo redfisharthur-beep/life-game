@@ -18,13 +18,13 @@
   transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease;
 }
 
-/* 職業選擇頁：左下 back.png、右下 Game Rules.png，取代上方文字膠囊。 */
+/* 職業選擇頁：左下 back.png、右下 Game Rules.png；依目前基準再往下 20px。 */
 #professionPanel .profession-home-pill,
 #professionPanel .rules-pill {
   appearance: none;
   position: absolute;
   top: auto !important;
-  bottom: 4.2% !important;
+  bottom: calc(4.2% - 20px) !important;
   z-index: 40;
   min-width: 0;
   min-height: 0;
@@ -187,14 +187,14 @@
 @media (max-width: 600px) {
   #professionPanel .profession-home-pill {
     left: 3.6% !important;
-    bottom: 3.6% !important;
+    bottom: calc(3.6% - 20px) !important;
     width: 15% !important;
     height: 9.5% !important;
   }
 
   #professionPanel .rules-pill {
     right: 3.6% !important;
-    bottom: 3.6% !important;
+    bottom: calc(3.6% - 20px) !important;
     width: 18% !important;
     height: 9.5% !important;
   }
