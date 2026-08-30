@@ -33,6 +33,17 @@
     artist: '/images/artist.png',
   };
 
+  const DREAM_IMAGES = {
+    doctor: { happy: '/images/doctorhappy.png', cry: '/images/doctorcry.png' },
+    engineer: { happy: '/images/engineerhappy.png', cry: '/images/engineercry.png' },
+    sales: { happy: '/images/saleshappy.png', cry: '/images/salescry.png' },
+    office: { happy: '/images/officehappy.png', cry: '/images/officecry.png' },
+    athlete: { happy: '/images/athletehappy.png', cry: '/images/athletecry.png' },
+    rich: { happy: '/images/richhappy.png', cry: '/images/richcry.png' },
+    civilServant: { happy: '/images/civil%20servanthappy.png', cry: '/images/civil%20servantcry.png' },
+    artist: { happy: '/images/artisthappy.png', cry: '/images/artistcry.png' },
+  };
+
   const NEGATIVE_FATE_IMAGES = [
     { label: '花錢消災', image: '/images/Spendmoney.png' },
     { label: '黑天鵝', image: '/images/Black%20Swan.png' },
@@ -131,6 +142,12 @@
   function getPlayerHead(player) {
     if (!player) return '/images/logo.png';
     return HEAD_IMAGES[player.profession] || FALLBACK_IMAGES[player.profession] || '/images/logo.png';
+  }
+
+  function getDreamHead(player, success) {
+    const set = DREAM_IMAGES[player?.profession];
+    if (!set) return getPlayerHead(player);
+    return success ? set.happy : set.cry;
   }
 
   function getSingleDieImage(value) {
@@ -233,17 +250,7 @@
     } else if (event.type === 'sellLand') {
       pushRow(rows, actor, playerName, [makeEffect('現金', Number(event.salaryIncome || 0) + Number(event.proceeds || 0)), Number(event.units || 0) ? makeEffect('土地', -Number(event.units || 0)) : null]);
     } else if (event.type === 'dream') {
-      if (event.success) {
-        const liquidation = event.liquidation || {};
-        pushRow(rows, actor, playerName, [
-          makeEffect('現金', Number(event.salaryIncome || 0) + Number(liquidation.proceeds || 0) - Number(event.fee || 0)),
-          Number(liquidation.stocks || 0) ? makeEffect('股票', -Number(liquidation.stocks || 0)) : null,
-          Number(liquidation.land || 0) ? makeEffect('土地', -Number(liquidation.land || 0)) : null,
-          makeEffect('幸福', event.happinessGain),
-        ]);
-      } else {
-        pushRow(rows, actor, playerName, [makeEffect('現金', event.salaryIncome)]);
-      }
+      pushRow(rows, actor, playerName, [makeEffect('現金', event.salaryIncome)]);
     } else if (event.type === 'sabotage' || event.type === 'help') {
       if (target) pushRow(rows, target, target.name, [firstSignedEffect(event.text)]);
       else pushRow(rows, actor, playerName, [firstSignedEffect(event.text)]);
@@ -275,6 +282,19 @@
     return null;
   }
 
+  function showDreamResult(actor, playerName, event) {
+    const name = actor?.name || playerName || '玩家';
+    const success = Boolean(event.success);
+    const cashGain = Number(event.salaryIncome || 0);
+    bodyEl.innerHTML = `
+      <div class="dream-outcome-result">
+        <img class="dream-outcome-head" src="${getDreamHead(actor, success)}" alt="${escapeHtml(name)} ${success ? '圓夢成功' : '圓夢失敗'}" decoding="async" />
+        <strong class="dream-outcome-title">${success ? '圓夢成功' : '圓夢失敗'}</strong>
+        <span class="dream-outcome-cash">現金 ${signed(cashGain)}</span>
+      </div>
+    `;
+  }
+
   function showResultStage(room, playerName, event) {
     positionShowcaseOverActions();
     overlay.classList.add('result-stage-active');
@@ -283,6 +303,11 @@
     titleEl.textContent = '';
 
     const actor = room.players.find((item) => item.id === event.playerId) || { name: playerName };
+    if (event.type === 'dream') {
+      showDreamResult(actor, playerName, event);
+      return;
+    }
+
     const target = room.players.find((item) => item.id === event.targetId);
     const rows = buildResultRows(room, event, actor);
     const primaryRow = rows[0] || { player: actor, name: actor?.name || playerName || '玩家', effects: ['無資產變動'] };
