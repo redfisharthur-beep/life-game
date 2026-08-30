@@ -51,86 +51,72 @@
   margin-top: -4px;
 }
 
-/* 骰完後：放大頭像在左、人名在右，數據獨立放下方。 */
-.simple-result-plain {
-  display: grid;
-  justify-items: center;
-  gap: 12px;
-  width: 100%;
-}
-
-.result-person-plain {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  width: 100%;
-}
-
-.result-person-plain .result-person-head {
-  width: 128px;
-  height: 128px;
-  flex: 0 0 128px;
-  object-fit: contain;
-}
-
-.result-person-plain .result-person-name {
-  max-width: 220px;
-  font-size: clamp(27px, 6vw, 36px);
-  line-height: 1.05;
-  text-align: left;
-  white-space: normal;
-}
-
-.simple-result-effects-plain {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px 14px;
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-.simple-result-effects-plain .simple-result-effect {
-  display: inline-block;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  color: #665d56;
-  font-size: clamp(20px, 4.8vw, 26px);
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.result-event-visual-plain {
-  margin-top: 4px;
-}
-
-.result-event-visual-plain .result-event-image {
-  width: min(190px, 46vw);
-  height: min(190px, 46vw);
-}
-
-/* 圓夢：只顯示 happy / cry 圖、成功或失敗、以及現金增加。 */
+.regular-action-result,
+.special-action-result,
 .dream-outcome-result {
   display: grid;
   justify-items: center;
-  gap: 8px;
   width: 100%;
+}
+
+.regular-action-result {
+  gap: 12px;
+}
+
+.regular-result-head {
+  display: block;
+  width: min(170px, 42vw);
+  height: min(170px, 42vw);
+  object-fit: contain;
+  background: transparent;
+  filter: drop-shadow(0 10px 16px rgba(71, 62, 55, .2));
+}
+
+.result-summary-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px 12px;
+  width: 100%;
+  color: #5b514a;
+  font-size: clamp(25px, 5.8vw, 34px);
+  line-height: 1.18;
+  text-align: center;
+}
+
+.result-summary-name {
+  font-weight: 800;
+}
+
+.result-summary-effect {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.special-action-result {
+  gap: 14px;
+}
+
+.result-event-visual-plain {
+  margin-top: 2px;
+}
+
+.result-event-visual-plain .result-event-image {
+  width: min(210px, 50vw);
+  height: min(210px, 50vw);
+  object-fit: contain;
+}
+
+/* 圓夢：happy / cry 圖在上，下方只顯示「人名＋圓夢成功／失敗」。 */
+.dream-outcome-result {
+  gap: 12px;
 }
 
 .dream-outcome-head {
   display: block;
-  width: min(245px, 58vw);
-  height: min(245px, 58vw);
+  width: min(255px, 60vw);
+  height: min(255px, 60vw);
   object-fit: contain;
   background: transparent;
   filter: drop-shadow(0 12px 20px rgba(71, 62, 55, .2));
@@ -139,13 +125,9 @@
 .dream-outcome-title {
   color: #554e49;
   font-size: clamp(27px, 6vw, 36px);
-  line-height: 1.05;
-}
-
-.dream-outcome-cash {
-  color: #665d56;
-  font-size: clamp(21px, 5vw, 28px);
+  font-weight: 800;
   line-height: 1.1;
+  text-align: center;
 }
 
 .dice-result-images.triple-dice-total .dice-result-image {
@@ -169,44 +151,27 @@
     height: min(155px, 46vw);
   }
 
-  .result-person-plain {
-    gap: 12px;
+  .regular-result-head {
+    width: min(150px, 46vw);
+    height: min(150px, 46vw);
   }
 
-  .result-person-plain .result-person-head {
-    width: 108px;
-    height: 108px;
-    flex-basis: 108px;
-  }
-
-  .result-person-plain .result-person-name {
-    max-width: 175px;
-    font-size: clamp(24px, 7vw, 31px);
-  }
-
-  .simple-result-effects-plain {
-    gap: 5px 10px;
-  }
-
-  .simple-result-effects-plain .simple-result-effect {
-    font-size: clamp(18px, 5.4vw, 22px);
+  .result-summary-line {
+    gap: 5px 9px;
+    font-size: clamp(23px, 6.6vw, 30px);
   }
 
   .result-event-visual-plain .result-event-image {
-    width: min(165px, 48vw);
-    height: min(165px, 48vw);
+    width: min(185px, 54vw);
+    height: min(185px, 54vw);
   }
 
   .dream-outcome-head {
-    width: min(215px, 62vw);
-    height: min(215px, 62vw);
+    width: min(225px, 64vw);
+    height: min(225px, 64vw);
   }
 
   .dream-outcome-title {
     font-size: clamp(25px, 7vw, 32px);
-  }
-
-  .dream-outcome-cash {
-    font-size: clamp(20px, 5.8vw, 25px);
   }
 }
