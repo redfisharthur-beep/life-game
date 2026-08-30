@@ -6,7 +6,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node runtime-rules.js",
-    "test": "node tests/smoke.test.js"
+    "test": "node tests/smoke.test.js",
+    "dev:cf": "wrangler dev",
+    "deploy:cf": "wrangler deploy"
   },
   "engines": {
     "node": ">=20"
@@ -14,5 +16,8 @@
   "dependencies": {
     "express": "^5.1.0",
     "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
   }
 }
