@@ -1,0 +1,177 @@
+/* 首頁輸入名字後的房間列表：沿用玩家列表背景與圓潤卡片風格。 */
+.room-browser-panel {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.room-browser-stage {
+  position: relative;
+  width: 100%;
+  min-height: min(760px, 100vh);
+  overflow: hidden;
+}
+
+.room-browser-bg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  object-fit: cover;
+}
+
+.room-browser-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 31% 13% 8%;
+  box-sizing: border-box;
+}
+
+.room-browser-title {
+  margin: 0 0 12px;
+  color: #765f4e;
+  font-size: clamp(22px, 5vw, 34px);
+  font-weight: 500;
+  letter-spacing: .08em;
+}
+
+.room-browser-list {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  width: 100%;
+  max-height: 49vh;
+  overflow: auto;
+  padding: 2px 3px 6px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.room-browser-item {
+  appearance: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 72px;
+  padding: 13px 18px;
+  border: 1px solid rgba(185, 151, 107, .25);
+  border-radius: 999px;
+  background: rgba(255, 249, 238, .94);
+  box-shadow: 0 5px 15px rgba(116, 81, 47, .10);
+  color: #765f4e;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.room-browser-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(116, 81, 47, .15);
+}
+
+.room-browser-item:active {
+  transform: scale(.985);
+}
+
+.room-browser-host {
+  min-width: 0;
+  overflow: hidden;
+  font-size: clamp(19px, 4.6vw, 28px);
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.room-browser-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 62px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #d3a455;
+  color: #fffaf1;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.room-browser-empty {
+  padding: 32px 12px;
+  color: #8b7361;
+  font-size: 18px;
+  text-align: center;
+}
+
+.room-browser-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.room-browser-action {
+  appearance: none;
+  min-height: 42px;
+  padding: 9px 18px;
+  border: 1px solid rgba(166, 129, 83, .30);
+  border-radius: 999px;
+  background: rgba(255, 250, 241, .95);
+  color: #765f4e;
+  box-shadow: 0 4px 12px rgba(95, 73, 53, .11);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.room-browser-action.primary {
+  background: #d3a455;
+  color: #fffaf1;
+}
+
+.room-browser-message {
+  min-height: 24px;
+  margin: 9px 0 0;
+  color: #8b7361;
+  font-size: 14px;
+  text-align: center;
+}
+
+.room-browser-message.error {
+  color: #a45d57;
+}
+
+@media (max-width: 600px) {
+  .room-browser-overlay {
+    padding: 29% 10% 6%;
+  }
+
+  .room-browser-list {
+    gap: 9px;
+    max-height: 53vh;
+  }
+
+  .room-browser-item {
+    min-height: 64px;
+    padding: 10px 15px;
+  }
+
+  .room-browser-actions {
+    margin-top: 11px;
+  }
+
+  .room-browser-action {
+    min-height: 40px;
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+}
