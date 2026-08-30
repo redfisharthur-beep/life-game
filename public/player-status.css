@@ -11,6 +11,7 @@
   flex-direction: column;
   gap: 6px;
   margin-bottom: 8px;
+  transform: translateY(-10px);
 }
 
 .player-status-card {
