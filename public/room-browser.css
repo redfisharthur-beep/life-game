@@ -45,7 +45,7 @@
   display: none !important;
 }
 
-/* 五間房放在玩家列表原本的主要名單區域，整組再往下 20px。 */
+/* 六間房放在玩家列表主要名單區域，整組維持往下 20px。 */
 .room-browser-list {
   position: absolute;
   left: 50%;
@@ -53,9 +53,9 @@
   width: 58%;
   height: 45.5%;
   display: grid;
-  grid-template-rows: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
   align-content: stretch;
-  gap: clamp(6px, .8vw, 9px);
+  gap: clamp(4px, .6vw, 7px);
   margin: 0;
   padding: 0;
   transform: translateX(-50%);
@@ -73,12 +73,12 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   min-height: 0;
   height: 100%;
   box-sizing: border-box;
-  padding: clamp(6px, .8vw, 9px) clamp(15px, 2.1vw, 22px);
+  padding: clamp(4px, .62vw, 7px) clamp(14px, 2vw, 20px);
   border: 1px solid rgba(191, 145, 75, .28);
   border-radius: 999px;
   background: rgba(255, 249, 236, .78);
@@ -111,17 +111,17 @@
 .room-browser-identity {
   display: grid;
   min-width: 0;
-  gap: 2px;
+  gap: 1px;
 }
 
 .room-browser-name {
   min-width: 0;
   overflow: hidden;
   color: #6d4b32;
-  font-size: clamp(20px, 2.55vw, 28px);
+  font-size: clamp(18px, 2.35vw, 26px);
   font-weight: 400;
-  line-height: 1.03;
-  letter-spacing: .025em;
+  line-height: 1.02;
+  letter-spacing: .02em;
   text-overflow: ellipsis;
   white-space: nowrap;
   text-shadow: 0 1px 0 rgba(255,255,255,.65);
@@ -131,9 +131,9 @@
   min-width: 0;
   overflow: hidden;
   color: #8c6e56;
-  font-size: clamp(12px, 1.65vw, 17px);
+  font-size: clamp(11px, 1.5vw, 16px);
   font-weight: 400;
-  line-height: 1.05;
+  line-height: 1.02;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -143,15 +143,15 @@
   align-items: center;
   justify-content: center;
   min-width: 0;
-  padding: .28em .72em;
+  padding: .25em .66em;
   border: 0;
   border-radius: 999px;
   background: linear-gradient(180deg, rgba(210, 167, 91, .96), rgba(185, 137, 67, .96));
   color: #fffaf0;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.30);
-  font-size: clamp(13px, 1.65vw, 18px);
+  font-size: clamp(12px, 1.55vw, 17px);
   font-weight: 400;
-  letter-spacing: .035em;
+  letter-spacing: .03em;
   white-space: nowrap;
 }
 
@@ -244,24 +244,24 @@
     width: 66%;
     top: calc(19.8% + 25px);
     height: 46%;
-    gap: 6px;
+    gap: 4px;
   }
 
   .room-browser-item {
-    padding: 5px 14px;
+    padding: 4px 13px;
   }
 
   .room-browser-name {
-    font-size: clamp(18px, 4.25vw, 25px);
+    font-size: clamp(17px, 3.9vw, 23px);
   }
 
   .room-browser-host {
-    font-size: clamp(11px, 2.8vw, 15px);
+    font-size: clamp(10px, 2.55vw, 14px);
   }
 
   .room-browser-count {
-    padding: .26em .68em;
-    font-size: clamp(12px, 3vw, 16px);
+    padding: .23em .62em;
+    font-size: clamp(11px, 2.8vw, 15px);
   }
 
   #roomBrowserBackBtn {
@@ -289,23 +289,23 @@
     width: 68%;
     top: calc(19.4% + 25px);
     height: 46.5%;
-    gap: 5px;
+    gap: 3px;
   }
 
   .room-browser-item {
-    padding: 4px 12px;
+    padding: 3px 11px;
   }
 
   .room-browser-name {
-    font-size: clamp(17px, 4.7vw, 22px);
+    font-size: clamp(16px, 4.35vw, 20px);
   }
 
   .room-browser-host {
-    font-size: clamp(10px, 3.1vw, 14px);
+    font-size: clamp(9px, 2.85vw, 13px);
   }
 
   .room-browser-count {
-    font-size: clamp(11px, 3.35vw, 15px);
+    font-size: clamp(10px, 3.05vw, 14px);
   }
 
   #roomBrowserBackBtn {
