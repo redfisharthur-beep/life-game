@@ -2,24 +2,23 @@
   const resultsPanel = document.getElementById('gameResults');
   if (!resultsPanel || typeof socket === 'undefined') return;
 
-  const IDLE_MS = 60_000;
-  const activityEvents = ['pointerdown', 'touchstart', 'keydown', 'wheel', 'scroll'];
-  let idleTimer = null;
+  const RESULTS_STAY_MS = 180_000;
+  let exitTimer = null;
   let leaving = false;
 
   function resultsVisible() {
     return !resultsPanel.classList.contains('hidden');
   }
 
-  function clearIdleTimer() {
-    if (idleTimer) clearTimeout(idleTimer);
-    idleTimer = null;
+  function clearExitTimer() {
+    if (exitTimer) clearTimeout(exitTimer);
+    exitTimer = null;
   }
 
   function goHome() {
     if (leaving || !resultsVisible()) return;
     leaving = true;
-    clearIdleTimer();
+    clearExitTimer();
 
     let completed = false;
     const finish = () => {
@@ -43,30 +42,19 @@
     }
   }
 
-  function armIdleTimer() {
-    clearIdleTimer();
+  function armExitTimer() {
+    clearExitTimer();
     if (!resultsVisible() || leaving) return;
-    idleTimer = setTimeout(goHome, IDLE_MS);
+    // 結算頁最多停留 3 分鐘；玩家操作不延長時間，避免房間被長時間占用。
+    exitTimer = setTimeout(goHome, RESULTS_STAY_MS);
   }
-
-  function onActivity() {
-    if (!resultsVisible() || leaving) return;
-    armIdleTimer();
-  }
-
-  activityEvents.forEach((eventName) => {
-    document.addEventListener(eventName, onActivity, {
-      capture: true,
-      passive: true,
-    });
-  });
 
   new MutationObserver(() => {
     if (resultsVisible()) {
       leaving = false;
-      armIdleTimer();
+      armExitTimer();
     } else {
-      clearIdleTimer();
+      clearExitTimer();
       leaving = false;
     }
   }).observe(resultsPanel, {
@@ -74,5 +62,5 @@
     attributeFilter: ['class'],
   });
 
-  if (resultsVisible()) armIdleTimer();
+  if (resultsVisible()) armExitTimer();
 })();
