@@ -1,0 +1,21 @@
+name: 3-6 Player Balance Analysis
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/game-room*.js'
+      - 'tests/balance-3to6-players.mjs'
+      - '.github/workflows/balance-3to6.yml'
+
+jobs:
+  balance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run 3-6 player balance analysis
+        run: node tests/balance-3to6-players.mjs
