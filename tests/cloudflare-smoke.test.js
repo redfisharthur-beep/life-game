@@ -18,7 +18,8 @@ assert.match(wrangler, /"new_sqlite_classes"/, 'Durable Object migration is miss
 
 assert.match(worker, /\/health/, 'Worker health endpoint is missing');
 assert.match(worker, /\/api\/auto-join/, 'Worker auto-join route is missing');
-assert.match(worker, /\/ws\//, 'Worker WebSocket route is missing');
+assert.match(worker, /const wsMatch = url\.pathname\.match/, 'Worker WebSocket route is missing');
+assert.match(worker, /target\.pathname = '\/ws'/, 'Worker WebSocket Durable Object forwarding is missing');
 assert.match(worker, /env\.ASSETS\.fetch/, 'Static asset fallback is missing');
 
 assert.match(gameRoom, /const TOTAL_ROUNDS = 30;/, 'Game must stay at 30 rounds');
