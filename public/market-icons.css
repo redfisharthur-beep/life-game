@@ -6,6 +6,7 @@
   padding: 6px 9px;
   border-radius: 14px;
   min-height: 0;
+  transform: translateY(-10px);
 }
 
 .stage-block {
@@ -59,20 +60,24 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
+  width: 100%;
   min-width: 0;
+  box-sizing: border-box;
   padding: 3px 6px;
   border-radius: 12px;
   background: #f4efe9;
   color: #69615a;
   white-space: nowrap;
+  justify-self: stretch;
 }
 
 .market-strip .market-item:first-child {
   grid-column: 3;
-  justify-self: start;
 }
 
-.market-strip .market-item:last-child { grid-column: 4; }
+.market-strip .market-item:last-child {
+  grid-column: 4;
+}
 
 .market-strip .market-icon {
   display: block;
