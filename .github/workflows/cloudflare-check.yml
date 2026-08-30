@@ -11,7 +11,7 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,10 +19,25 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Cloudflare smoke checks
         run: npm run test:cf
 
       - name: Wrangler compile dry run
         run: npx --yes wrangler@4 deploy --dry-run --outdir .wrangler-dry-run
+
+      - name: Two-player Worker integration
+        run: |
+          npx --yes wrangler@4 dev --local --port 8787 > /tmp/life-game-wrangler.log 2>&1 &
+          WRANGLER_PID=$!
+          cleanup() {
+            kill "$WRANGLER_PID" 2>/dev/null || true
+            wait "$WRANGLER_PID" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          node tests/cloudflare-integration.test.mjs
+
+      - name: Show Wrangler log on failure
+        if: failure()
+        run: cat /tmp/life-game-wrangler.log || true
