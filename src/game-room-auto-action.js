@@ -12,6 +12,8 @@ const AUTO_ACTIONS = [
   'dream',
 ];
 
+const PROFESSION_AUTO_PICK_MS = 60_000;
+
 function randomChoice(values) {
   return values.length ? values[Math.floor(Math.random() * values.length)] : null;
 }
@@ -51,6 +53,22 @@ export class GameRoom extends MilestoneGameRoom {
       room.game.lastEvent.autoReason = reason;
     }
     return settled;
+  }
+
+  // 正式啟程或「再來一局」進入職業選擇後，將自動選職倒數統一改為 1 分鐘。
+  async handleSocketEvent(socket, attachment, message) {
+    const event = String(message?.event || '');
+    await super.handleSocketEvent(socket, attachment, message);
+
+    if (event !== 'room:start' && event !== 'game:restart') return;
+
+    const room = await this.getRoom();
+    if (room.phase !== 'profession' || !room.started) return;
+
+    room.professionDeadline = Date.now() + PROFESSION_AUTO_PICK_MS;
+    await this.saveRoom(room);
+    this.broadcast('room:update', this.publicRoom(room));
+    await this.reschedule(room);
   }
 
   // 原本所有「逾時自動領薪」入口都會呼叫 settleSalary(..., true)。
