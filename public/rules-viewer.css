@@ -127,7 +127,7 @@
   overflow: hidden;
 }
 
-/* 規則圖固定放大為原本 2 倍，可上下左右自由滑動查看。 */
+/* 3 張規則圖由上往下排列，固定為原圖顯示尺寸 1.5 倍，可上下左右自由滑動。 */
 .rules-viewer-page {
   width: 100%;
   height: 100%;
@@ -140,7 +140,7 @@
 
 .rules-viewer-image {
   display: block;
-  width: 200%;
+  width: 150%;
   max-width: none;
   height: auto;
   max-height: none;
