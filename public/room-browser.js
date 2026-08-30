@@ -3,7 +3,6 @@
   const roomBrowserPanel = document.getElementById('roomBrowserPanel');
   const roomBrowserList = document.getElementById('roomBrowserList');
   const roomBrowserMessage = document.getElementById('roomBrowserMessage');
-  const createRoomBtn = document.getElementById('createRoomBtn');
   const refreshRoomsBtn = document.getElementById('refreshRoomsBtn');
   const roomBrowserBackBtn = document.getElementById('roomBrowserBackBtn');
   const joinGameBtn = document.getElementById('joinGameBtn');
@@ -50,24 +49,23 @@
 
   function setBusy(busy) {
     loading = busy;
-    createRoomBtn.disabled = busy;
     refreshRoomsBtn.disabled = busy;
     roomBrowserBackBtn.disabled = busy;
     roomBrowserList.querySelectorAll('button').forEach((button) => {
-      button.disabled = busy;
+      button.disabled = busy || button.dataset.available === 'false';
     });
   }
 
   async function fetchRooms() {
     if (loading) return;
     setBusy(true);
-    setBrowserMessage('正在更新房間列表…');
+    setBrowserMessage('正在更新四個人生房間…');
     try {
       const response = await fetch('/api/rooms', { cache: 'no-store' });
       const result = await response.json();
       if (!result?.ok) throw new Error(result?.message || '讀取房間失敗');
       renderRooms(result.rooms || []);
-      setBrowserMessage(result.rooms?.length ? '點選房主房間即可加入' : '目前沒有可加入的房間，可以建立自己的房間');
+      setBrowserMessage('選一個喜歡的人生房間加入吧！');
     } catch (error) {
       console.error('load rooms failed', error);
       roomBrowserList.innerHTML = '<div class="room-browser-empty">房間列表讀取失敗</div>';
@@ -79,27 +77,44 @@
 
   function renderRooms(rooms) {
     roomBrowserList.innerHTML = '';
-    if (!rooms.length) {
-      roomBrowserList.innerHTML = '<div class="room-browser-empty">目前還沒有房間</div>';
-      return;
-    }
 
     rooms.forEach((room) => {
+      const available = room.available !== false;
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'room-browser-item';
       button.dataset.roomCode = room.code;
+      button.dataset.available = String(available);
+      button.disabled = !available;
+      if (!available) button.classList.add('unavailable');
+
+      const identity = document.createElement('span');
+      identity.className = 'room-browser-identity';
+
+      const title = document.createElement('strong');
+      title.className = 'room-browser-name';
+      title.textContent = `${room.icon || '✨'} ${room.name || room.code}`;
 
       const host = document.createElement('span');
       host.className = 'room-browser-host';
-      host.textContent = `${room.hostName || `房間 ${room.code}`} 的房間`;
+      if (room.started) {
+        host.textContent = '遊戲進行中';
+      } else if (room.full) {
+        host.textContent = '房間已滿';
+      } else if (room.hostName) {
+        host.textContent = `房主：${room.hostName}`;
+      } else {
+        host.textContent = '等待第一位房主';
+      }
+
+      identity.append(title, host);
 
       const count = document.createElement('span');
       count.className = 'room-browser-count';
       count.textContent = `${Number(room.count || 0)} / ${Number(room.maxPlayers || 6)}`;
 
-      button.append(host, count);
-      button.addEventListener('click', () => joinRoom(room.code));
+      button.append(identity, count);
+      if (available) button.addEventListener('click', () => joinRoom(room.code));
       roomBrowserList.appendChild(button);
     });
   }
@@ -158,28 +173,6 @@
     }
   }
 
-  async function createRoom() {
-    if (loading) return;
-    const name = currentName();
-    if (!name) {
-      showEntry();
-      setMessage('請先輸入名字', 'error');
-      return;
-    }
-
-    setBusy(true);
-    setBrowserMessage('正在建立你的房間…');
-    try {
-      const result = await postRoom('/api/create-room', { name });
-      await enterRoom(result);
-    } catch (error) {
-      console.error('create room failed', error);
-      setBrowserMessage('建立房間失敗，請再試一次', 'error');
-    } finally {
-      setBusy(false);
-    }
-  }
-
   function openRoomBrowser(event) {
     event?.preventDefault();
     event?.stopImmediatePropagation();
@@ -201,14 +194,13 @@
     openRoomBrowser(event);
   }, true);
 
-  createRoomBtn.addEventListener('click', createRoom);
   refreshRoomsBtn.addEventListener('click', fetchRooms);
   roomBrowserBackBtn.addEventListener('click', () => {
     setBrowserMessage('');
     showEntry();
   });
 
-  // 房間列表開啟時每 4 秒更新一次，讓新房間與人數變化自然出現。
+  // 固定四間房每 4 秒同步一次人數與遊戲狀態。
   setInterval(() => {
     if (!roomBrowserPanel.classList.contains('hidden') && !loading) fetchRooms();
   }, 4000);
