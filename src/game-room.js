@@ -8,7 +8,12 @@ export class GameRoom {
     const url = new URL(request.url);
 
     if (url.pathname === '/health') {
-      return new Response(JSON.stringify({ ok: true, durableObject: 'GameRoom' }), {
+      const code = url.searchParams.get('code') || 'UNKNOWN';
+      return new Response(JSON.stringify({
+        ok: true,
+        durableObject: 'GameRoom',
+        room: code,
+      }), {
         headers: { 'content-type': 'application/json; charset=utf-8' },
       });
     }
