@@ -13,9 +13,14 @@ function cleanCode(value) {
   return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 32);
 }
 
-function randomRoomCode() {
-  return String(Math.floor(1000 + Math.random() * 9000));
-}
+const FIXED_ROOMS = [
+  { code: 'DREAM', name: '夢想起跑線', icon: '✨' },
+  { code: 'FORTUNE', name: '財富翻身局', icon: '💰' },
+  { code: 'HAPPY', name: '幸福人生館', icon: '💖' },
+  { code: 'DESTINY', name: '命運轉折站', icon: '🎲' },
+];
+
+const FIXED_ROOM_BY_CODE = Object.fromEntries(FIXED_ROOMS.map((room) => [room.code, room]));
 
 export class Matchmaker {
   constructor(state, env) {
@@ -53,43 +58,45 @@ export class Matchmaker {
   }
 
   publicRooms(rooms) {
-    return Object.entries(rooms)
-      .filter(([, meta]) => !meta.started && Number(meta.count || 0) > 0 && Number(meta.count || 0) < 6)
-      .sort((a, b) => Number(b[1].updatedAt || 0) - Number(a[1].updatedAt || 0))
-      .map(([code, meta]) => ({
-        code,
-        hostName: meta.hostName || `房間 ${code}`,
-        count: Number(meta.count || 0),
+    return FIXED_ROOMS.map((fixedRoom) => {
+      const meta = rooms[fixedRoom.code] || {};
+      const count = Number(meta.count || 0);
+      const started = Boolean(meta.started);
+      const full = count >= 6;
+      return {
+        code: fixedRoom.code,
+        name: fixedRoom.name,
+        icon: fixedRoom.icon,
+        hostName: meta.hostName || '',
+        count,
         maxPlayers: 6,
-      }));
-  }
-
-  async createRoom(name) {
-    const rooms = await this.getRegistry();
-    let code = randomRoomCode();
-    for (let tries = 0; tries < 30 && rooms[code]; tries += 1) code = randomRoomCode();
-    if (rooms[code]) return { ok: false, message: '目前無法建立新房間，請稍後再試。' };
-
-    const response = await this.joinRoom(code, name);
-    const result = await response.json();
-    this.rememberResult(rooms, code, result);
-    await this.saveRegistry(rooms);
-    return result;
+        started,
+        full,
+        available: !started && !full,
+      };
+    });
   }
 
   async joinSpecificRoom(code, name) {
+    const fixed = FIXED_ROOM_BY_CODE[code];
+    if (!fixed) return { ok: false, reason: 'unavailable', message: '這個房間不存在。' };
+
     const rooms = await this.getRegistry();
-    const meta = rooms[code];
-    if (!meta || meta.started || Number(meta.count || 0) >= 6) {
-      return { ok: false, reason: 'unavailable', message: '這個房間已無法加入，請重新整理房間列表。' };
-    }
+    const meta = rooms[code] || {};
+    if (meta.started) return { ok: false, reason: 'started', message: '這個房間正在遊戲中，請選其他房間。' };
+    if (Number(meta.count || 0) >= 6) return { ok: false, reason: 'full', message: '這個房間已滿，請選其他房間。' };
 
     const response = await this.joinRoom(code, name);
     const result = await response.json();
     if (result.ok) {
       this.rememberResult(rooms, code, result);
     } else if (result.reason === 'full' || result.reason === 'started') {
-      delete rooms[code];
+      rooms[code] = {
+        ...meta,
+        started: result.reason === 'started' ? true : Boolean(meta.started),
+        count: result.reason === 'full' ? 6 : Number(meta.count || 0),
+        updatedAt: Date.now(),
+      };
     }
     await this.saveRegistry(rooms);
     return result;
@@ -97,26 +104,18 @@ export class Matchmaker {
 
   async autoJoin(name) {
     const rooms = await this.getRegistry();
-    const candidates = Object.entries(rooms)
-      .filter(([, meta]) => !meta.started && Number(meta.count || 0) < 6)
-      .sort((a, b) => Number(b[1].count || 0) - Number(a[1].count || 0));
+    const candidates = FIXED_ROOMS
+      .map((room) => ({ room, meta: rooms[room.code] || {} }))
+      .filter(({ meta }) => !meta.started && Number(meta.count || 0) < 6)
+      .sort((a, b) => Number(b.meta.count || 0) - Number(a.meta.count || 0));
 
-    for (const [code] of candidates) {
-      const response = await this.joinRoom(code, name);
-      const result = await response.json();
-      if (result.ok) {
-        this.rememberResult(rooms, code, result);
-        await this.saveRegistry(rooms);
-        return result;
-      }
-      if (result.reason === 'full' || result.reason === 'started') delete rooms[code];
-      if (result.reason !== 'nameTaken' && result.reason !== 'full' && result.reason !== 'started') {
-        await this.saveRegistry(rooms);
-        return result;
-      }
+    for (const { room } of candidates) {
+      const result = await this.joinSpecificRoom(room.code, name);
+      if (result.ok) return result;
+      if (!['nameTaken', 'full', 'started'].includes(result.reason)) return result;
     }
 
-    return this.createRoom(name);
+    return { ok: false, message: '目前四個房間都在遊戲中或已滿，請稍後再試。' };
   }
 
   async fetch(request) {
@@ -125,13 +124,6 @@ export class Matchmaker {
     if (url.pathname === '/rooms' && request.method === 'GET') {
       const rooms = await this.getRegistry();
       return json({ ok: true, rooms: this.publicRooms(rooms) });
-    }
-
-    if (url.pathname === '/create-room' && request.method === 'POST') {
-      const payload = await request.json().catch(() => ({}));
-      const name = cleanName(payload.name);
-      if (!name) return json({ ok: false, message: '請輸入暱稱' }, 400);
-      return json(await this.createRoom(name));
     }
 
     if (url.pathname === '/join-room' && request.method === 'POST') {
@@ -152,10 +144,15 @@ export class Matchmaker {
     if (url.pathname === '/sync' && request.method === 'POST') {
       const payload = await request.json().catch(() => ({}));
       const code = cleanCode(payload.code);
-      if (!code) return json({ ok: false }, 400);
+      if (!code || !FIXED_ROOM_BY_CODE[code]) return json({ ok: false }, 400);
       const rooms = await this.getRegistry();
       if (Number(payload.count || 0) <= 0) {
-        delete rooms[code];
+        rooms[code] = {
+          count: 0,
+          started: false,
+          hostName: '',
+          updatedAt: Date.now(),
+        };
       } else {
         rooms[code] = {
           count: Number(payload.count || 0),
