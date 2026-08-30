@@ -51,7 +51,7 @@
   background-image: url('/images/Game%20Rules.png') !important;
 }
 
-/* 中央：房主顯示 go，其他玩家顯示 wait。 */
+/* 中央：房主顯示 go，其他玩家顯示 wait。兩張圖以中心點放大 1.5 倍。 */
 .room-mode #startGameBtn {
   display: block !important;
   position: absolute;
@@ -60,7 +60,8 @@
   z-index: 18;
   width: 25%;
   height: 11%;
-  transform: translateX(-50%) !important;
+  transform: translateX(-50%) scale(1.5) !important;
+  transform-origin: center center;
 }
 
 .room-mode #startGameBtn[data-room-role='host'] {
@@ -87,13 +88,12 @@
 }
 
 .room-mode #leaveRoomBtn:hover,
-.room-mode #roomRulesOpenBtn:hover,
-.room-mode #startGameBtn[data-room-role='host']:not(:disabled):hover {
+.room-mode #roomRulesOpenBtn:hover {
   transform: scale(1.04);
 }
 
 .room-mode #startGameBtn[data-room-role='host']:not(:disabled):hover {
-  transform: translateX(-50%) scale(1.04) !important;
+  transform: translateX(-50%) scale(1.56) !important;
 }
 
 .room-mode #leaveRoomBtn:active,
@@ -102,7 +102,7 @@
 }
 
 .room-mode #startGameBtn[data-room-role='host']:not(:disabled):active {
-  transform: translateX(-50%) scale(.97) !important;
+  transform: translateX(-50%) scale(1.455) !important;
 }
 
 @media (max-width: 760px) {
