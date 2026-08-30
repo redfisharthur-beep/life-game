@@ -27,6 +27,12 @@
 .action-showcase .simple-result-player { font-size: clamp(24px, 5.7vw, 34px) !important; }
 .action-showcase .simple-result-effect { font-size: clamp(20px, 4.8vw, 27px) !important; }
 
+/* 行動結果的膠囊列高度縮為原本約 80%，內容仍垂直置中。 */
+.action-showcase.result-stage-active .simple-result-row {
+  padding-top: 8.8px !important;
+  padding-bottom: 8.8px !important;
+}
+
 /*
  * 行動選擇後的所有視覺統一縮為原本 80%。
  * 不影響 9 選 1 按鈕本身，只影響：選擇圖、骰子動畫／結果、行動結果圖。
@@ -112,6 +118,11 @@
   .action-showcase .dream-fail-label { font-size: 22px !important; }
   .action-showcase .simple-result-player { font-size: clamp(23px, 7.2vw, 31px) !important; }
   .action-showcase .simple-result-effect { font-size: clamp(19px, 5.5vw, 24px) !important; }
+
+  .action-showcase.result-stage-active .simple-result-row {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
 
   .action-showcase .action-showcase-image {
     width: min(152px, 36.8vw) !important;
