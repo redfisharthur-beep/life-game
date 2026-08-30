@@ -1,4 +1,4 @@
-import { GameRoom as EraWaveGameRoom } from './game-room-era-wave.js';
+import { GameRoom as MilestoneGameRoom } from './game-room-milestones.js';
 
 const AUTO_ACTIONS = [
   'salary',
@@ -16,7 +16,7 @@ function randomChoice(values) {
   return values.length ? values[Math.floor(Math.random() * values.length)] : null;
 }
 
-export class GameRoom extends EraWaveGameRoom {
+export class GameRoom extends MilestoneGameRoom {
   getAvailableAutoActions(room, playerId) {
     return AUTO_ACTIONS.filter((action) => {
       if (action === 'sabotage') {
