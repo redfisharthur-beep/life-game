@@ -6,6 +6,8 @@
     office: '/images/officehead.png',
     athlete: '/images/athleteghead.png',
     rich: '/images/richghead.png',
+    civilServant: '/images/civil%20servant.png',
+    artist: '/images/artist.png',
   };
 
   const FALLBACK_IMAGES = {
@@ -15,6 +17,8 @@
     office: '/images/office.png',
     athlete: '/images/athlete.png',
     rich: '/images/rich.png',
+    civilServant: '/images/civil%20servant.png',
+    artist: '/images/artist.png',
   };
 
   const PROFESSION_NAMES = {
@@ -24,6 +28,8 @@
     office: '白領上班族',
     athlete: '職棒球員',
     rich: '企業富二代',
+    civilServant: '公務員',
+    artist: '藝人',
   };
 
   function formatInteger(value) {
