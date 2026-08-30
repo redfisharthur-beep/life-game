@@ -11,9 +11,8 @@
   <link rel="stylesheet" href="/profession-layout.css?v=20260828-1230" />
   <link rel="stylesheet" href="/profession-position.css?v=20260828-1324" />
   <link rel="stylesheet" href="/profession-eight.css?v=20260830-1350" />
-  <link rel="stylesheet" href="/action-showcase.css?v=20260829-1251" />
-  <link rel="stylesheet" href="/dice-animation.css?v=20260830-1435" />
-  <link rel="stylesheet" href="/showcase-result-overrides.css?v=20260827-2045" />
+  <link rel="stylesheet" href="/action-showcase.css?v=20260830-2130" />
+  <link rel="stylesheet" href="/dice-animation.css?v=20260830-2130" />
   <link rel="stylesheet" href="/game-ui-v2.css?v=20260830-1435" />
   <link rel="stylesheet" href="/game-typography.css?v=20260830-1555" />
   <link rel="stylesheet" href="/dream-result.css?v=20260830-1806" />
@@ -27,6 +26,7 @@
   <link rel="stylesheet" href="/ui-final-tweaks.css?v=20260829-1301" />
   <link rel="stylesheet" href="/rules-viewer.css?v=20260830-1745" />
   <link rel="stylesheet" href="/room-controls.css?v=20260830-1400" />
+  <link rel="stylesheet" href="/result-simple.css?v=20260830-2130" />
 </head>
 <body>
   <main class="shell">
@@ -35,12 +35,8 @@
 
       <div id="homeStage" class="home-stage">
         <img class="front-page-image" src="/images/front%20page.png?v=20260827-1710" alt="人生首頁" decoding="async" />
-
         <div id="entryPanel" class="panel home-entry-panel">
-          <label class="field entry-control">
-            <input id="playerName" maxlength="12" autocomplete="nickname" placeholder="輸入名字" />
-          </label>
-
+          <label class="field entry-control"><input id="playerName" maxlength="12" autocomplete="nickname" placeholder="輸入名字" /></label>
           <button id="joinGameBtn" class="primary entry-control" type="button">迎向新局</button>
           <p id="message" class="message" aria-live="polite"></p>
         </div>
@@ -63,11 +59,8 @@
         <div class="player-list-stage">
           <img class="player-list-bg" src="/images/Player%20List.png?v=20260827-1905" alt="玩家等待畫面" decoding="async" />
           <div class="player-list-overlay">
-            <div class="players-head compact">
-              <span id="playerCount">0 / 6</span>
-            </div>
+            <div class="players-head compact"><span id="playerCount">0 / 6</span></div>
             <div id="playerList" class="players"></div>
-
             <button id="startGameBtn" class="start-button" type="button" disabled>啟程</button>
             <p id="launchMessage" class="launch-message" aria-live="polite"></p>
             <button id="leaveRoomBtn" class="home-pill" type="button" aria-label="返回房間列表" title="返回房間列表">房間列表</button>
@@ -88,18 +81,10 @@
 
       <div id="gamePanel" class="panel hidden">
         <section id="playerStatusBar" class="player-status-bar" aria-label="玩家資訊"></section>
-
         <div class="game-topbar">
-          <div class="stage-block">
-            <span id="stageName" class="stage-name">人生起步</span>
-            <span id="roundLabel" class="round-label">21歲</span>
-          </div>
-
+          <div class="stage-block"><span id="stageName" class="stage-name">人生起步</span><span id="roundLabel" class="round-label">21歲</span></div>
           <div class="game-topbar-right">
-            <div class="timer-box topbar-timer" aria-label="回合剩餘秒數">
-              <strong id="turnTimer">6</strong>
-            </div>
-
+            <div class="timer-box topbar-timer" aria-label="回合剩餘秒數"><strong id="turnTimer">6</strong></div>
             <div class="market-strip" aria-label="最新市場價格">
               <span class="market-item" title="股市"><img class="market-icon" src="/images/stock.png" alt="股市" loading="lazy" decoding="async" /><b id="stockPrice" class="market-value">10.00</b></span>
               <span class="market-item" title="地價"><img class="market-icon" src="/images/land.png" alt="地價" loading="lazy" decoding="async" /><b id="landPrice" class="market-value">10.00</b></span>
@@ -109,14 +94,10 @@
 
         <section class="me-card">
           <div class="me-head"><div><span id="myName" class="me-name">玩家</span><span id="myProfession" class="me-profession">職業</span></div></div>
-          <div class="asset-grid">
-            <span>現金 <b id="myCash">0</b></span><span>股票 <b id="myStocks">0</b></span><span>土地 <b id="myLand">0</b></span><span>幸福 <b id="myHappiness">0.00</b></span>
-          </div>
+          <div class="asset-grid"><span>現金 <b id="myCash">0</b></span><span>股票 <b id="myStocks">0</b></span><span>土地 <b id="myLand">0</b></span><span>幸福 <b id="myHappiness">0.00</b></span></div>
         </section>
 
-        <section class="turn-section hidden" aria-hidden="true">
-          <div class="turn-title">本輪順序</div><div id="turnOrder" class="turn-order"></div><p id="turnNotice" class="turn-notice">等待回合開始…</p>
-        </section>
+        <section class="turn-section hidden" aria-hidden="true"><div class="turn-title">本輪順序</div><div id="turnOrder" class="turn-order"></div><p id="turnNotice" class="turn-notice">等待回合開始…</p></section>
 
         <section class="actions-section">
           <div id="actionGrid" class="action-grid">
@@ -133,7 +114,6 @@
         </section>
 
         <section class="event-box"><span class="event-label">最新事件</span><p id="gameEvent">職業選擇完成，人生啟程！</p></section>
-
         <section id="gameResults" class="game-results hidden" aria-live="polite">
           <div class="results-heading"><span>人生結算</span><strong id="resultWinner">🏆</strong></div>
           <div id="rankingList" class="ranking-list"></div>
@@ -143,9 +123,7 @@
     </section>
   </main>
 
-  <section id="roundAnnouncement" class="round-announcement hidden" aria-live="assertive">
-    <img class="round-announcement-image" src="/images/The%20tide%20of%20the%20times.png" alt="時代浪潮" loading="lazy" decoding="async" />
-  </section>
+  <section id="roundAnnouncement" class="round-announcement hidden" aria-live="assertive"><img class="round-announcement-image" src="/images/The%20tide%20of%20the%20times.png" alt="時代浪潮" loading="lazy" decoding="async" /></section>
 
   <section id="rulesViewer" class="rules-viewer hidden" aria-hidden="true" aria-label="遊戲規則">
     <div class="rules-viewer-card" role="dialog" aria-modal="true" aria-label="遊戲規則圖片">
@@ -168,13 +146,9 @@
   <script src="/age-display.js?v=20260830-1435"></script>
   <script src="/player-status.js?v=20260830-2115"></script>
   <script src="/haptics.js?v=20260830-1500"></script>
-  <script src="/cheer-feedback.js?v=20260830-1501"></script>
-  <script src="/action-showcase.js?v=20260829-1301"></script>
-  <script src="/action-result-head-fix.js?v=20260830-1412"></script>
-  <script src="/game-ui-v2.js?v=20260830-1510"></script>
-  <script src="/dice-animation.js?v=20260830-2115"></script>
-  <script src="/showcase-result-overrides.js?v=20260828-1905"></script>
-  <script src="/dream-result.js?v=20260830-2115"></script>
+  <script src="/cheer-feedback.js?v=20260830-2130"></script>
+  <script src="/action-showcase.js?v=20260830-2130"></script>
+  <script src="/dice-animation.js?v=20260830-2130"></script>
   <script src="/major-event.js?v=20260830-1435"></script>
   <script src="/announcement-tone.js?v=20260827-2225"></script>
   <script src="/logo-visibility.js?v=20260827-1905"></script>
