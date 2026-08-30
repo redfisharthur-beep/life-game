@@ -250,7 +250,7 @@
     } else if (event.type === 'sellLand') {
       pushRow(rows, actor, playerName, [makeEffect('現金', Number(event.salaryIncome || 0) + Number(event.proceeds || 0)), Number(event.units || 0) ? makeEffect('土地', -Number(event.units || 0)) : null]);
     } else if (event.type === 'dream') {
-      pushRow(rows, actor, playerName, [makeEffect('現金', event.salaryIncome)]);
+      pushRow(rows, actor, playerName, []);
     } else if (event.type === 'sabotage' || event.type === 'help') {
       if (target) pushRow(rows, target, target.name, [firstSignedEffect(event.text)]);
       else pushRow(rows, actor, playerName, [firstSignedEffect(event.text)]);
@@ -282,15 +282,22 @@
     return null;
   }
 
+  function renderSummary(name, effects) {
+    return `
+      <div class="result-summary-line">
+        <strong class="result-summary-name">${escapeHtml(name)}</strong>
+        ${effects.map((effect) => `<span class="result-summary-effect">${escapeHtml(effect)}</span>`).join('')}
+      </div>
+    `;
+  }
+
   function showDreamResult(actor, playerName, event) {
     const name = actor?.name || playerName || '玩家';
     const success = Boolean(event.success);
-    const cashGain = Number(event.salaryIncome || 0);
     bodyEl.innerHTML = `
       <div class="dream-outcome-result">
         <img class="dream-outcome-head" src="${getDreamHead(actor, success)}" alt="${escapeHtml(name)} ${success ? '圓夢成功' : '圓夢失敗'}" decoding="async" />
-        <strong class="dream-outcome-title">${success ? '圓夢成功' : '圓夢失敗'}</strong>
-        <span class="dream-outcome-cash">現金 ${signed(cashGain)}</span>
+        <strong class="dream-outcome-title">${escapeHtml(name)} ${success ? '圓夢成功' : '圓夢失敗'}</strong>
       </div>
     `;
   }
@@ -311,24 +318,29 @@
     const target = room.players.find((item) => item.id === event.targetId);
     const rows = buildResultRows(room, event, actor);
     const primaryRow = rows[0] || { player: actor, name: actor?.name || playerName || '玩家', effects: ['無資產變動'] };
+    const isSpecial = ['fate', 'sabotage', 'help'].includes(event.type);
     const resultPlayer = (event.type === 'sabotage' || event.type === 'help') && target ? target : (primaryRow.player || actor);
     const resultName = resultPlayer?.name || primaryRow.name || playerName || '玩家';
     const fateVisual = fateVisualFor(event);
 
+    if (isSpecial) {
+      bodyEl.innerHTML = `
+        <div class="special-action-result">
+          ${renderSummary(resultName, primaryRow.effects)}
+          ${fateVisual ? `
+            <div class="result-event-visual result-event-visual-plain">
+              <img class="result-event-image" src="${fateVisual.image}" alt="${escapeHtml(fateVisual.label)}" decoding="async" />
+            </div>
+          ` : ''}
+        </div>
+      `;
+      return;
+    }
+
     bodyEl.innerHTML = `
-      <div class="simple-result simple-result-plain">
-        <div class="result-person result-person-plain">
-          <img class="result-person-head" src="${getPlayerHead(resultPlayer)}" alt="${escapeHtml(resultName)}" decoding="async" />
-          <span class="result-person-name">${escapeHtml(resultName)}</span>
-        </div>
-        <div class="simple-result-effects simple-result-effects-plain">
-          ${primaryRow.effects.map((effect) => `<span class="simple-result-effect">${escapeHtml(effect)}</span>`).join('')}
-        </div>
-        ${fateVisual ? `
-          <div class="result-event-visual result-event-visual-plain">
-            <img class="result-event-image" src="${fateVisual.image}" alt="${escapeHtml(fateVisual.label)}" decoding="async" />
-          </div>
-        ` : ''}
+      <div class="regular-action-result">
+        <img class="regular-result-head" src="${getPlayerHead(resultPlayer)}" alt="${escapeHtml(resultName)}" decoding="async" />
+        ${renderSummary(resultName, primaryRow.effects)}
       </div>
     `;
   }
