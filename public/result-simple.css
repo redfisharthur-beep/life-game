@@ -1,0 +1,74 @@
+.action-showcase.result-stage-active .action-showcase-card {
+  width: min(440px, 92vw);
+  min-height: 0;
+  padding: 20px 18px;
+}
+
+.simple-choice-result {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  gap: 12px;
+}
+
+.simple-choice-player {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+}
+
+.simple-choice-head {
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+  background: transparent;
+  filter: drop-shadow(0 8px 12px rgba(71, 62, 55, .18));
+}
+
+.simple-choice-name {
+  max-width: 240px;
+  overflow: hidden;
+  color: #554e49;
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 700;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.simple-choice-action,
+.simple-choice-fate {
+  display: block;
+  width: min(200px, 48vw);
+  height: min(200px, 48vw);
+  object-fit: contain;
+  background: transparent;
+}
+
+.simple-choice-fate {
+  width: min(175px, 42vw);
+  height: min(175px, 42vw);
+  margin-top: -4px;
+}
+
+.dice-result-images.triple-dice-total .dice-result-image {
+  width: min(260px, 58vw);
+  height: min(260px, 58vw);
+}
+
+@media (max-width: 520px) {
+  .simple-choice-head {
+    width: 80px;
+    height: 80px;
+  }
+
+  .simple-choice-action {
+    width: min(180px, 52vw);
+    height: min(180px, 52vw);
+  }
+
+  .simple-choice-fate {
+    width: min(155px, 46vw);
+    height: min(155px, 46vw);
+  }
+}
