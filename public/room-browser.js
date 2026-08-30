@@ -3,14 +3,26 @@
   const roomBrowserPanel = document.getElementById('roomBrowserPanel');
   const roomBrowserList = document.getElementById('roomBrowserList');
   const roomBrowserMessage = document.getElementById('roomBrowserMessage');
-  const refreshRoomsBtn = document.getElementById('refreshRoomsBtn');
+  const roomBrowserActions = roomBrowserPanel?.querySelector('.room-browser-actions');
   const roomBrowserBackBtn = document.getElementById('roomBrowserBackBtn');
   const joinGameBtn = document.getElementById('joinGameBtn');
   const playerNameInput = document.getElementById('playerName');
   const homeStage = document.getElementById('homeStage');
   const lobbyCard = document.getElementById('lobbyCard');
 
-  if (!entryPanel || !roomBrowserPanel || !roomBrowserList || !joinGameBtn || !playerNameInput) return;
+  if (!entryPanel || !roomBrowserPanel || !roomBrowserList || !roomBrowserBackBtn || !joinGameBtn || !playerNameInput) return;
+
+  // 房間列表下方沿用等待玩家頁的兩個圖示：左下上一頁、右下遊戲規則。
+  let roomBrowserRulesBtn = document.getElementById('roomBrowserRulesBtn');
+  if (!roomBrowserRulesBtn && roomBrowserActions) {
+    roomBrowserRulesBtn = document.createElement('button');
+    roomBrowserRulesBtn.id = 'roomBrowserRulesBtn';
+    roomBrowserRulesBtn.className = 'room-browser-action';
+    roomBrowserRulesBtn.type = 'button';
+    roomBrowserRulesBtn.setAttribute('aria-label', '遊戲規則');
+    roomBrowserRulesBtn.title = '遊戲規則';
+    roomBrowserActions.appendChild(roomBrowserRulesBtn);
+  }
 
   let loading = false;
 
@@ -19,6 +31,7 @@
   }
 
   function setBrowserMessage(text = '', type = '') {
+    if (!roomBrowserMessage) return;
     roomBrowserMessage.textContent = text;
     roomBrowserMessage.className = `room-browser-message ${type}`.trim();
   }
@@ -49,8 +62,8 @@
 
   function setBusy(busy) {
     loading = busy;
-    refreshRoomsBtn.disabled = busy;
     roomBrowserBackBtn.disabled = busy;
+    if (roomBrowserRulesBtn) roomBrowserRulesBtn.disabled = busy;
     roomBrowserList.querySelectorAll('button').forEach((button) => {
       button.disabled = busy || button.dataset.available === 'false';
     });
@@ -59,17 +72,15 @@
   async function fetchRooms() {
     if (loading) return;
     setBusy(true);
-    setBrowserMessage('正在更新四個人生房間…');
+    setBrowserMessage('');
     try {
       const response = await fetch('/api/rooms', { cache: 'no-store' });
       const result = await response.json();
       if (!result?.ok) throw new Error(result?.message || '讀取房間失敗');
       renderRooms(result.rooms || []);
-      setBrowserMessage('選一個喜歡的人生房間加入吧！');
     } catch (error) {
       console.error('load rooms failed', error);
       roomBrowserList.innerHTML = '<div class="room-browser-empty">房間列表讀取失敗</div>';
-      setBrowserMessage('請稍後重新整理', 'error');
     } finally {
       setBusy(false);
     }
@@ -120,19 +131,14 @@
   }
 
   async function enterRoom(result) {
-    if (!result?.ok || !result?.session) {
-      setBrowserMessage(result?.message || '無法加入房間', 'error');
-      return;
-    }
+    if (!result?.ok || !result?.session) return;
 
     saveSession(result.session);
     localStorage.setItem('lifeGame.playerName', currentName());
-    setBrowserMessage('正在進入房間…');
 
     socket.emit('room:resume', result.session, (resumeResult) => {
       if (!resumeResult?.ok) {
         clearSession();
-        setBrowserMessage(resumeResult?.message || '無法進入房間', 'error');
         fetchRooms();
         return;
       }
@@ -161,13 +167,15 @@
     }
 
     setBusy(true);
-    setBrowserMessage('正在加入房間…');
     try {
       const result = await postRoom('/api/join-room', { code, name });
+      if (!result?.ok) {
+        await fetchRooms();
+        return;
+      }
       await enterRoom(result);
     } catch (error) {
       console.error('join room failed', error);
-      setBrowserMessage('加入房間失敗，請再試一次', 'error');
     } finally {
       setBusy(false);
     }
@@ -194,13 +202,16 @@
     openRoomBrowser(event);
   }, true);
 
-  refreshRoomsBtn.addEventListener('click', fetchRooms);
   roomBrowserBackBtn.addEventListener('click', () => {
     setBrowserMessage('');
     showEntry();
   });
 
-  // 固定四間房每 4 秒同步一次人數與遊戲狀態。
+  roomBrowserRulesBtn?.addEventListener('click', () => {
+    document.getElementById('rulesOpenBtn')?.click();
+  });
+
+  // 固定四間房每 4 秒在背景同步人數與遊戲狀態，不需要手動重新整理。
   setInterval(() => {
     if (!roomBrowserPanel.classList.contains('hidden') && !loading) fetchRooms();
   }, 4000);
