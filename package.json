@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node runtime-rules.js",
     "test": "node tests/smoke.test.js",
-    "test:cf": "node tests/cloudflare-smoke.test.js",
+    "test:cf": "node tests/cloudflare-smoke.test.js && node tests/cloudflare-alarm.test.mjs",
     "dev:cf": "wrangler dev",
     "deploy:cf": "wrangler deploy"
   },
