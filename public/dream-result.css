@@ -1,0 +1,62 @@
+/* 圓夢結果：成功／失敗都只顯示一張職業情緒圖＋文字。 */
+.dream-result-layout {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.dream-result-image {
+  display: block;
+  width: 152px;
+  height: 152px;
+  object-fit: contain;
+  border: 0;
+  background: transparent;
+  filter: drop-shadow(0 10px 18px rgba(71, 62, 55, .20));
+}
+
+.dream-result-copy {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.dream-result-title {
+  color: #554e49;
+  font-size: clamp(23px, 5.4vw, 32px);
+  font-weight: 300;
+  line-height: 1.1;
+}
+
+.dream-result-detail {
+  color: #665d56;
+  font-size: clamp(19px, 4.5vw, 25px);
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+@media (max-width: 520px) {
+  .dream-result-layout {
+    gap: 8px;
+  }
+
+  .dream-result-image {
+    width: 128px;
+    height: 128px;
+  }
+
+  .dream-result-copy {
+    gap: 5px;
+  }
+
+  .dream-result-title {
+    font-size: clamp(22px, 7vw, 29px);
+  }
+
+  .dream-result-detail {
+    font-size: clamp(18px, 5.2vw, 22px);
+  }
+}
