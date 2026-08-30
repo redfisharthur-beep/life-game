@@ -104,6 +104,17 @@
     }, FINAL_HOLD_MS);
   }
 
+  function getCurrentDiceCount(image) {
+    try {
+      const dice = typeof currentRoom !== 'undefined' ? currentRoom?.game?.lastEvent?.dice : null;
+      if (Array.isArray(dice) && dice.length >= 1 && dice.length <= 3) return dice.length;
+    } catch (_) {}
+
+    if (image?.closest('.triple-dice-total')) return 3;
+    if (image?.closest('.double-dice-total')) return 2;
+    return 1;
+  }
+
   function startAnimation(image) {
     if (!image || image.dataset.diceAnimating === '1') return;
 
@@ -114,15 +125,18 @@
     const token = animationToken;
     const finalSrc = image.getAttribute('src') || '/images/dice.png';
     const finalAlt = image.getAttribute('alt') || '骰子結果';
-    const isTriple = Boolean(image.closest('.triple-dice-total'));
-    const isDouble = Boolean(image.closest('.double-dice-total'));
-    const frames = isTriple ? TRIPLE_ROLL_FRAMES : isDouble ? DOUBLE_ROLL_FRAMES : SINGLE_ROLL_FRAMES;
+    const diceCount = getCurrentDiceCount(image);
+    const frames = diceCount === 3
+      ? TRIPLE_ROLL_FRAMES
+      : diceCount === 2
+        ? DOUBLE_ROLL_FRAMES
+        : SINGLE_ROLL_FRAMES;
     let frameIndex = 0;
 
     image.classList.remove('dice-landed');
     image.classList.add('dice-rolling');
     image.src = frames[0];
-    playDiceAudio(isDouble || isTriple);
+    playDiceAudio(diceCount >= 2);
 
     rollInterval = setInterval(() => {
       if (token !== animationToken || !image.isConnected) return;
