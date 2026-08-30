@@ -51,6 +51,57 @@
   margin-top: -4px;
 }
 
+/* 骰完後結果：頭像＋人名＋純文字數據，不使用膠囊框。 */
+.simple-result-plain {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.result-person-plain {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+}
+
+.simple-result-effects-plain {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.simple-result-effects-plain .simple-result-effect {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #665d56;
+  font-size: clamp(20px, 4.8vw, 26px);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.result-event-visual-plain {
+  margin-top: 4px;
+}
+
+.result-event-visual-plain .result-event-image {
+  width: min(190px, 46vw);
+  height: min(190px, 46vw);
+}
+
 .dice-result-images.triple-dice-total .dice-result-image {
   width: min(260px, 58vw);
   height: min(260px, 58vw);
@@ -70,5 +121,18 @@
   .simple-choice-fate {
     width: min(155px, 46vw);
     height: min(155px, 46vw);
+  }
+
+  .simple-result-effects-plain {
+    gap: 5px 10px;
+  }
+
+  .simple-result-effects-plain .simple-result-effect {
+    font-size: clamp(18px, 5.4vw, 22px);
+  }
+
+  .result-event-visual-plain .result-event-image {
+    width: min(165px, 48vw);
+    height: min(165px, 48vw);
   }
 }
