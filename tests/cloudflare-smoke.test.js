@@ -17,6 +17,9 @@ const gameRoomHardening = read('src/game-room-hardening.js');
 const matchmaker = read('src/matchmaker.js');
 const socketCompat = read('public/cloudflare-socket.js');
 const app = read('public/app.js');
+const actionShowcase = read('public/action-showcase.js');
+const diceAnimation = read('public/dice-animation.js');
+const cheerFeedback = read('public/cheer-feedback.js');
 const professionEight = read('public/profession-eight.css');
 const index = read('public/index.html');
 
@@ -80,10 +83,20 @@ assert.match(app, /artist\.png/, 'Artist image is not connected in app.js');
 assert.match(professionEight, /grid-template-rows: repeat\(4/, 'Profession grid must use four rows');
 assert.match(professionEight, /grid-template-columns: repeat\(2/, 'Profession grid must use two columns');
 
+assert.match(actionShowcase, /Math\.min\(3, dice\.length/, 'Action showcase must natively support three dice');
+assert.match(actionShowcase, /simple-choice-result/, 'Simplified action result layout is missing');
+assert.match(actionShowcase, /secondaryFateVisual/, 'Sabotage/help fate image support is missing');
+assert.match(diceAnimation, /preloadFrames\(1\)/, 'Single-die roll1-roll5 warmup is missing');
+assert.match(cheerFeedback, /event\.type === 'help'/, 'Help cheer feedback is missing');
+assert.match(cheerFeedback, /POSITIVE_FATE_INDEXES/, 'Positive fate cheer feedback is missing');
+
 assert.match(index, /cloudflare-socket\.js/, 'Cloudflare socket compatibility script is not loaded');
 assert.match(index, /profession-eight\.css/, '2x4 profession layout is not loaded');
-assert.match(index, /game-ui-v2\.js/, 'Updated special result UI script is not loaded');
-assert.match(index, /game-ui-v2\.css/, 'Updated special result UI styles are not loaded');
+assert.match(index, /action-showcase\.js/, 'Action showcase script is not loaded');
+assert.match(index, /result-simple\.css/, 'Simplified result styles are not loaded');
+assert.doesNotMatch(index, /game-ui-v2\.js/, 'Legacy result patch must stay unloaded');
+assert.doesNotMatch(index, /showcase-result-overrides\.js/, 'Legacy result override must stay unloaded');
+assert.doesNotMatch(index, /dream-result\.js/, 'Legacy dream result override must stay unloaded');
 assert.doesNotMatch(index, /profession-extension\.js/, 'Obsolete profession extension must stay removed');
 assert.doesNotMatch(index, /socket\.io\/socket\.io\.js/, 'Legacy Socket.IO browser client must not be loaded on Cloudflare');
 
