@@ -70,12 +70,8 @@
     updateResults();
   }
 
-  // app.js 的 room:update 會先完成主要畫面渲染；用下一個 task 再套顯示微調，
-  // 避免 MutationObserver 監聽整頁後又修改 DOM，造成無限 mutation 迴圈與瀏覽器卡死。
   socket.on('room:update', () => setTimeout(applyTweaks, 0));
   socket.on('room:started', () => setTimeout(applyTweaks, 0));
-
-  // 低頻備援只處理可能較晚出現的 DOM，不做高頻輪詢。
-  setInterval(applyTweaks, 1500);
+  window.addEventListener('pageshow', () => setTimeout(applyTweaks, 0));
   applyTweaks();
 })();
