@@ -5,6 +5,8 @@
   const roomBrowserMessage = document.getElementById('roomBrowserMessage');
   const roomBrowserActions = roomBrowserPanel?.querySelector('.room-browser-actions');
   const roomBrowserBackBtn = document.getElementById('roomBrowserBackBtn');
+  const roomRulesOpenBtn = document.getElementById('roomRulesOpenBtn');
+  const leaveRoomBtn = document.getElementById('leaveRoomBtn');
   const joinGameBtn = document.getElementById('joinGameBtn');
   const playerNameInput = document.getElementById('playerName');
   const homeStage = document.getElementById('homeStage');
@@ -105,20 +107,24 @@
       const title = document.createElement('strong');
       title.className = 'room-browser-name';
       title.textContent = `${room.icon || '✨'} ${room.name || room.code}`;
+      identity.appendChild(title);
 
-      const host = document.createElement('span');
-      host.className = 'room-browser-host';
+      let hostText = '';
       if (room.started) {
-        host.textContent = '遊戲進行中';
+        hostText = '遊戲進行中';
       } else if (room.full) {
-        host.textContent = '房間已滿';
+        hostText = '房間已滿';
       } else if (room.hostName) {
-        host.textContent = `房主：${room.hostName}`;
-      } else {
-        host.textContent = '等待第一位房主';
+        hostText = `房主：${room.hostName}`;
       }
 
-      identity.append(title, host);
+      // 空房不再顯示「等待第一位房主」，只保留房名與人數。
+      if (hostText) {
+        const host = document.createElement('span');
+        host.className = 'room-browser-host';
+        host.textContent = hostText;
+        identity.appendChild(host);
+      }
 
       const count = document.createElement('span');
       count.className = 'room-browser-count';
@@ -196,11 +202,31 @@
     fetchRooms();
   }
 
+  // 玩家列表左下「上一頁」：先退出目前房間，再回固定四間房列表。
+  function leaveLobbyToRoomBrowser(event) {
+    if (typeof currentRoom === 'undefined' || currentRoom?.phase !== 'lobby') return;
+    event?.preventDefault();
+    event?.stopImmediatePropagation();
+    if (!leaveRoomBtn || leaveRoomBtn.disabled) return;
+
+    leaveRoomBtn.disabled = true;
+    socket.emit('room:leave', {}, () => {
+      if (typeof clearSession === 'function') clearSession();
+      if (typeof currentRoom !== 'undefined') currentRoom = null;
+      leaveRoomBtn.disabled = false;
+      showBrowser();
+      fetchRooms();
+    });
+  }
+
   joinGameBtn.addEventListener('click', openRoomBrowser, true);
   playerNameInput.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter') return;
     openRoomBrowser(event);
   }, true);
+
+  // capture 階段攔截 app.js 原本「回首頁」的處理，只在玩家列表 lobby 生效。
+  leaveRoomBtn?.addEventListener('click', leaveLobbyToRoomBrowser, true);
 
   roomBrowserBackBtn.addEventListener('click', () => {
     setBrowserMessage('');
@@ -210,6 +236,9 @@
   roomBrowserRulesBtn?.addEventListener('click', () => {
     document.getElementById('rulesOpenBtn')?.click();
   });
+
+  // 玩家列表的遊戲說明仍維持原本功能。
+  roomRulesOpenBtn?.setAttribute('title', '遊戲規則');
 
   // 固定四間房每 4 秒在背景同步人數與遊戲狀態，不需要手動重新整理。
   setInterval(() => {
