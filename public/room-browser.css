@@ -1,4 +1,4 @@
-/* 首頁輸入名字後的房間列表：沿用玩家列表背景與圓潤卡片風格。 */
+/* 首頁輸入名字後的固定四間房：沿用玩家列表背景與圓潤卡片風格。 */
 .room-browser-panel {
   position: relative;
   width: 100%;
@@ -58,32 +58,57 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: 72px;
-  padding: 13px 18px;
-  border: 1px solid rgba(185, 151, 107, .25);
+  min-height: 78px;
+  padding: 12px 18px;
+  border: 1px solid rgba(185, 151, 107, .28);
   border-radius: 999px;
-  background: rgba(255, 249, 238, .94);
+  background: rgba(255, 249, 238, .96);
   box-shadow: 0 5px 15px rgba(116, 81, 47, .10);
   color: #765f4e;
   text-align: left;
   cursor: pointer;
-  transition: transform .15s ease, box-shadow .15s ease;
+  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
 }
 
-.room-browser-item:hover {
+.room-browser-item:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(116, 81, 47, .15);
 }
 
-.room-browser-item:active {
+.room-browser-item:active:not(:disabled) {
   transform: scale(.985);
+}
+
+.room-browser-item.unavailable,
+.room-browser-item:disabled {
+  cursor: default;
+  opacity: .58;
+}
+
+.room-browser-identity {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.room-browser-name {
+  min-width: 0;
+  overflow: hidden;
+  color: #76502f;
+  font-size: clamp(20px, 4.7vw, 29px);
+  font-weight: 600;
+  line-height: 1.08;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .room-browser-host {
   min-width: 0;
   overflow: hidden;
-  font-size: clamp(19px, 4.6vw, 28px);
+  color: #9a806a;
+  font-size: clamp(13px, 3.2vw, 17px);
   font-weight: 400;
+  line-height: 1.15;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -100,6 +125,10 @@
   font-size: 15px;
   font-weight: 500;
   white-space: nowrap;
+}
+
+.room-browser-item.unavailable .room-browser-count {
+  background: #aa9c8b;
 }
 
 .room-browser-empty {
@@ -133,11 +162,6 @@
   cursor: pointer;
 }
 
-.room-browser-action.primary {
-  background: #d3a455;
-  color: #fffaf1;
-}
-
 .room-browser-message {
   min-height: 24px;
   margin: 9px 0 0;
@@ -161,8 +185,8 @@
   }
 
   .room-browser-item {
-    min-height: 64px;
-    padding: 10px 15px;
+    min-height: 68px;
+    padding: 9px 15px;
   }
 
   .room-browser-actions {
