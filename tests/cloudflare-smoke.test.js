@@ -11,6 +11,7 @@ const gameRoom = read('src/game-room.js');
 const gameRoomEight = read('src/game-room-eight.js');
 const gameRoomRulesV2 = read('src/game-room-rules-v2.js');
 const gameRoomRecovery = read('src/game-room-recovery.js');
+const gameRoomEraWave = read('src/game-room-era-wave.js');
 const matchmaker = read('src/matchmaker.js');
 const socketCompat = read('public/cloudflare-socket.js');
 const app = read('public/app.js');
@@ -27,7 +28,7 @@ assert.match(worker, /\/api\/auto-join/, 'Worker auto-join route is missing');
 assert.match(worker, /const wsMatch = url\.pathname\.match/, 'Worker WebSocket route is missing');
 assert.match(worker, /target\.pathname = '\/ws'/, 'Worker WebSocket Durable Object forwarding is missing');
 assert.match(worker, /env\.ASSETS\.fetch/, 'Static asset fallback is missing');
-assert.match(worker, /game-room-recovery\.js/, 'Worker must use stalled-room recovery wrapper');
+assert.match(worker, /game-room-era-wave\.js/, 'Worker must use era-wave three-dice wrapper');
 
 assert.match(gameRoom, /const TOTAL_ROUNDS = 30;/, 'Game must stay at 30 rounds');
 assert.match(gameRoom, /const HAPPINESS_GOAL = 48;/, 'Happiness goal must stay at 48');
@@ -48,6 +49,12 @@ assert.match(gameRoomRecovery, /transitionUntil/, 'Expired transition recovery i
 assert.match(gameRoomRecovery, /majorEventUntil/, 'Expired major-event recovery is missing');
 assert.match(gameRoomRecovery, /deadline/, 'Expired turn deadline recovery is missing');
 assert.match(gameRoomRecovery, /async alarm\(\)/, 'Alarm recovery fallback is missing');
+
+assert.match(gameRoomEraWave, /event\?\.id === 'eraWave'/, 'Era wave major-event override is missing');
+assert.match(gameRoomEraWave, /forceTripleDice = true/, 'Era wave must enable permanent three-dice mode');
+assert.match(gameRoomEraWave, /forceDoubleDice = false/, 'Era wave must disable the legacy double-dice flag');
+assert.match(gameRoomEraWave, /後續所有骰子都改為3顆/, 'Era wave public description must say three dice');
+assert.match(gameRoomEraWave, /withTripleDice/, 'Era wave three-dice action wrapper is missing');
 
 assert.match(gameRoomEight, /civilServant: \{ name: '公務員'/, 'Civil servant gameplay definition is missing');
 assert.match(gameRoomEight, /artist: \{ name: '藝人'/, 'Artist gameplay definition is missing');
