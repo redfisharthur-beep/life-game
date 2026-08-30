@@ -7,7 +7,8 @@
 
   Object.values(tracks).forEach((audio) => {
     audio.loop = true;
-    audio.preload = 'auto';
+    // 避免首頁一次下載三首音樂；真正切換到該畫面時 audio.play() 才載入。
+    audio.preload = 'none';
     audio.volume = 0.35;
   });
   tracks.game.volume = 0.20;
