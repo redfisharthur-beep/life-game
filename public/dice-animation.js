@@ -13,16 +13,23 @@
     '/images/2roll4.png',
     '/images/2roll5.png',
   ];
+  const TRIPLE_ROLL_FRAMES = [
+    '/images/3roll1.png',
+    '/images/3roll2.png',
+    '/images/3roll3.png',
+    '/images/3roll4.png',
+    '/images/3roll5.png',
+  ];
   const FRAME_MS = 300;
   const ROLL_MS = 1500;
   const FINAL_HOLD_MS = 1500;
 
   const singleRollAudio = new Audio('/music/Dice_Roll.mp3');
-  const doubleRollAudio = new Audio('/music/2Dice_Roll.mp3');
+  const multiRollAudio = new Audio('/music/2Dice_Roll.mp3');
   singleRollAudio.preload = 'auto';
-  doubleRollAudio.preload = 'auto';
+  multiRollAudio.preload = 'auto';
   singleRollAudio.volume = 0.7;
-  doubleRollAudio.volume = 0.7;
+  multiRollAudio.volume = 0.7;
 
   let activeImage = null;
   let rollInterval = null;
@@ -31,7 +38,7 @@
   let animationToken = 0;
 
   function stopDiceAudio() {
-    [singleRollAudio, doubleRollAudio].forEach((audio) => {
+    [singleRollAudio, multiRollAudio].forEach((audio) => {
       try {
         audio.pause();
         audio.currentTime = 0;
@@ -39,9 +46,9 @@
     });
   }
 
-  function playDiceAudio(isDouble) {
+  function playDiceAudio(isMulti) {
     stopDiceAudio();
-    const audio = isDouble ? doubleRollAudio : singleRollAudio;
+    const audio = isMulti ? multiRollAudio : singleRollAudio;
     audio.volume = 0.7;
     const playPromise = audio.play();
     if (playPromise?.catch) playPromise.catch(() => {});
@@ -107,14 +114,15 @@
     const token = animationToken;
     const finalSrc = image.getAttribute('src') || '/images/dice.png';
     const finalAlt = image.getAttribute('alt') || '骰子結果';
+    const isTriple = Boolean(image.closest('.triple-dice-total'));
     const isDouble = Boolean(image.closest('.double-dice-total'));
-    const frames = isDouble ? DOUBLE_ROLL_FRAMES : SINGLE_ROLL_FRAMES;
+    const frames = isTriple ? TRIPLE_ROLL_FRAMES : isDouble ? DOUBLE_ROLL_FRAMES : SINGLE_ROLL_FRAMES;
     let frameIndex = 0;
 
     image.classList.remove('dice-landed');
     image.classList.add('dice-rolling');
     image.src = frames[0];
-    playDiceAudio(isDouble);
+    playDiceAudio(isDouble || isTriple);
 
     rollInterval = setInterval(() => {
       if (token !== animationToken || !image.isConnected) return;
@@ -162,7 +170,7 @@
     }
   }
 
-  [...SINGLE_ROLL_FRAMES, ...DOUBLE_ROLL_FRAMES].forEach((src) => {
+  [...SINGLE_ROLL_FRAMES, ...DOUBLE_ROLL_FRAMES, ...TRIPLE_ROLL_FRAMES].forEach((src) => {
     const img = new Image();
     img.src = src;
   });
