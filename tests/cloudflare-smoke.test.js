@@ -16,7 +16,6 @@ const gameRoomAutoAction = read('src/game-room-auto-action.js');
 const matchmaker = read('src/matchmaker.js');
 const socketCompat = read('public/cloudflare-socket.js');
 const app = read('public/app.js');
-const professionExtension = read('public/profession-extension.js');
 const professionEight = read('public/profession-eight.css');
 const index = read('public/index.html');
 
@@ -74,9 +73,8 @@ assert.match(socketCompat, /new WebSocket\(/, 'Native WebSocket connection is mi
 
 assert.match(app, /id: 'civilServant'/, 'Civil servant profession UI is missing from app.js');
 assert.match(app, /id: 'artist'/, 'Artist profession UI is missing from app.js');
-assert.match(professionExtension, /civilServant/, 'Civil servant profession extension is missing');
-assert.match(professionExtension, /artist/, 'Artist profession extension is missing');
-assert.match(professionExtension, /civil%20servant\.png/, 'Civil servant image is not connected');
+assert.match(app, /civil%20servant\.png/, 'Civil servant image is not connected in app.js');
+assert.match(app, /artist\.png/, 'Artist image is not connected in app.js');
 assert.match(professionEight, /grid-template-rows: repeat\(4/, 'Profession grid must use four rows');
 assert.match(professionEight, /grid-template-columns: repeat\(2/, 'Profession grid must use two columns');
 
@@ -84,6 +82,7 @@ assert.match(index, /cloudflare-socket\.js/, 'Cloudflare socket compatibility sc
 assert.match(index, /profession-eight\.css/, '2x4 profession layout is not loaded');
 assert.match(index, /game-ui-v2\.js/, 'Updated special result UI script is not loaded');
 assert.match(index, /game-ui-v2\.css/, 'Updated special result UI styles are not loaded');
+assert.doesNotMatch(index, /profession-extension\.js/, 'Obsolete profession extension must stay removed');
 assert.doesNotMatch(index, /socket\.io\/socket\.io\.js/, 'Legacy Socket.IO browser client must not be loaded on Cloudflare');
 
 console.log('Cloudflare smoke checks passed');
