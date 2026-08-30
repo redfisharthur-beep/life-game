@@ -8,6 +8,7 @@ on:
       - 'tests/balance-3to6-players.mjs'
       - '.github/workflows/balance-3to6.yml'
 
+# Manual rerun marker: 2026-08-30 15:50 Asia/Taipei
 jobs:
   balance:
     runs-on: ubuntu-latest
