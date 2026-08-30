@@ -44,13 +44,13 @@
   transform: scale(1.08);
 }
 
-/* 薪資／選股／圈地／圓夢與 SABC 評級整排，在目前基準上往右 30px。 */
+/* 能力與 SABC 評級：在目前 +30px 基準上再往右 20px，並往下 20px。 */
 .profession-detail,
 .profession-card:nth-child(even) .profession-detail,
 .profession-card:nth-child(5) .profession-detail,
 .profession-card:nth-child(6) .profession-detail {
   height: 100%;
-  transform: translate(calc(-.9em + 30px), 0) !important;
+  transform: translate(calc(-.9em + 50px), 20px) !important;
 }
 
 .profession-abilities {
@@ -104,7 +104,7 @@
   .profession-card:nth-child(even) .profession-detail,
   .profession-card:nth-child(5) .profession-detail,
   .profession-card:nth-child(6) .profession-detail {
-    transform: translate(calc(-.8em + 30px), 0) !important;
+    transform: translate(calc(-.8em + 50px), 20px) !important;
   }
 
   .profession-abilities {
@@ -158,7 +158,7 @@
   .profession-card:nth-child(even) .profession-detail,
   .profession-card:nth-child(5) .profession-detail,
   .profession-card:nth-child(6) .profession-detail {
-    transform: translate(calc(-.65em + 30px), 0) !important;
+    transform: translate(calc(-.65em + 50px), 20px) !important;
   }
 
   .profession-abilities {
