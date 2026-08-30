@@ -1,4 +1,4 @@
-export { GameRoom } from './game-room-rules-v2.js';
+export { GameRoom } from './game-room-recovery.js';
 export { Matchmaker } from './matchmaker.js';
 
 function json(data, status = 200) {
