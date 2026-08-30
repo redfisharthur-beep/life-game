@@ -13,11 +13,7 @@
   const overlay = document.createElement('section');
   overlay.className = 'major-event-overlay hidden';
   overlay.setAttribute('aria-live', 'assertive');
-  overlay.innerHTML = `
-    <div class="major-event-card">
-      <img class="major-event-image" src="" alt="" />
-    </div>
-  `;
+  overlay.innerHTML = '<img class="major-event-image" src="" alt="" />';
   document.body.appendChild(overlay);
 
   const imageEl = overlay.querySelector('.major-event-image');
@@ -44,10 +40,9 @@
     let until = Number(game?.majorEventUntil || 0);
     let isDiceTransition = false;
 
-    // 第16回合正式切換為2顆骰子時，只顯示「時代浪潮」圖片，不顯示任何文字。
     const transitionUntil = Number(game?.transitionUntil || 0);
-    if (!event && room?.phase === 'game' && game?.round === 16 && transitionUntil > now) {
-      event = { id: 'eraWave', round: 16 };
+    if (!event && room?.phase === 'game' && (game?.round === 11 || game?.round === 21) && transitionUntil > now) {
+      event = { id: 'eraWave', round: game.round };
       until = transitionUntil;
       isDiceTransition = true;
     }
