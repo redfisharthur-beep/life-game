@@ -6,17 +6,17 @@
   const style = document.createElement('style');
   style.textContent = `
     .home-stage{position:relative}
-    .line-auth-wrap{position:absolute;right:35%;bottom:35.5%;display:flex;align-items:center;gap:6px;width:auto;height:46px;z-index:10001;pointer-events:auto;white-space:nowrap}
-    .line-login-btn,.line-logout-btn{height:46px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,.08);border-radius:999px;box-shadow:0 3px 9px rgba(0,0,0,.14);cursor:pointer;touch-action:manipulation;box-sizing:border-box;text-decoration:none;font-family:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif;font-weight:800}
-    .line-login-btn{gap:8px;min-width:128px;padding:0 16px 0 12px;background:#06c755;color:#fff;font-size:15px}
+    .line-auth-wrap{position:absolute;right:35%;bottom:35.5%;display:flex;align-items:center;gap:5px;width:auto;height:30px;z-index:10001;pointer-events:auto;white-space:nowrap}
+    .line-login-btn,.line-logout-btn{height:30px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,.08);border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.12);cursor:pointer;touch-action:manipulation;box-sizing:border-box;text-decoration:none;font-family:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif;font-weight:800;line-height:1}
+    .line-login-btn{gap:5px;min-width:104px;padding:0 11px 0 8px;background:#06c755;color:#fff;font-size:12px}
     .line-login-btn:hover,.line-logout-btn:hover{filter:brightness(.97)}
     .line-login-btn:active,.line-logout-btn:active{transform:translateY(1px)}
-    .line-login-btn svg{width:28px;height:28px;display:block;flex:0 0 28px}
-    .line-login-btn.is-logged-in{box-shadow:0 0 0 2px rgba(6,199,85,.22),0 3px 9px rgba(0,0,0,.14)}
+    .line-login-btn svg{width:19px;height:19px;display:block;flex:0 0 19px}
+    .line-login-btn.is-logged-in{box-shadow:0 0 0 2px rgba(6,199,85,.16),0 2px 6px rgba(0,0,0,.12)}
     .line-login-btn.is-loading{opacity:.62;pointer-events:none}
-    .line-logout-btn{min-width:58px;padding:0 12px;background:rgba(255,255,255,.94);color:#7a512f;font-size:14px}
-    .line-auth-error{position:absolute;left:0;top:52px;width:max-content;max-width:min(260px,80vw);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:12px;color:#b83838;text-align:left;z-index:10002}
-    @media(max-width:640px){.line-auth-wrap{right:35%;bottom:35.5%;height:42px;gap:5px}.line-login-btn,.line-logout-btn{height:42px}.line-login-btn{min-width:116px;padding:0 13px 0 10px;gap:7px;font-size:14px}.line-login-btn svg{width:25px;height:25px;flex-basis:25px}.line-logout-btn{min-width:52px;padding:0 10px;font-size:13px}}
+    .line-logout-btn{min-width:44px;padding:0 10px;background:rgba(255,255,255,.94);color:#7a512f;font-size:12px}
+    .line-auth-error{position:absolute;left:0;top:35px;width:max-content;max-width:min(260px,80vw);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:12px;color:#b83838;text-align:left;z-index:10002}
+    @media(max-width:640px){.line-auth-wrap{right:35%;bottom:35.5%;height:28px;gap:4px}.line-login-btn,.line-logout-btn{height:28px}.line-login-btn{min-width:98px;padding:0 9px 0 7px;gap:4px;font-size:11px}.line-login-btn svg{width:18px;height:18px;flex-basis:18px}.line-logout-btn{min-width:42px;padding:0 9px;font-size:11px}.line-auth-error{top:33px}}
   `;
   document.head.appendChild(style);
 
