@@ -24,7 +24,8 @@ assert.match(diceAnimation, /preloadFrames\(diceCount\)/, 'Dice frames should be
 assert.match(diceAnimation, /preloadFrames\(1\)/, 'Single-die roll frames must be warmed up for reliable first-roll animation');
 assert.doesNotMatch(diceAnimation, /\[\.\.\.SINGLE_ROLL_FRAMES,\s*\.\.\.DOUBLE_ROLL_FRAMES,\s*\.\.\.TRIPLE_ROLL_FRAMES\]\.forEach/, 'All 15 dice frames must not be preloaded on page load');
 assert.doesNotMatch(diceAnimation, /observer\.observe\(document\.body/, 'Dice observer should not watch the entire document body');
-assert.match(actionShowcase, /simple-choice-result/, 'Result stage should use the simplified result layout');
+assert.match(actionShowcase, /regular-action-result/, 'Regular result stage layout is missing');
+assert.match(actionShowcase, /special-action-result/, 'Special result stage layout is missing');
 
 // 命運／陷害／援助結果必須直接使用後端已結算欄位，不可在前端套舊公式重算。
 assert.match(actionShowcase, /event\.targetChange/, 'Sabotage/help result must use the settled targetChange');
