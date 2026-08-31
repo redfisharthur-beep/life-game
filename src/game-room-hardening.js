@@ -86,6 +86,74 @@ export class GameRoom extends AutoActionGameRoom {
     }
   }
 
+  async removePlayer(room, playerId) {
+    const wasProfession = room?.phase === 'profession';
+    await super.removePlayer(room, playerId);
+
+    let latest = await this.getRoom();
+
+    // 選職業階段只剩 0～1 人時，不能繼續停在 profession。
+    // 立即退回等待大廳，讓剩餘玩家重新等待其他人加入並可正常啟程。
+    if (wasProfession && latest?.phase === 'profession' && latest.players.length < 2) {
+      latest.started = false;
+      latest.phase = 'lobby';
+      latest.professionDeadline = null;
+      latest.game = null;
+      latest.players.forEach((player) => {
+        player.profession = null;
+        player.disconnectDeadline = null;
+      });
+      if (!latest.players.some((player) => player.id === latest.hostId)) {
+        latest.hostId = latest.players[0]?.id || null;
+      }
+      await this.broadcastRoom(latest);
+      latest = await this.getRoom();
+    }
+
+    // 某些核心分支（例如遊戲中當前玩家離開）會提早 return，
+    // 這裡統一補一次 Matchmaker 與 alarm 同步，避免房間人數殘留。
+    await this.syncMatchmaker(latest);
+    if (typeof this.reschedule === 'function') await this.reschedule(latest);
+  }
+
+  async webSocketClose(socket) {
+    const attachment = socket.deserializeAttachment?.() || {};
+    const room = await this.getRoom();
+    const player = room?.players?.find((item) => item.id === attachment.playerId);
+    if (!player) return;
+
+    const stillConnected = this.state.getWebSockets().some((candidate) => {
+      if (candidate === socket) return false;
+      const data = candidate.deserializeAttachment?.() || {};
+      return data.playerId === player.id;
+    });
+
+    // 同一玩家若還有另一個分頁／裝置連線，保留玩家。
+    if (stillConnected) {
+      player.connected = true;
+      player.disconnectDeadline = null;
+      await this.saveRoom(room);
+      this.broadcast('room:update', this.publicRoom(room));
+      await this.reschedule(room);
+      return;
+    }
+
+    // 真正沒有任何連線時立即移出房間，不再保留 90 秒幽靈玩家。
+    // lobby / profession / game 都適用；finished 則保留結果到 TTL 清理。
+    if (room.phase !== 'finished') {
+      player.connected = false;
+      player.disconnectDeadline = null;
+      await this.removePlayer(room, player.id);
+      return;
+    }
+
+    await super.webSocketClose(socket);
+  }
+
+  async webSocketError(socket) {
+    await this.webSocketClose(socket);
+  }
+
   async handleVoiceEvent(socket, attachment, message) {
     const event = String(message?.event || '');
     if (event !== 'voice:signal' && event !== 'voice:announce') return false;
