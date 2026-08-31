@@ -27,15 +27,15 @@
 
   const style = document.createElement('style');
   style.textContent = `
-    .voice-chat-control{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:12000;display:block;width:62px;height:62px;padding:0;background:transparent;border:0;box-shadow:none;backdrop-filter:none}
+    .voice-chat-control{position:fixed;left:50%;bottom:calc(max(14px,env(safe-area-inset-bottom)) + 5vh);transform:translateX(-50%);z-index:12000;display:block;width:100px;height:100px;padding:0;background:transparent;border:0;box-shadow:none;backdrop-filter:none}
     .voice-chat-control.hidden{display:none}
-    .voice-chat-button{width:62px;height:62px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:0;background:transparent;cursor:pointer;box-shadow:none;touch-action:manipulation;overflow:visible}
-    .voice-chat-icon{width:54px;height:54px;display:block;object-fit:contain;transition:filter .16s ease,opacity .16s ease,transform .16s ease}
+    .voice-chat-button{width:100px;height:100px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:0;background:transparent;cursor:pointer;box-shadow:none;touch-action:manipulation;overflow:visible}
+    .voice-chat-icon{width:100px;height:100px;display:block;object-fit:contain;transition:filter .16s ease,opacity .16s ease,transform .16s ease}
     .voice-chat-control:not(.on) .voice-chat-icon,.voice-chat-control.muted .voice-chat-icon{filter:grayscale(1);opacity:.42}
     .voice-chat-control.on:not(.muted) .voice-chat-icon{filter:none;opacity:1}
     .voice-chat-button:active .voice-chat-icon{transform:scale(.92)}
     .voice-remote-audio{display:none}
-    @media (max-width:640px){.voice-chat-control{left:50%;bottom:max(10px,env(safe-area-inset-bottom));width:54px;height:54px}.voice-chat-button{width:54px;height:54px}.voice-chat-icon{width:48px;height:48px}}
+    @media (max-width:640px){.voice-chat-control{left:50%;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 3vh);width:60px;height:60px}.voice-chat-button{width:60px;height:60px}.voice-chat-icon{width:60px;height:60px}}
   `;
   document.head.appendChild(style);
 
