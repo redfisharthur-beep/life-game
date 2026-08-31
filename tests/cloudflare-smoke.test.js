@@ -84,8 +84,10 @@ assert.match(professionEight, /grid-template-rows: repeat\(4/, 'Profession grid 
 assert.match(professionEight, /grid-template-columns: repeat\(2/, 'Profession grid must use two columns');
 
 assert.match(actionShowcase, /Math\.min\(3, dice\.length/, 'Action showcase must natively support three dice');
-assert.match(actionShowcase, /simple-choice-result/, 'Simplified action result layout is missing');
-assert.match(actionShowcase, /secondaryFateVisual/, 'Sabotage/help fate image support is missing');
+assert.match(actionShowcase, /regular-action-result/, 'Regular action result layout is missing');
+assert.match(actionShowcase, /special-action-result/, 'Fate/sabotage/help result layout is missing');
+assert.match(actionShowcase, /fateVisualFor/, 'Fate/sabotage/help fate image support is missing');
+assert.match(actionShowcase, /event\.targetChange/, 'Sabotage/help must display settled target changes');
 assert.match(diceAnimation, /preloadFrames\(1\)/, 'Single-die roll1-roll5 warmup is missing');
 assert.match(cheerFeedback, /event\.type === 'help'/, 'Help cheer feedback is missing');
 assert.match(cheerFeedback, /POSITIVE_FATE_INDEXES/, 'Positive fate cheer feedback is missing');
