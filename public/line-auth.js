@@ -17,7 +17,8 @@
     .line-auth-wrap .line-logout-btn{min-width:82px;padding:0 18px!important;background:rgba(255,255,255,.94);color:#7a512f;font-size:20px}
     .line-auth-error{position:absolute;left:0;top:75px;width:max-content;max-width:min(260px,80vw);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:12px;color:#b83838;text-align:left;z-index:10002}
     @media(max-width:640px){
-      .line-auth-wrap{right:calc(34% + 10px);bottom:calc(35.5% - 5px);height:35px!important;min-height:35px!important;max-height:35px!important;gap:4px;align-items:center!important}
+      .line-auth-wrap{right:calc(34% + 20px);bottom:calc(35.5% - 15px);height:35px!important;min-height:35px!important;max-height:35px!important;gap:4px;align-items:center!important}
+      .line-auth-wrap.is-logged-in{right:34%}
       .line-auth-wrap .line-login-btn,.line-auth-wrap .line-logout-btn{height:35px!important;min-height:35px!important;max-height:35px!important;line-height:33px!important;margin:0!important;border-radius:999px!important;box-shadow:0 1px 4px rgba(0,0,0,.10)!important;transform:none}
       .line-auth-wrap .line-login-btn{width:auto!important;min-width:104px!important;max-width:none!important;padding:0 10px 0 7px!important;gap:5px!important;font-size:12px!important}
       .line-auth-wrap .line-login-btn svg{width:19px!important;height:19px!important;min-width:19px;flex:0 0 19px!important}
@@ -26,7 +27,8 @@
       .line-auth-error{top:40px;font-size:10px;padding:4px 6px}
     }
     @media(max-width:430px){
-      .line-auth-wrap{right:calc(32% + 10px);height:35px!important;min-height:35px!important;max-height:35px!important;gap:3px}
+      .line-auth-wrap{right:calc(32% + 20px);height:35px!important;min-height:35px!important;max-height:35px!important;gap:3px}
+      .line-auth-wrap.is-logged-in{right:32%}
       .line-auth-wrap .line-login-btn,.line-auth-wrap .line-logout-btn{height:35px!important;min-height:35px!important;max-height:35px!important;line-height:33px!important}
       .line-auth-wrap .line-login-btn{min-width:100px!important;padding:0 9px 0 6px!important;font-size:11.5px!important}
       .line-auth-wrap .line-login-btn svg{width:18px!important;height:18px!important;min-width:18px;flex-basis:18px!important}
@@ -71,12 +73,14 @@
   }
 
   function showLoggedOut(errorText = '') {
+    wrap.classList.remove('is-logged-in');
     wrap.innerHTML = '';
     wrap.appendChild(makeLoginPill());
     setError(errorText);
   }
 
   function showLoggedIn(user) {
+    wrap.classList.add('is-logged-in');
     wrap.innerHTML = '';
     wrap.appendChild(makeLoginPill({ loggedIn: true }));
     const logoutButton = document.createElement('button');
@@ -111,6 +115,7 @@
   }
 
   async function loadSession() {
+    wrap.classList.remove('is-logged-in');
     wrap.innerHTML = '';
     wrap.appendChild(makeLoginPill({ loading: true }));
     const params = new URLSearchParams(window.location.search);
