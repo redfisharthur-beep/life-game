@@ -7,29 +7,30 @@
   style.textContent = `
     .home-stage{position:relative}
     .line-auth-wrap{position:absolute;right:35%;bottom:35.5%;display:flex;align-items:center;gap:5px;width:auto;height:30px;z-index:10001;pointer-events:auto;white-space:nowrap}
-    .line-login-btn,.line-logout-btn{height:30px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,.08);border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.12);cursor:pointer;touch-action:manipulation;box-sizing:border-box;text-decoration:none;font-family:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif;font-weight:800;line-height:1}
-    .line-login-btn{gap:5px;min-width:104px;padding:0 11px 0 8px;background:#06c755;color:#fff;font-size:12px}
+    .line-auth-wrap .line-login-btn,.line-auth-wrap .line-logout-btn{height:30px;min-height:0!important;max-height:30px;display:inline-flex!important;align-items:center;justify-content:center;margin:0!important;border:1px solid rgba(0,0,0,.08);border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.12);cursor:pointer;touch-action:manipulation;box-sizing:border-box;text-decoration:none;font-family:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif;font-weight:800;line-height:1!important;vertical-align:middle;flex:0 0 auto}
+    .line-auth-wrap .line-login-btn{gap:5px;min-width:104px;padding:0 11px 0 8px!important;background:#06c755;color:#fff;font-size:12px}
     .line-login-btn:hover,.line-logout-btn:hover{filter:brightness(.97)}
     .line-login-btn:active,.line-logout-btn:active{transform:translateY(1px)}
     .line-login-btn svg{width:19px;height:19px;display:block;flex:0 0 19px}
     .line-login-btn.is-logged-in{box-shadow:0 0 0 2px rgba(6,199,85,.16),0 2px 6px rgba(0,0,0,.12)}
     .line-login-btn.is-loading{opacity:.62;pointer-events:none}
-    .line-logout-btn{min-width:44px;padding:0 10px;background:rgba(255,255,255,.94);color:#7a512f;font-size:12px}
+    .line-auth-wrap .line-logout-btn{min-width:44px;padding:0 10px!important;background:rgba(255,255,255,.94);color:#7a512f;font-size:12px}
     .line-auth-error{position:absolute;left:0;top:35px;width:max-content;max-width:min(260px,80vw);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:12px;color:#b83838;text-align:left;z-index:10002}
     @media(max-width:640px){
-      .line-auth-wrap{right:34%;bottom:35.5%;height:22px;gap:3px}
-      .line-login-btn,.line-logout-btn{height:22px;box-shadow:0 1px 4px rgba(0,0,0,.10);border-width:1px}
-      .line-login-btn{min-width:78px;padding:0 7px 0 5px;gap:3px;font-size:9.5px}
-      .line-login-btn svg{width:14px;height:14px;flex-basis:14px}
-      .line-logout-btn{min-width:34px;padding:0 6px;font-size:9.5px}
-      .line-auth-error{top:27px;font-size:10px;padding:4px 6px}
+      .line-auth-wrap{right:34%;bottom:35.5%;height:24px!important;min-height:0!important;max-height:24px!important;gap:4px;align-items:center!important}
+      .line-auth-wrap .line-login-btn,.line-auth-wrap .line-logout-btn{height:24px!important;min-height:24px!important;max-height:24px!important;margin:0!important;line-height:22px!important;border-radius:999px!important;box-shadow:0 1px 4px rgba(0,0,0,.10)!important;transform:none;position:static!important;inset:auto!important}
+      .line-auth-wrap .line-login-btn{width:auto!important;min-width:88px!important;max-width:none!important;padding:0 8px 0 6px!important;gap:4px!important;font-size:10px!important}
+      .line-auth-wrap .line-login-btn svg{width:15px!important;height:15px!important;min-width:15px;flex:0 0 15px!important}
+      .line-auth-wrap .line-login-btn span{display:inline!important;line-height:1!important;margin:0!important;padding:0!important}
+      .line-auth-wrap .line-logout-btn{width:auto!important;min-width:38px!important;max-width:none!important;padding:0 7px!important;font-size:10px!important}
+      .line-auth-error{top:29px;font-size:10px;padding:4px 6px}
     }
     @media(max-width:430px){
-      .line-auth-wrap{right:32%;height:20px;gap:2px}
-      .line-login-btn,.line-logout-btn{height:20px}
-      .line-login-btn{min-width:72px;padding:0 6px 0 4px;font-size:9px}
-      .line-login-btn svg{width:13px;height:13px;flex-basis:13px}
-      .line-logout-btn{min-width:31px;padding:0 5px;font-size:9px}
+      .line-auth-wrap{right:32%;height:23px!important;max-height:23px!important;gap:3px}
+      .line-auth-wrap .line-login-btn,.line-auth-wrap .line-logout-btn{height:23px!important;min-height:23px!important;max-height:23px!important;line-height:21px!important}
+      .line-auth-wrap .line-login-btn{min-width:84px!important;padding:0 7px 0 5px!important;font-size:9.5px!important}
+      .line-auth-wrap .line-login-btn svg{width:14px!important;height:14px!important;min-width:14px;flex-basis:14px!important}
+      .line-auth-wrap .line-logout-btn{min-width:36px!important;padding:0 6px!important;font-size:9.5px!important}
     }
   `;
   document.head.appendChild(style);
@@ -78,7 +79,6 @@
   function showLoggedIn(user) {
     wrap.innerHTML = '';
     wrap.appendChild(makeLoginPill({ loggedIn: true }));
-
     const logoutButton = document.createElement('button');
     logoutButton.type = 'button';
     logoutButton.className = 'line-logout-btn';
@@ -101,13 +101,11 @@
       }
     });
     wrap.appendChild(logoutButton);
-
     if (user.name) {
       playerName.value = String(user.name).slice(0, Number(playerName.maxLength) || 12);
       playerName.readOnly = true;
       playerName.title = '名稱來自 LINE 帳號';
     }
-
     window.lifeGameLineUser = user;
     window.dispatchEvent(new CustomEvent('life-game:line-user', { detail: user }));
   }
@@ -117,19 +115,14 @@
     wrap.appendChild(makeLoginPill({ loading: true }));
     const params = new URLSearchParams(window.location.search);
     const callbackError = params.get('line_error');
-
     try {
       const response = await fetch('/auth/me', { credentials: 'same-origin', cache: 'no-store' });
       const data = await response.json();
-      if (response.ok && data.authenticated && data.user) {
-        showLoggedIn(data.user);
-      } else {
-        showLoggedOut(callbackError ? 'LINE 登入未完成，請再試一次。' : '');
-      }
+      if (response.ok && data.authenticated && data.user) showLoggedIn(data.user);
+      else showLoggedOut(callbackError ? 'LINE 登入未完成，請再試一次。' : '');
     } catch (_) {
       showLoggedOut('目前無法確認 LINE 登入狀態。');
     }
-
     if (params.has('line_login') || params.has('line_error')) {
       params.delete('line_login');
       params.delete('line_error');
