@@ -6,8 +6,8 @@
   const style = document.createElement('style');
   style.textContent = `
     .home-stage{position:relative}
-    .line-auth-wrap{position:absolute;right:calc(35% + 20px);bottom:calc(35.5% - 15px);display:flex;align-items:center;gap:8px;width:auto;height:70px!important;min-height:70px!important;max-height:70px!important;z-index:10001;pointer-events:auto;white-space:nowrap}
-    .line-auth-wrap.is-logged-in{right:calc(35% + 30px)}
+    .line-auth-wrap{position:absolute;right:calc(35% + 35px);bottom:calc(35.5% - 15px);display:flex;align-items:center;gap:8px;width:auto;height:70px!important;min-height:70px!important;max-height:70px!important;z-index:10001;pointer-events:auto;white-space:nowrap}
+    .line-auth-wrap.is-logged-in{right:calc(35% + 40px)}
     .line-auth-wrap .line-login-btn,.line-auth-wrap .line-logout-btn{height:70px!important;min-height:70px!important;max-height:70px!important;display:inline-flex!important;align-items:center;justify-content:center;margin:0!important;border:1px solid rgba(0,0,0,.08);border-radius:999px!important;box-shadow:0 2px 6px rgba(0,0,0,.12);cursor:pointer;touch-action:manipulation;box-sizing:border-box;text-decoration:none;font-family:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif;font-weight:800;line-height:68px!important;vertical-align:middle;flex:0 0 auto;position:static!important;inset:auto!important}
     .line-auth-wrap .line-login-btn{gap:8px;min-width:190px;padding:0 22px 0 16px!important;background:#06c755;color:#fff;font-size:20px}
     .line-login-btn:hover,.line-logout-btn:hover{filter:brightness(.97)}
