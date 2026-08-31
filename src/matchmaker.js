@@ -23,7 +23,6 @@ const FIXED_ROOMS = [
 ];
 
 const FIXED_ROOM_BY_CODE = Object.fromEntries(FIXED_ROOMS.map((room) => [room.code, room]));
-const STALE_STARTED_CHECK_MS = 180_000;
 
 export class Matchmaker {
   constructor(state, env) {
@@ -49,55 +48,49 @@ export class Matchmaker {
     });
   }
 
-  async refreshStaleStartedRooms(rooms) {
+  async refreshLiveRooms(rooms) {
     const now = Date.now();
-    let changed = false;
-
-    for (const fixedRoom of FIXED_ROOMS) {
-      const meta = rooms[fixedRoom.code];
-      if (!meta?.started) continue;
-      if (now - Number(meta.updatedAt || 0) < STALE_STARTED_CHECK_MS) continue;
-
+    const results = await Promise.all(FIXED_ROOMS.map(async (fixedRoom) => {
       try {
         const id = this.env.GAME_ROOMS.idFromName(fixedRoom.code);
         const room = this.env.GAME_ROOMS.get(id);
-        const response = await room.fetch('https://room.internal/internal/reap-finished', {
+        const response = await room.fetch('https://room.internal/internal/presence', {
           method: 'POST',
         });
+        if (!response.ok) return null;
         const status = await response.json();
-        if (!status?.ok) continue;
-
-        if (status.reaped || Number(status.count || 0) <= 0) {
-          rooms[fixedRoom.code] = {
-            count: 0,
-            started: false,
-            hostName: '',
-            updatedAt: now,
-          };
-        } else {
-          // 活躍中的遊戲只更新檢查時間，避免房間列表每次輪詢都打到 GameRoom DO。
-          rooms[fixedRoom.code] = {
-            ...meta,
-            count: Number(status.count || meta.count || 0),
-            started: Boolean(status.started),
-            updatedAt: now,
-          };
-        }
-        changed = true;
+        if (!status?.ok) return null;
+        return { code: fixedRoom.code, status };
       } catch (error) {
-        console.error('stale room check failed', fixedRoom.code, error);
+        console.error('room presence refresh failed', fixedRoom.code, error);
+        return null;
       }
+    }));
+
+    for (const result of results) {
+      if (!result) continue;
+      const { code, status } = result;
+      const count = Math.max(0, Number(status.count || 0));
+      rooms[code] = {
+        count,
+        started: count > 0 ? Boolean(status.started) : false,
+        hostName: count > 0 ? cleanName(status.hostName) : '',
+        updatedAt: now,
+      };
     }
 
-    if (changed) await this.saveRegistry(rooms);
+    await this.saveRegistry(rooms);
     return rooms;
   }
 
   rememberResult(rooms, code, result) {
     if (!result?.ok || !result?.room) return;
-    const host = result.room.players?.find((player) => player.id === result.room.hostId);
+    const onlinePlayers = (result.room.players || []).filter((player) => player.connected);
+    const host = onlinePlayers.find((player) => player.id === result.room.hostId)
+      || onlinePlayers[0]
+      || result.room.players?.find((player) => player.id === result.room.hostId);
     rooms[code] = {
-      count: Number(result.room.players?.length || 0),
+      count: onlinePlayers.length || Number(result.room.players?.length || 0),
       started: Boolean(result.room.started),
       hostName: host?.name || rooms[code]?.hostName || '',
       updatedAt: Date.now(),
@@ -124,12 +117,12 @@ export class Matchmaker {
     });
   }
 
-  async joinSpecificRoom(code, name) {
+  async joinSpecificRoom(code, name, { skipRefresh = false } = {}) {
     const fixed = FIXED_ROOM_BY_CODE[code];
     if (!fixed) return { ok: false, reason: 'unavailable', message: '這個房間不存在。' };
 
     const rooms = await this.getRegistry();
-    await this.refreshStaleStartedRooms(rooms);
+    if (!skipRefresh) await this.refreshLiveRooms(rooms);
     const meta = rooms[code] || {};
     if (meta.started) return { ok: false, reason: 'started', message: '這個房間正在遊戲中，請選其他房間。' };
     if (Number(meta.count || 0) >= 6) return { ok: false, reason: 'full', message: '這個房間已滿，請選其他房間。' };
@@ -152,14 +145,14 @@ export class Matchmaker {
 
   async autoJoin(name) {
     const rooms = await this.getRegistry();
-    await this.refreshStaleStartedRooms(rooms);
+    await this.refreshLiveRooms(rooms);
     const candidates = FIXED_ROOMS
       .map((room) => ({ room, meta: rooms[room.code] || {} }))
       .filter(({ meta }) => !meta.started && Number(meta.count || 0) < 6)
       .sort((a, b) => Number(b.meta.count || 0) - Number(a.meta.count || 0));
 
     for (const { room } of candidates) {
-      const result = await this.joinSpecificRoom(room.code, name);
+      const result = await this.joinSpecificRoom(room.code, name, { skipRefresh: true });
       if (result.ok) return result;
       if (!['nameTaken', 'full', 'started'].includes(result.reason)) return result;
     }
@@ -172,7 +165,7 @@ export class Matchmaker {
 
     if (url.pathname === '/rooms' && request.method === 'GET') {
       const rooms = await this.getRegistry();
-      await this.refreshStaleStartedRooms(rooms);
+      await this.refreshLiveRooms(rooms);
       return json({ ok: true, rooms: this.publicRooms(rooms) });
     }
 
