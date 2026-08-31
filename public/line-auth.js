@@ -16,7 +16,21 @@
     .line-login-btn.is-loading{opacity:.62;pointer-events:none}
     .line-logout-btn{min-width:44px;padding:0 10px;background:rgba(255,255,255,.94);color:#7a512f;font-size:12px}
     .line-auth-error{position:absolute;left:0;top:35px;width:max-content;max-width:min(260px,80vw);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:12px;color:#b83838;text-align:left;z-index:10002}
-    @media(max-width:640px){.line-auth-wrap{right:35%;bottom:35.5%;height:28px;gap:4px}.line-login-btn,.line-logout-btn{height:28px}.line-login-btn{min-width:98px;padding:0 9px 0 7px;gap:4px;font-size:11px}.line-login-btn svg{width:18px;height:18px;flex-basis:18px}.line-logout-btn{min-width:42px;padding:0 9px;font-size:11px}.line-auth-error{top:33px}}
+    @media(max-width:640px){
+      .line-auth-wrap{right:34%;bottom:35.5%;height:22px;gap:3px}
+      .line-login-btn,.line-logout-btn{height:22px;box-shadow:0 1px 4px rgba(0,0,0,.10);border-width:1px}
+      .line-login-btn{min-width:78px;padding:0 7px 0 5px;gap:3px;font-size:9.5px}
+      .line-login-btn svg{width:14px;height:14px;flex-basis:14px}
+      .line-logout-btn{min-width:34px;padding:0 6px;font-size:9.5px}
+      .line-auth-error{top:27px;font-size:10px;padding:4px 6px}
+    }
+    @media(max-width:430px){
+      .line-auth-wrap{right:32%;height:20px;gap:2px}
+      .line-login-btn,.line-logout-btn{height:20px}
+      .line-login-btn{min-width:72px;padding:0 6px 0 4px;font-size:9px}
+      .line-login-btn svg{width:13px;height:13px;flex-basis:13px}
+      .line-logout-btn{min-width:31px;padding:0 5px;font-size:9px}
+    }
   `;
   document.head.appendChild(style);
 
