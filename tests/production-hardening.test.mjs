@@ -25,6 +25,15 @@ assert.match(diceAnimation, /preloadFrames\(1\)/, 'Single-die roll frames must b
 assert.doesNotMatch(diceAnimation, /\[\.\.\.SINGLE_ROLL_FRAMES,\s*\.\.\.DOUBLE_ROLL_FRAMES,\s*\.\.\.TRIPLE_ROLL_FRAMES\]\.forEach/, 'All 15 dice frames must not be preloaded on page load');
 assert.doesNotMatch(diceAnimation, /observer\.observe\(document\.body/, 'Dice observer should not watch the entire document body');
 assert.match(actionShowcase, /simple-choice-result/, 'Result stage should use the simplified result layout');
+
+// 命運／陷害／援助結果必須直接使用後端已結算欄位，不可在前端套舊公式重算。
+assert.match(actionShowcase, /event\.targetChange/, 'Sabotage/help result must use the settled targetChange');
+assert.match(actionShowcase, /event\.amount/, 'Cash fate result must use the settled amount');
+assert.match(actionShowcase, /event\.units/, 'Stock/land fate result must use the settled units');
+assert.match(actionShowcase, /event\.happinessChange/, 'Happiness fate result must use the settled happinessChange');
+assert.doesNotMatch(actionShowcase, /150\s*\*\s*total/, 'Frontend must not restore the obsolete fate cash formula');
+assert.doesNotMatch(actionShowcase, /5\s*\*\s*total/, 'Frontend must not restore the obsolete fixed stock/land fate formula');
+
 assert.doesNotMatch(index, /action-result-head-fix\.js|game-ui-v2\.js|showcase-result-overrides\.js|dream-result\.js/, 'Obsolete result patch scripts must stay unloaded');
 
 console.log('Production hardening regression checks passed');
