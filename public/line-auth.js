@@ -6,15 +6,17 @@
   const style = document.createElement('style');
   style.textContent = `
     .home-stage{position:relative}
-    .line-auth-wrap{position:absolute;right:25%;bottom:calc(35.5% + 1px);width:46px;height:46px;z-index:10001;pointer-events:auto}
-    .line-icon-btn{width:46px;height:46px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid rgba(0,0,0,.08);border-radius:11px;background:#06c755;box-shadow:0 3px 9px rgba(0,0,0,.14);cursor:pointer;text-decoration:none;touch-action:manipulation;box-sizing:border-box;overflow:hidden}
-    .line-icon-btn:hover{filter:brightness(.97)}
-    .line-icon-btn:active{transform:translateY(1px)}
+    .line-auth-wrap{position:absolute;right:35%;bottom:35.5%;display:flex;align-items:center;gap:6px;width:auto;height:46px;z-index:10001;pointer-events:auto;white-space:nowrap}
+    .line-icon-btn,.line-logout-btn{height:46px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,.08);border-radius:11px;box-shadow:0 3px 9px rgba(0,0,0,.14);cursor:pointer;touch-action:manipulation;box-sizing:border-box;text-decoration:none;font-family:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif;font-weight:800}
+    .line-icon-btn{width:46px;flex:0 0 46px;padding:0;background:#06c755;overflow:hidden}
+    .line-icon-btn:hover,.line-logout-btn:hover{filter:brightness(.97)}
+    .line-icon-btn:active,.line-logout-btn:active{transform:translateY(1px)}
     .line-icon-btn svg{width:30px;height:30px;display:block}
     .line-icon-btn.is-logged-in{box-shadow:0 0 0 2px rgba(6,199,85,.22),0 3px 9px rgba(0,0,0,.14)}
     .line-icon-btn.is-loading{opacity:.62;pointer-events:none}
+    .line-logout-btn{min-width:58px;padding:0 12px;background:rgba(255,255,255,.94);color:#7a512f;font-size:14px}
     .line-auth-error{position:absolute;left:0;top:52px;width:max-content;max-width:min(260px,80vw);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:12px;color:#b83838;text-align:left;z-index:10002}
-    @media(max-width:640px){.line-auth-wrap{right:25%;bottom:calc(35.5% + 1px);width:42px;height:42px}.line-icon-btn{width:42px;height:42px}.line-icon-btn svg{width:27px;height:27px}}
+    @media(max-width:640px){.line-auth-wrap{right:35%;bottom:35.5%;height:42px;gap:5px}.line-icon-btn,.line-logout-btn{height:42px}.line-icon-btn{width:42px;flex-basis:42px}.line-icon-btn svg{width:27px;height:27px}.line-logout-btn{min-width:52px;padding:0 10px;font-size:13px}}
   `;
   document.head.appendChild(style);
 
@@ -37,12 +39,10 @@
     wrap.appendChild(error);
   }
 
-  function makeIcon({ loggedIn = false, loading = false } = {}) {
-    wrap.innerHTML = '';
+  function makeLoginIcon({ loggedIn = false, loading = false } = {}) {
     const control = document.createElement(loggedIn ? 'button' : 'a');
     control.className = `line-icon-btn${loggedIn ? ' is-logged-in' : ''}${loading ? ' is-loading' : ''}`;
     control.innerHTML = lineIconSvg;
-
     if (loggedIn) {
       control.type = 'button';
       control.title = '已使用 LINE 登入';
@@ -52,18 +52,41 @@
       control.title = '使用 LINE 登入';
       control.setAttribute('aria-label', '使用 LINE 登入');
     }
-
-    wrap.appendChild(control);
     return control;
   }
 
   function showLoggedOut(errorText = '') {
-    makeIcon();
+    wrap.innerHTML = '';
+    wrap.appendChild(makeLoginIcon());
     setError(errorText);
   }
 
   function showLoggedIn(user) {
-    makeIcon({ loggedIn: true });
+    wrap.innerHTML = '';
+    wrap.appendChild(makeLoginIcon({ loggedIn: true }));
+
+    const logoutButton = document.createElement('button');
+    logoutButton.type = 'button';
+    logoutButton.className = 'line-logout-btn';
+    logoutButton.textContent = '登出';
+    logoutButton.setAttribute('aria-label', '登出 LINE');
+    logoutButton.addEventListener('click', async () => {
+      logoutButton.disabled = true;
+      try {
+        const response = await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin', cache: 'no-store' });
+        if (!response.ok) throw new Error('logout failed');
+        window.lifeGameLineUser = null;
+        playerName.readOnly = false;
+        playerName.title = '';
+        playerName.value = '';
+        showLoggedOut();
+        playerName.focus();
+      } catch (_) {
+        logoutButton.disabled = false;
+        setError('LINE 登出失敗，請再試一次。');
+      }
+    });
+    wrap.appendChild(logoutButton);
 
     if (user.name) {
       playerName.value = String(user.name).slice(0, Number(playerName.maxLength) || 12);
@@ -76,7 +99,8 @@
   }
 
   async function loadSession() {
-    makeIcon({ loading: true });
+    wrap.innerHTML = '';
+    wrap.appendChild(makeLoginIcon({ loading: true }));
     const params = new URLSearchParams(window.location.search);
     const callbackError = params.get('line_error');
 
