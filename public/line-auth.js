@@ -1,35 +1,26 @@
 (() => {
   const playerName = document.getElementById('playerName');
-  const entryPanel = document.getElementById('entryPanel');
-  if (!playerName || !entryPanel) return;
-
-  const nameField = playerName.closest('label');
-  if (!nameField) return;
+  const homeStage = document.getElementById('homeStage');
+  if (!playerName || !homeStage) return;
 
   const style = document.createElement('style');
   style.textContent = `
-    .name-line-row{display:flex;align-items:stretch;gap:8px;width:100%;position:relative;z-index:10000}
-    .name-line-row>.field{flex:1 1 auto;min-width:0;width:auto!important;margin:0!important}
-    .line-auth-wrap{flex:0 0 46px;width:46px;height:46px;position:relative;z-index:10001;pointer-events:auto}
-    .line-icon-btn{width:46px;height:46px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid rgba(0,0,0,.08);border-radius:11px;background:#06c755;box-shadow:0 3px 9px rgba(0,0,0,.12);cursor:pointer;text-decoration:none;touch-action:manipulation;box-sizing:border-box;overflow:hidden}
+    .home-stage{position:relative}
+    .line-auth-wrap{position:absolute;left:18%;bottom:7.5%;width:46px;height:46px;z-index:10001;pointer-events:auto}
+    .line-icon-btn{width:46px;height:46px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid rgba(0,0,0,.08);border-radius:11px;background:#06c755;box-shadow:0 3px 9px rgba(0,0,0,.14);cursor:pointer;text-decoration:none;touch-action:manipulation;box-sizing:border-box;overflow:hidden}
     .line-icon-btn:hover{filter:brightness(.97)}
     .line-icon-btn:active{transform:translateY(1px)}
     .line-icon-btn svg{width:30px;height:30px;display:block}
-    .line-icon-btn.is-logged-in{box-shadow:0 0 0 2px rgba(6,199,85,.22),0 3px 9px rgba(0,0,0,.12)}
+    .line-icon-btn.is-logged-in{box-shadow:0 0 0 2px rgba(6,199,85,.22),0 3px 9px rgba(0,0,0,.14)}
     .line-icon-btn.is-loading{opacity:.62;pointer-events:none}
-    .line-auth-error{position:absolute;right:0;top:52px;width:max-content;max-width:min(260px,80vw);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:12px;color:#b83838;text-align:left;z-index:10002}
-    @media(max-width:640px){.name-line-row{gap:6px}.line-auth-wrap,.line-icon-btn{width:42px;height:42px;flex-basis:42px}.line-icon-btn svg{width:27px;height:27px}}
+    .line-auth-error{position:absolute;left:0;top:52px;width:max-content;max-width:min(260px,80vw);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:12px;color:#b83838;text-align:left;z-index:10002}
+    @media(max-width:640px){.line-auth-wrap{left:17%;bottom:7%;width:42px;height:42px}.line-icon-btn{width:42px;height:42px}.line-icon-btn svg{width:27px;height:27px}}
   `;
   document.head.appendChild(style);
 
-  const row = document.createElement('div');
-  row.className = 'name-line-row entry-control';
-  nameField.parentNode.insertBefore(row, nameField);
-  row.appendChild(nameField);
-
   const wrap = document.createElement('div');
   wrap.className = 'line-auth-wrap';
-  row.appendChild(wrap);
+  homeStage.appendChild(wrap);
 
   const lineIconSvg = `
     <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
