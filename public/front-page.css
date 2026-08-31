@@ -32,7 +32,6 @@
   overflow: visible;
 }
 
-/* entryPanel 完整覆蓋「圖片實際渲染後的尺寸」。 */
 .home-entry-panel {
   position: absolute;
   inset: 0;
@@ -44,12 +43,12 @@
   pointer-events: none;
 }
 
-/* 名字輸入區：由上一版位置往下 2%。 */
+/* 名字輸入區：由上一版再往下 1%。 */
 .home-entry-panel .field.entry-control {
   position: absolute;
   display: block;
   left: 22.1%;
-  top: calc(49.7% - .2em - 3px);
+  top: calc(50.7% - .2em - 3px);
   width: 51.8%;
   height: 9.6%;
   margin: 0;
@@ -96,7 +95,6 @@
   box-shadow: none !important;
 }
 
-/* 橘色「迎向新局」使用底圖原本視覺，只有透明點擊熱區；由上一版再往下 5%。 */
 .home-entry-panel #joinGameBtn {
   position: absolute;
   left: 21.5%;
@@ -132,12 +130,10 @@
   outline-offset: -6px;
 }
 
-/* 首頁不再顯示「請輸入暱稱」等額外訊息列，避免破壞底圖排版。 */
 .home-entry-panel .message {
   display: none !important;
 }
 
-/* RWD 只改外層留白與字級，不改互動區座標。 */
 @media (max-width: 760px) {
   .shell:has(.card.home-mode) {
     padding: 0;
