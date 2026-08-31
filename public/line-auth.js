@@ -1,88 +1,78 @@
 (() => {
   const playerName = document.getElementById('playerName');
   const entryPanel = document.getElementById('entryPanel');
-  const homeStage = document.getElementById('homeStage');
-  if (!playerName || !entryPanel || !homeStage) return;
+  if (!playerName || !entryPanel) return;
+
+  const nameField = playerName.closest('label');
+  if (!nameField) return;
 
   const style = document.createElement('style');
   style.textContent = `
-    .home-stage{position:relative}
-    .line-auth-wrap{position:absolute;left:18px;bottom:18px;z-index:9999;display:grid;gap:8px;width:min(240px,calc(100% - 36px));pointer-events:auto}
-    .line-login-btn,.line-logout-btn{border:0;border-radius:12px;min-height:46px;font:700 16px/1.2 system-ui,-apple-system,"Noto Sans TC",sans-serif;cursor:pointer;pointer-events:auto;position:relative;z-index:10000}
-    .line-login-btn{display:flex;align-items:center;justify-content:center;width:180px;max-width:100%;text-decoration:none;background:#06c755;color:#fff;box-shadow:0 5px 14px rgba(6,199,85,.22);touch-action:manipulation}
-    .line-login-btn:hover{filter:brightness(.97)}
-    .line-user-card{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.94);border:1px solid rgba(0,0,0,.08);box-shadow:0 5px 16px rgba(0,0,0,.12);position:relative;z-index:10000}
-    .line-user-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#eee;flex:0 0 auto}
-    .line-user-copy{min-width:0;flex:1;text-align:left}
-    .line-user-name{font-weight:800;color:#2d342f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .line-user-note{font-size:12px;color:#68716b;margin-top:2px}
-    .line-logout-btn{width:auto;min-height:34px;padding:0 10px;font-size:12px;background:#f0f2f1;color:#59615c}
-    .line-auth-error{font-size:12px;color:#b83838;text-align:left;background:rgba(255,255,255,.92);padding:5px 8px;border-radius:8px}
-    .line-auth-loading{font-size:13px;color:#68716b;text-align:left;background:rgba(255,255,255,.9);padding:7px 10px;border-radius:10px}
-    @media (max-width:640px){.line-auth-wrap{left:12px;bottom:12px;width:min(220px,calc(100% - 24px))}.line-login-btn{width:156px;min-height:42px;font-size:15px}.line-user-card{padding:7px 9px}.line-user-avatar{width:36px;height:36px}}
+    .name-line-row{display:flex;align-items:stretch;gap:8px;width:100%;position:relative;z-index:10000}
+    .name-line-row>.field{flex:1 1 auto;min-width:0;width:auto!important;margin:0!important}
+    .line-auth-wrap{flex:0 0 46px;width:46px;height:46px;position:relative;z-index:10001;pointer-events:auto}
+    .line-icon-btn{width:46px;height:46px;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid rgba(0,0,0,.08);border-radius:11px;background:#06c755;box-shadow:0 3px 9px rgba(0,0,0,.12);cursor:pointer;text-decoration:none;touch-action:manipulation;box-sizing:border-box;overflow:hidden}
+    .line-icon-btn:hover{filter:brightness(.97)}
+    .line-icon-btn:active{transform:translateY(1px)}
+    .line-icon-btn svg{width:30px;height:30px;display:block}
+    .line-icon-btn.is-logged-in{box-shadow:0 0 0 2px rgba(6,199,85,.22),0 3px 9px rgba(0,0,0,.12)}
+    .line-icon-btn.is-loading{opacity:.62;pointer-events:none}
+    .line-auth-error{position:absolute;right:0;top:52px;width:max-content;max-width:min(260px,80vw);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:12px;color:#b83838;text-align:left;z-index:10002}
+    @media(max-width:640px){.name-line-row{gap:6px}.line-auth-wrap,.line-icon-btn{width:42px;height:42px;flex-basis:42px}.line-icon-btn svg{width:27px;height:27px}}
   `;
   document.head.appendChild(style);
 
+  const row = document.createElement('div');
+  row.className = 'name-line-row entry-control';
+  nameField.parentNode.insertBefore(row, nameField);
+  row.appendChild(nameField);
+
   const wrap = document.createElement('div');
   wrap.className = 'line-auth-wrap';
-  homeStage.appendChild(wrap);
+  row.appendChild(wrap);
 
-  function escapeText(value) {
-    return String(value ?? '');
+  const lineIconSvg = `
+    <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+      <path fill="#fff" d="M32 9C18.7 9 8 17.7 8 28.4c0 9.6 8.5 17.6 20 19.1.8.2 1.9.6 2.2 1.4.3.7.2 1.8.1 2.5l-.4 2.4c-.1.7-.6 2.8 2.4 1.5 3-1.3 16.3-9.6 22.2-16.5C58.6 34.3 56 28.4 56 28.4 56 17.7 45.3 9 32 9Z"/>
+      <path fill="#06c755" d="M19.2 23.8h3.4v10.9h5.7v3.1h-9.1v-14Zm11.1 0h3.4v14h-3.4v-14Zm6.2 0h3.2l5.9 8.1v-8.1H49v14h-3l-6.1-8.4v8.4h-3.4v-14Z"/>
+    </svg>`;
+
+  function setError(text = '') {
+    wrap.querySelector('.line-auth-error')?.remove();
+    if (!text) return;
+    const error = document.createElement('div');
+    error.className = 'line-auth-error';
+    error.textContent = text;
+    wrap.appendChild(error);
+  }
+
+  function makeIcon({ loggedIn = false, loading = false } = {}) {
+    wrap.innerHTML = '';
+    const control = document.createElement(loggedIn ? 'button' : 'a');
+    control.className = `line-icon-btn${loggedIn ? ' is-logged-in' : ''}${loading ? ' is-loading' : ''}`;
+    control.innerHTML = lineIconSvg;
+
+    if (loggedIn) {
+      control.type = 'button';
+      control.title = '已使用 LINE 登入';
+      control.setAttribute('aria-label', '已使用 LINE 登入');
+    } else {
+      control.href = '/auth/line';
+      control.title = '使用 LINE 登入';
+      control.setAttribute('aria-label', '使用 LINE 登入');
+    }
+
+    wrap.appendChild(control);
+    return control;
   }
 
   function showLoggedOut(errorText = '') {
-    wrap.innerHTML = '';
-    const link = document.createElement('a');
-    link.className = 'line-login-btn';
-    link.href = '/auth/line';
-    link.textContent = 'LINE 登入';
-    link.setAttribute('role', 'button');
-    link.setAttribute('aria-label', '使用 LINE 登入');
-    wrap.appendChild(link);
-    if (errorText) {
-      const error = document.createElement('div');
-      error.className = 'line-auth-error';
-      error.textContent = errorText;
-      wrap.appendChild(error);
-    }
+    makeIcon();
+    setError(errorText);
   }
 
   function showLoggedIn(user) {
-    wrap.innerHTML = '';
-    const card = document.createElement('div');
-    card.className = 'line-user-card';
-
-    if (user.picture) {
-      const avatar = document.createElement('img');
-      avatar.className = 'line-user-avatar';
-      avatar.src = user.picture;
-      avatar.alt = '';
-      avatar.referrerPolicy = 'no-referrer';
-      card.appendChild(avatar);
-    }
-
-    const copy = document.createElement('div');
-    copy.className = 'line-user-copy';
-    const name = document.createElement('div');
-    name.className = 'line-user-name';
-    name.textContent = escapeText(user.name || 'LINE 玩家');
-    const note = document.createElement('div');
-    note.className = 'line-user-note';
-    note.textContent = '已使用 LINE 登入';
-    copy.append(name, note);
-    card.appendChild(copy);
-
-    const logout = document.createElement('button');
-    logout.className = 'line-logout-btn';
-    logout.type = 'button';
-    logout.textContent = '登出';
-    logout.addEventListener('click', async () => {
-      try { await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' }); } catch (_) {}
-      window.location.replace('/');
-    });
-    card.appendChild(logout);
-    wrap.appendChild(card);
+    makeIcon({ loggedIn: true });
 
     if (user.name) {
       playerName.value = String(user.name).slice(0, Number(playerName.maxLength) || 12);
@@ -95,9 +85,10 @@
   }
 
   async function loadSession() {
-    wrap.innerHTML = '<div class="line-auth-loading">確認 LINE 登入狀態…</div>';
+    makeIcon({ loading: true });
     const params = new URLSearchParams(window.location.search);
     const callbackError = params.get('line_error');
+
     try {
       const response = await fetch('/auth/me', { credentials: 'same-origin', cache: 'no-store' });
       const data = await response.json();
