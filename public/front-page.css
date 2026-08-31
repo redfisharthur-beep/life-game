@@ -44,12 +44,12 @@
   pointer-events: none;
 }
 
-/* 名字輸入區：再往上約 5%。 */
+/* 名字輸入區：由上一版位置往下 2%。 */
 .home-entry-panel .field.entry-control {
   position: absolute;
   display: block;
   left: 22.1%;
-  top: calc(47.7% - .2em - 3px);
+  top: calc(49.7% - .2em - 3px);
   width: 51.8%;
   height: 9.6%;
   margin: 0;
@@ -96,11 +96,11 @@
   box-shadow: none !important;
 }
 
-/* 橘色「迎向新局」使用底圖原本視覺，只有透明點擊熱區；整體往下 5%。 */
+/* 橘色「迎向新局」使用底圖原本視覺，只有透明點擊熱區；由上一版再往下 5%。 */
 .home-entry-panel #joinGameBtn {
   position: absolute;
   left: 21.5%;
-  top: 64.8%;
+  top: 69.8%;
   width: 57%;
   height: 18.2%;
   min-height: 0;
