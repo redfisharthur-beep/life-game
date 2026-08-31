@@ -77,7 +77,7 @@
 
   if (!document.querySelector('script[data-line-auth]')) {
     const lineAuthScript = document.createElement('script');
-    lineAuthScript.src = '/line-auth.js?v=20260831-1532';
+    lineAuthScript.src = '/line-auth.js?v=20260831-1741';
     lineAuthScript.async = true;
     lineAuthScript.dataset.lineAuth = '1';
     document.body.appendChild(lineAuthScript);
