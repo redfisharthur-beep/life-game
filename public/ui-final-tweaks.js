@@ -82,4 +82,12 @@
     lineAuthScript.dataset.lineAuth = '1';
     document.body.appendChild(lineAuthScript);
   }
+
+  if (!document.querySelector('script[data-voice-chat]')) {
+    const voiceScript = document.createElement('script');
+    voiceScript.src = '/voice-chat.js?v=20260831-1645';
+    voiceScript.async = true;
+    voiceScript.dataset.voiceChat = '1';
+    document.body.appendChild(voiceScript);
+  }
 })();
