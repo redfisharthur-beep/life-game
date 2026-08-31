@@ -77,7 +77,7 @@
 
   if (!document.querySelector('script[data-line-auth]')) {
     const lineAuthScript = document.createElement('script');
-    lineAuthScript.src = '/line-auth.js?v=20260831-1748';
+    lineAuthScript.src = '/line-auth.js?v=20260831-1752';
     lineAuthScript.async = true;
     lineAuthScript.dataset.lineAuth = '1';
     document.body.appendChild(lineAuthScript);
@@ -85,7 +85,7 @@
 
   if (!document.querySelector('script[data-voice-chat]')) {
     const voiceScript = document.createElement('script');
-    voiceScript.src = '/voice-chat.js?v=20260831-1748';
+    voiceScript.src = '/voice-chat.js?v=20260831-1752';
     voiceScript.async = true;
     voiceScript.dataset.voiceChat = '1';
     document.body.appendChild(voiceScript);
