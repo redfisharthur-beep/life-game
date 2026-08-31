@@ -74,4 +74,12 @@
   socket.on('room:started', () => setTimeout(applyTweaks, 0));
   window.addEventListener('pageshow', () => setTimeout(applyTweaks, 0));
   applyTweaks();
+
+  if (!document.querySelector('script[data-line-auth]')) {
+    const lineAuthScript = document.createElement('script');
+    lineAuthScript.src = '/line-auth.js?v=20260831-1532';
+    lineAuthScript.async = true;
+    lineAuthScript.dataset.lineAuth = '1';
+    document.body.appendChild(lineAuthScript);
+  }
 })();
