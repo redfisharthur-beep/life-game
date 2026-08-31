@@ -2,6 +2,7 @@ import { GameRoom as AutoActionGameRoom } from './game-room-auto-action.js';
 
 const PROFESSION_AUTO_PICK_MS = 60_000;
 const FINISHED_ROOM_TTL_MS = 180_000;
+const MAX_VOICE_SIGNAL_BYTES = 64_000;
 
 export class GameRoom extends AutoActionGameRoom {
   async syncMatchmaker(room) {
@@ -85,8 +86,68 @@ export class GameRoom extends AutoActionGameRoom {
     }
   }
 
+  async handleVoiceEvent(socket, attachment, message) {
+    const event = String(message?.event || '');
+    if (event !== 'voice:signal' && event !== 'voice:announce') return false;
+
+    const room = await this.getRoom();
+    const player = this.findPlayer(room, attachment?.playerId, attachment?.reconnectToken);
+    const requestId = message?.requestId || null;
+    if (!player) {
+      this.ack(socket, requestId, { ok: false, message: '語音玩家驗證失敗。' });
+      return true;
+    }
+
+    if (event === 'voice:announce') {
+      const enabled = Boolean(message?.payload?.enabled);
+      const packet = {
+        type: 'event',
+        event: 'voice:announce',
+        data: { playerId: player.id, enabled },
+      };
+      for (const candidate of this.state.getWebSockets()) {
+        this.send(candidate, packet);
+      }
+      this.ack(socket, requestId, { ok: true });
+      return true;
+    }
+
+    const targetPlayerId = String(message?.payload?.targetPlayerId || '');
+    const signal = message?.payload?.signal;
+    if (!targetPlayerId || !room.players.some((item) => item.id === targetPlayerId) || !signal) {
+      this.ack(socket, requestId, { ok: false, message: '語音訊號目標不存在。' });
+      return true;
+    }
+
+    let serialized = '';
+    try { serialized = JSON.stringify(signal); } catch (_) {}
+    if (!serialized || serialized.length > MAX_VOICE_SIGNAL_BYTES) {
+      this.ack(socket, requestId, { ok: false, message: '語音訊號格式無效。' });
+      return true;
+    }
+
+    const packet = {
+      type: 'event',
+      event: 'voice:signal',
+      data: { fromPlayerId: player.id, signal },
+    };
+    let delivered = 0;
+    for (const candidate of this.state.getWebSockets()) {
+      const targetAttachment = candidate.deserializeAttachment?.() || {};
+      if (targetAttachment.playerId !== targetPlayerId) continue;
+      this.send(candidate, packet);
+      delivered += 1;
+    }
+
+    this.ack(socket, requestId, { ok: delivered > 0, delivered });
+    return true;
+  }
+
   async handleSocketEvent(socket, attachment, message) {
     const event = String(message?.event || '');
+
+    if (await this.handleVoiceEvent(socket, attachment, message)) return;
+
     await super.handleSocketEvent(socket, attachment, message);
 
     if (event === 'room:start' || event === 'game:restart' || event === 'room:resume') {
