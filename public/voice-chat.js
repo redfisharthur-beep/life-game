@@ -15,22 +15,24 @@
   let currentRoom = null;
   let enabled = false;
   let muted = false;
+  let dragged = false;
 
   const root = document.createElement('div');
   root.className = 'voice-chat-control hidden';
   root.innerHTML = `
     <button class="voice-chat-button" type="button" aria-label="開啟語音聊天" title="語音聊天">
-      <img class="voice-chat-icon" src="/images/mic.png" alt="" decoding="async" />
+      <img class="voice-chat-icon" src="/images/mic.png" alt="" decoding="async" draggable="false" />
     </button>
   `;
   document.body.appendChild(root);
 
   const style = document.createElement('style');
   style.textContent = `
-    .voice-chat-control{position:fixed;left:50%;bottom:calc(max(14px,env(safe-area-inset-bottom)) + 5vh);transform:translateX(-50%);z-index:12000;display:block;width:100px;height:100px;padding:0;background:transparent;border:0;box-shadow:none;backdrop-filter:none}
+    .voice-chat-control{position:fixed;left:50%;bottom:calc(max(14px,env(safe-area-inset-bottom)) + 5vh);transform:translateX(-50%);z-index:12000;display:block;width:100px;height:100px;padding:0;background:transparent;border:0;box-shadow:none;backdrop-filter:none;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+    .voice-chat-control.dragging{cursor:grabbing}
     .voice-chat-control.hidden{display:none}
-    .voice-chat-button{width:100px;height:100px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:0;background:transparent;cursor:pointer;box-shadow:none;touch-action:manipulation;overflow:visible}
-    .voice-chat-icon{width:100px;height:100px;display:block;object-fit:contain;transition:filter .16s ease,opacity .16s ease,transform .16s ease}
+    .voice-chat-button{width:100px;height:100px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:0;background:transparent;cursor:inherit;box-shadow:none;touch-action:none;overflow:visible}
+    .voice-chat-icon{width:100px;height:100px;display:block;object-fit:contain;pointer-events:none;user-select:none;-webkit-user-drag:none;transition:filter .16s ease,opacity .16s ease,transform .16s ease}
     .voice-chat-control:not(.on) .voice-chat-icon,.voice-chat-control.muted .voice-chat-icon{filter:grayscale(1);opacity:.42}
     .voice-chat-control.on:not(.muted) .voice-chat-icon{filter:none;opacity:1}
     .voice-chat-button:active .voice-chat-icon{transform:scale(.92)}
@@ -40,6 +42,86 @@
   document.head.appendChild(style);
 
   const button = root.querySelector('.voice-chat-button');
+
+  function savePosition() {
+    const rect = root.getBoundingClientRect();
+    try {
+      localStorage.setItem('lifeGame.voicePosition', JSON.stringify({
+        x: Math.round(rect.left),
+        y: Math.round(rect.top),
+      }));
+    } catch (_) {}
+  }
+
+  function applyPosition(x, y) {
+    const width = root.offsetWidth || (window.innerWidth <= 640 ? 60 : 100);
+    const height = root.offsetHeight || (window.innerWidth <= 640 ? 60 : 100);
+    const maxX = Math.max(0, window.innerWidth - width);
+    const maxY = Math.max(0, window.innerHeight - height);
+    root.style.left = `${Math.max(0, Math.min(x, maxX))}px`;
+    root.style.top = `${Math.max(0, Math.min(y, maxY))}px`;
+    root.style.right = 'auto';
+    root.style.bottom = 'auto';
+    root.style.transform = 'none';
+  }
+
+  function restorePosition() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('lifeGame.voicePosition') || 'null');
+      if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
+        applyPosition(saved.x, saved.y);
+        dragged = true;
+      }
+    } catch (_) {}
+  }
+
+  let dragState = null;
+  root.addEventListener('pointerdown', (event) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    const rect = root.getBoundingClientRect();
+    dragState = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+      moved: false,
+    };
+    root.classList.add('dragging');
+    try { root.setPointerCapture(event.pointerId); } catch (_) {}
+  });
+
+  root.addEventListener('pointermove', (event) => {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    const distance = Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY);
+    if (distance > 5) dragState.moved = true;
+    if (!dragState.moved) return;
+    event.preventDefault();
+    applyPosition(event.clientX - dragState.offsetX, event.clientY - dragState.offsetY);
+  });
+
+  function finishDrag(event) {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    const wasMoved = dragState.moved;
+    dragState = null;
+    root.classList.remove('dragging');
+    try { root.releasePointerCapture(event.pointerId); } catch (_) {}
+    if (wasMoved) {
+      dragged = true;
+      savePosition();
+      button.dataset.suppressClick = '1';
+      setTimeout(() => { delete button.dataset.suppressClick; }, 0);
+    }
+  }
+  root.addEventListener('pointerup', finishDrag);
+  root.addEventListener('pointercancel', finishDrag);
+
+  window.addEventListener('resize', () => {
+    if (!dragged) return;
+    const rect = root.getBoundingClientRect();
+    applyPosition(rect.left, rect.top);
+    savePosition();
+  });
 
   function myId() {
     return localStorage.getItem('lifeGame.playerId') || '';
@@ -248,6 +330,7 @@
   }
 
   button.addEventListener('click', async () => {
+    if (button.dataset.suppressClick === '1') return;
     if (!enabled) await startVoice();
     else toggleMute();
   });
@@ -301,5 +384,6 @@
     if (panel) observer.observe(panel, { attributes: true, attributeFilter: ['class'] });
   });
 
+  restorePosition();
   updateButton();
 })();
