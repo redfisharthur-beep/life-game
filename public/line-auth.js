@@ -5,7 +5,7 @@
 
   const style = document.createElement('style');
   style.textContent = `
-    .line-auth-wrap{display:grid;gap:8px;margin-top:10px}.line-login-btn,.line-logout-btn{width:100%;border:0;border-radius:12px;min-height:46px;font:700 16px/1.2 system-ui,-apple-system,"Noto Sans TC",sans-serif;cursor:pointer}.line-login-btn{background:#06c755;color:#fff;box-shadow:0 5px 14px rgba(6,199,85,.22)}.line-login-btn:hover{filter:brightness(.97)}.line-user-card{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.9);border:1px solid rgba(0,0,0,.08)}.line-user-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#eee;flex:0 0 auto}.line-user-copy{min-width:0;flex:1;text-align:left}.line-user-name{font-weight:800;color:#2d342f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.line-user-note{font-size:12px;color:#68716b;margin-top:2px}.line-logout-btn{width:auto;min-height:34px;padding:0 10px;font-size:12px;background:#f0f2f1;color:#59615c}.line-auth-error{font-size:12px;color:#b83838;text-align:center}.line-auth-loading{font-size:13px;color:#68716b;text-align:center}
+    .line-auth-wrap{display:grid;gap:8px;margin-top:10px;position:relative;z-index:9999;pointer-events:auto}.line-login-btn,.line-logout-btn{width:100%;border:0;border-radius:12px;min-height:46px;font:700 16px/1.2 system-ui,-apple-system,"Noto Sans TC",sans-serif;cursor:pointer;pointer-events:auto;position:relative;z-index:10000}.line-login-btn{display:flex;align-items:center;justify-content:center;text-decoration:none;background:#06c755;color:#fff;box-shadow:0 5px 14px rgba(6,199,85,.22);touch-action:manipulation}.line-login-btn:hover{filter:brightness(.97)}.line-user-card{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.9);border:1px solid rgba(0,0,0,.08);position:relative;z-index:10000}.line-user-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#eee;flex:0 0 auto}.line-user-copy{min-width:0;flex:1;text-align:left}.line-user-name{font-weight:800;color:#2d342f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.line-user-note{font-size:12px;color:#68716b;margin-top:2px}.line-logout-btn{width:auto;min-height:34px;padding:0 10px;font-size:12px;background:#f0f2f1;color:#59615c}.line-auth-error{font-size:12px;color:#b83838;text-align:center}.line-auth-loading{font-size:13px;color:#68716b;text-align:center}
   `;
   document.head.appendChild(style);
 
@@ -19,14 +19,13 @@
 
   function showLoggedOut(errorText = '') {
     wrap.innerHTML = '';
-    const button = document.createElement('button');
-    button.className = 'line-login-btn';
-    button.type = 'button';
-    button.textContent = 'LINE 登入';
-    button.addEventListener('click', () => {
-      window.location.assign('/auth/line');
-    });
-    wrap.appendChild(button);
+    const link = document.createElement('a');
+    link.className = 'line-login-btn';
+    link.href = '/auth/line';
+    link.textContent = 'LINE 登入';
+    link.setAttribute('role', 'button');
+    link.setAttribute('aria-label', '使用 LINE 登入');
+    wrap.appendChild(link);
     if (errorText) {
       const error = document.createElement('div');
       error.className = 'line-auth-error';
