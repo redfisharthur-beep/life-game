@@ -44,12 +44,12 @@
   pointer-events: none;
 }
 
-/* 名字輸入區：目前位置再往左 5%，垂直位置維持不變。 */
+/* 名字輸入區：整體往上約 5%。 */
 .home-entry-panel .field.entry-control {
   position: absolute;
   display: block;
   left: 22.1%;
-  top: calc(57.7% - .2em - 3px);
+  top: calc(52.7% - .2em - 3px);
   width: 51.8%;
   height: 9.6%;
   margin: 0;
