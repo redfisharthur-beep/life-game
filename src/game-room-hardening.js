@@ -3,26 +3,147 @@ import { GameRoom as AutoActionGameRoom } from './game-room-auto-action.js';
 const PROFESSION_AUTO_PICK_MS = 60_000;
 const FINISHED_ROOM_TTL_MS = 180_000;
 const MAX_VOICE_SIGNAL_BYTES = 64_000;
+const JOIN_SOCKET_GRACE_MS = 15_000;
 
 export class GameRoom extends AutoActionGameRoom {
+  getLivePlayerIds(excludeSocket = null) {
+    const ids = new Set();
+    for (const socket of this.state.getWebSockets()) {
+      if (excludeSocket && socket === excludeSocket) continue;
+      const attachment = socket.deserializeAttachment?.() || {};
+      if (attachment.playerId) ids.add(String(attachment.playerId));
+    }
+    return ids;
+  }
+
   async syncMatchmaker(room) {
     try {
+      const liveIds = this.getLivePlayerIds();
+      const onlinePlayers = (room?.players || []).filter((player) => liveIds.has(String(player.id)));
+      const host = onlinePlayers.find((player) => player.id === room.hostId) || onlinePlayers[0] || null;
       const id = this.env.MATCHMAKER.idFromName('global');
       const stub = this.env.MATCHMAKER.get(id);
-      const host = room?.players?.find((player) => player.id === room.hostId);
       await stub.fetch('https://matchmaker.internal/sync', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           code: room.code,
-          count: room.players.length,
-          started: Boolean(room.started),
+          count: onlinePlayers.length,
+          started: Boolean(room.started && onlinePlayers.length > 0),
           hostName: host?.name || '',
         }),
       });
     } catch (error) {
       console.error('Matchmaker sync failed', error);
     }
+  }
+
+  async join(name, code, skipSync = false) {
+    // 加入新玩家前先清理舊版本遺留的幽靈玩家。新版本玩家會有 joinedAt，
+    // 並保留 15 秒等待瀏覽器建立 WebSocket，避免 HTTP join 與 WS 連線之間被誤刪。
+    let room = await this.getRoom(code);
+    const liveIds = this.getLivePlayerIds();
+    const now = Date.now();
+    const staleIds = (room?.players || [])
+      .filter((player) => {
+        if (liveIds.has(String(player.id))) return false;
+        const joinedAt = Number(player.joinedAt || 0);
+        return !joinedAt || (now - joinedAt) > JOIN_SOCKET_GRACE_MS;
+      })
+      .map((player) => player.id);
+
+    for (const playerId of staleIds) {
+      room = await this.getRoom(code);
+      if (!room.players.some((player) => player.id === playerId)) continue;
+      await this.removePlayer(room, playerId);
+    }
+
+    room = await this.getRoom(code);
+    if (!room.players.length && room.started) {
+      room.started = false;
+      room.phase = 'lobby';
+      room.professionDeadline = null;
+      room.finishedCleanupAt = null;
+      room.game = null;
+      room.hostId = null;
+      await this.saveRoom(room);
+      await this.syncMatchmaker(room);
+    }
+
+    const result = await super.join(name, code, skipSync);
+    if (result?.ok && result?.session?.playerId) {
+      const latest = await this.getRoom(code);
+      const player = latest.players.find((item) => item.id === result.session.playerId);
+      if (player) {
+        player.joinedAt = Date.now();
+        await this.saveRoom(latest);
+      }
+    }
+    return result;
+  }
+
+  async reconcilePresence({ destructive = false } = {}) {
+    let room = await this.getRoom();
+    const liveIds = this.getLivePlayerIds();
+    const now = Date.now();
+
+    if (destructive && room.phase !== 'finished') {
+      const staleIds = room.players
+        .filter((player) => {
+          if (liveIds.has(String(player.id))) return false;
+          const joinedAt = Number(player.joinedAt || 0);
+          return !joinedAt || (now - joinedAt) > JOIN_SOCKET_GRACE_MS;
+        })
+        .map((player) => player.id);
+
+      for (const playerId of staleIds) {
+        const latest = await this.getRoom();
+        if (!latest.players.some((player) => player.id === playerId)) continue;
+        await this.removePlayer(latest, playerId);
+      }
+      room = await this.getRoom();
+    }
+
+    const currentLiveIds = this.getLivePlayerIds();
+    let changed = false;
+    for (const player of room.players) {
+      const online = currentLiveIds.has(String(player.id));
+      if (player.connected !== online) {
+        player.connected = online;
+        if (online) player.disconnectDeadline = null;
+        changed = true;
+      }
+    }
+
+    if (!room.players.length && room.phase !== 'finished') {
+      room.hostId = null;
+      room.started = false;
+      room.phase = 'lobby';
+      room.professionDeadline = null;
+      room.game = null;
+      changed = true;
+    } else if (!room.players.some((player) => player.id === room.hostId)) {
+      room.hostId = room.players.find((player) => currentLiveIds.has(String(player.id)))?.id
+        || room.players[0]?.id
+        || null;
+      changed = true;
+    }
+
+    if (changed) await this.saveRoom(room);
+
+    const onlinePlayers = room.players.filter((player) => currentLiveIds.has(String(player.id)));
+    const onlineHost = onlinePlayers.find((player) => player.id === room.hostId) || onlinePlayers[0] || null;
+    return {
+      room,
+      status: {
+        ok: true,
+        phase: room.phase || 'lobby',
+        count: onlinePlayers.length,
+        storedCount: room.players.length,
+        started: Boolean(room.started && onlinePlayers.length > 0),
+        hostName: onlineHost?.name || '',
+      },
+    };
   }
 
   getNextDeadline(room) {
@@ -53,8 +174,6 @@ export class GameRoom extends AutoActionGameRoom {
     await this.syncMatchmaker(room);
     try { await this.state.storage.deleteAlarm(); } catch (_) {}
 
-    // 已結算房間到期後，後端直接切斷殘留連線；即使手機休眠、
-    // 關頁或前端 timer 沒有執行，也不會繼續占住房間。
     for (const socket of this.state.getWebSockets()) {
       try { socket.close(1000, 'finished room expired'); } catch (_) {}
     }
@@ -77,8 +196,6 @@ export class GameRoom extends AutoActionGameRoom {
     const current = Number(room.professionDeadline || 0);
     const maxDeadline = now + PROFESSION_AUTO_PICK_MS;
 
-    // 舊版本可能曾寫入 5 分鐘 deadline；進到正式 production chain 後
-    // 一律收斂到 60 秒內，避免玩家卡在職業選擇頁。
     if (!current || current > maxDeadline) {
       room.professionDeadline = maxDeadline;
       await this.saveRoom(room);
@@ -92,8 +209,6 @@ export class GameRoom extends AutoActionGameRoom {
 
     let latest = await this.getRoom();
 
-    // 選職業階段只剩 0～1 人時，不能繼續停在 profession。
-    // 立即退回等待大廳，讓剩餘玩家重新等待其他人加入並可正常啟程。
     if (wasProfession && latest?.phase === 'profession' && latest.players.length < 2) {
       latest.started = false;
       latest.phase = 'lobby';
@@ -110,8 +225,6 @@ export class GameRoom extends AutoActionGameRoom {
       latest = await this.getRoom();
     }
 
-    // 某些核心分支（例如遊戲中當前玩家離開）會提早 return，
-    // 這裡統一補一次 Matchmaker 與 alarm 同步，避免房間人數殘留。
     await this.syncMatchmaker(latest);
     if (typeof this.reschedule === 'function') await this.reschedule(latest);
   }
@@ -122,13 +235,8 @@ export class GameRoom extends AutoActionGameRoom {
     const player = room?.players?.find((item) => item.id === attachment.playerId);
     if (!player) return;
 
-    const stillConnected = this.state.getWebSockets().some((candidate) => {
-      if (candidate === socket) return false;
-      const data = candidate.deserializeAttachment?.() || {};
-      return data.playerId === player.id;
-    });
+    const stillConnected = this.getLivePlayerIds(socket).has(String(player.id));
 
-    // 同一玩家若還有另一個分頁／裝置連線，保留玩家。
     if (stillConnected) {
       player.connected = true;
       player.disconnectDeadline = null;
@@ -138,8 +246,6 @@ export class GameRoom extends AutoActionGameRoom {
       return;
     }
 
-    // 真正沒有任何連線時立即移出房間，不再保留 90 秒幽靈玩家。
-    // lobby / profession / game 都適用；finished 則保留結果到 TTL 清理。
     if (room.phase !== 'finished') {
       player.connected = false;
       player.disconnectDeadline = null;
@@ -148,6 +254,8 @@ export class GameRoom extends AutoActionGameRoom {
     }
 
     await super.webSocketClose(socket);
+    const latest = await this.getRoom();
+    await this.syncMatchmaker(latest);
   }
 
   async webSocketError(socket) {
@@ -251,7 +359,14 @@ export class GameRoom extends AutoActionGameRoom {
   async fetch(request) {
     const url = new URL(request.url);
 
-    // Matchmaker 用來回收舊版本遺留下來、沒有 TTL alarm 的 finished 房。
+    if (url.pathname === '/internal/presence' && request.method === 'POST') {
+      const { room, status } = await this.reconcilePresence({ destructive: true });
+      await this.syncMatchmaker(room);
+      return new Response(JSON.stringify(status), {
+        headers: { 'content-type': 'application/json; charset=utf-8' },
+      });
+    }
+
     if (url.pathname === '/internal/reap-finished' && request.method === 'POST') {
       const room = await this.getRoom();
       if (room?.phase === 'finished') {
@@ -261,17 +376,17 @@ export class GameRoom extends AutoActionGameRoom {
         });
       }
 
-      return new Response(JSON.stringify({
-        ok: true,
-        reaped: false,
-        phase: room?.phase || 'lobby',
-        count: Number(room?.players?.length || 0),
-        started: Boolean(room?.started),
-      }), {
+      const { status } = await this.reconcilePresence({ destructive: true });
+      return new Response(JSON.stringify({ ...status, reaped: false }), {
         headers: { 'content-type': 'application/json; charset=utf-8' },
       });
     }
 
-    return super.fetch(request);
+    const response = await super.fetch(request);
+    if (url.pathname === '/ws' && response.status === 101) {
+      const latest = await this.getRoom();
+      await this.syncMatchmaker(latest);
+    }
+    return response;
   }
 }
