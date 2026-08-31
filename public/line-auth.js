@@ -7,16 +7,16 @@
   style.textContent = `
     .home-stage{position:relative}
     .line-auth-wrap{position:absolute;right:35%;bottom:35.5%;display:flex;align-items:center;gap:6px;width:auto;height:46px;z-index:10001;pointer-events:auto;white-space:nowrap}
-    .line-icon-btn,.line-logout-btn{height:46px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,.08);border-radius:11px;box-shadow:0 3px 9px rgba(0,0,0,.14);cursor:pointer;touch-action:manipulation;box-sizing:border-box;text-decoration:none;font-family:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif;font-weight:800}
-    .line-icon-btn{width:46px;flex:0 0 46px;padding:0;background:#06c755;overflow:hidden}
-    .line-icon-btn:hover,.line-logout-btn:hover{filter:brightness(.97)}
-    .line-icon-btn:active,.line-logout-btn:active{transform:translateY(1px)}
-    .line-icon-btn svg{width:30px;height:30px;display:block}
-    .line-icon-btn.is-logged-in{box-shadow:0 0 0 2px rgba(6,199,85,.22),0 3px 9px rgba(0,0,0,.14)}
-    .line-icon-btn.is-loading{opacity:.62;pointer-events:none}
+    .line-login-btn,.line-logout-btn{height:46px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,.08);border-radius:999px;box-shadow:0 3px 9px rgba(0,0,0,.14);cursor:pointer;touch-action:manipulation;box-sizing:border-box;text-decoration:none;font-family:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif;font-weight:800}
+    .line-login-btn{gap:8px;min-width:128px;padding:0 16px 0 12px;background:#06c755;color:#fff;font-size:15px}
+    .line-login-btn:hover,.line-logout-btn:hover{filter:brightness(.97)}
+    .line-login-btn:active,.line-logout-btn:active{transform:translateY(1px)}
+    .line-login-btn svg{width:28px;height:28px;display:block;flex:0 0 28px}
+    .line-login-btn.is-logged-in{box-shadow:0 0 0 2px rgba(6,199,85,.22),0 3px 9px rgba(0,0,0,.14)}
+    .line-login-btn.is-loading{opacity:.62;pointer-events:none}
     .line-logout-btn{min-width:58px;padding:0 12px;background:rgba(255,255,255,.94);color:#7a512f;font-size:14px}
     .line-auth-error{position:absolute;left:0;top:52px;width:max-content;max-width:min(260px,80vw);padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 3px 10px rgba(0,0,0,.12);font-size:12px;color:#b83838;text-align:left;z-index:10002}
-    @media(max-width:640px){.line-auth-wrap{right:35%;bottom:35.5%;height:42px;gap:5px}.line-icon-btn,.line-logout-btn{height:42px}.line-icon-btn{width:42px;flex-basis:42px}.line-icon-btn svg{width:27px;height:27px}.line-logout-btn{min-width:52px;padding:0 10px;font-size:13px}}
+    @media(max-width:640px){.line-auth-wrap{right:35%;bottom:35.5%;height:42px;gap:5px}.line-login-btn,.line-logout-btn{height:42px}.line-login-btn{min-width:116px;padding:0 13px 0 10px;gap:7px;font-size:14px}.line-login-btn svg{width:25px;height:25px;flex-basis:25px}.line-logout-btn{min-width:52px;padding:0 10px;font-size:13px}}
   `;
   document.head.appendChild(style);
 
@@ -39,10 +39,10 @@
     wrap.appendChild(error);
   }
 
-  function makeLoginIcon({ loggedIn = false, loading = false } = {}) {
+  function makeLoginPill({ loggedIn = false, loading = false } = {}) {
     const control = document.createElement(loggedIn ? 'button' : 'a');
-    control.className = `line-icon-btn${loggedIn ? ' is-logged-in' : ''}${loading ? ' is-loading' : ''}`;
-    control.innerHTML = lineIconSvg;
+    control.className = `line-login-btn${loggedIn ? ' is-logged-in' : ''}${loading ? ' is-loading' : ''}`;
+    control.innerHTML = `${lineIconSvg}<span>${loggedIn ? 'LINE 已登入' : 'LINE 登入'}</span>`;
     if (loggedIn) {
       control.type = 'button';
       control.title = '已使用 LINE 登入';
@@ -57,13 +57,13 @@
 
   function showLoggedOut(errorText = '') {
     wrap.innerHTML = '';
-    wrap.appendChild(makeLoginIcon());
+    wrap.appendChild(makeLoginPill());
     setError(errorText);
   }
 
   function showLoggedIn(user) {
     wrap.innerHTML = '';
-    wrap.appendChild(makeLoginIcon({ loggedIn: true }));
+    wrap.appendChild(makeLoginPill({ loggedIn: true }));
 
     const logoutButton = document.createElement('button');
     logoutButton.type = 'button';
@@ -100,7 +100,7 @@
 
   async function loadSession() {
     wrap.innerHTML = '';
-    wrap.appendChild(makeLoginIcon({ loading: true }));
+    wrap.appendChild(makeLoginPill({ loading: true }));
     const params = new URLSearchParams(window.location.search);
     const callbackError = params.get('line_error');
 
