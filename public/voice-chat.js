@@ -22,26 +22,24 @@
     <button class="voice-chat-button" type="button" aria-label="開啟語音聊天" title="語音聊天">
       <img class="voice-chat-icon" src="/images/mic.png" alt="" decoding="async" />
     </button>
-    <span class="voice-chat-label">語音</span>
   `;
   document.body.appendChild(root);
 
   const style = document.createElement('style');
   style.textContent = `
-    .voice-chat-control{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:12000;display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.94);box-shadow:0 5px 18px rgba(0,0,0,.18);backdrop-filter:blur(8px)}
+    .voice-chat-control{position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:12000;display:block;width:46px;height:46px;padding:0;background:transparent;border:0;box-shadow:none;backdrop-filter:none}
     .voice-chat-control.hidden{display:none}
-    .voice-chat-button{width:46px;height:46px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.96);cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);touch-action:manipulation;overflow:hidden}
-    .voice-chat-icon{width:34px;height:34px;display:block;object-fit:contain;transition:filter .16s ease,opacity .16s ease,transform .16s ease}
-    .voice-chat-control:not(.on) .voice-chat-icon,.voice-chat-control.muted .voice-chat-icon{filter:grayscale(1);opacity:.48}
+    .voice-chat-button{width:46px;height:46px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:0;background:transparent;cursor:pointer;box-shadow:none;touch-action:manipulation;overflow:visible}
+    .voice-chat-icon{width:38px;height:38px;display:block;object-fit:contain;transition:filter .16s ease,opacity .16s ease,transform .16s ease}
+    .voice-chat-control:not(.on) .voice-chat-icon,.voice-chat-control.muted .voice-chat-icon{filter:grayscale(1);opacity:.42}
     .voice-chat-control.on:not(.muted) .voice-chat-icon{filter:none;opacity:1}
-    .voice-chat-button:active .voice-chat-icon{transform:scale(.94)}
-    .voice-chat-label{font:700 13px/1.2 system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#4b554f;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis}.voice-remote-audio{display:none}
-    @media (max-width:640px){.voice-chat-control{left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);padding:5px 8px}.voice-chat-button{width:42px;height:42px}.voice-chat-icon{width:31px;height:31px}.voice-chat-label{font-size:12px}}
+    .voice-chat-button:active .voice-chat-icon{transform:scale(.92)}
+    .voice-remote-audio{display:none}
+    @media (max-width:640px){.voice-chat-control{left:50%;bottom:max(10px,env(safe-area-inset-bottom));width:42px;height:42px}.voice-chat-button{width:42px;height:42px}.voice-chat-icon{width:34px;height:34px}}
   `;
   document.head.appendChild(style);
 
   const button = root.querySelector('.voice-chat-button');
-  const label = root.querySelector('.voice-chat-label');
 
   function myId() {
     return localStorage.getItem('lifeGame.playerId') || '';
@@ -66,15 +64,12 @@
     if (!enabled) {
       button.setAttribute('aria-label', '開啟語音聊天');
       button.title = '開啟語音聊天';
-      label.textContent = '語音';
     } else if (muted) {
       button.setAttribute('aria-label', '取消靜音');
       button.title = '取消靜音';
-      label.textContent = '已靜音';
     } else {
       button.setAttribute('aria-label', '麥克風靜音');
-      button.title = '麥克風靜音';
-      label.textContent = peers.size ? `語音 ${peers.size + 1} 人` : '語音開啟';
+      button.title = peers.size ? `語音已開啟，共 ${peers.size + 1} 人` : '麥克風靜音';
     }
   }
 
@@ -226,7 +221,7 @@
       await emitVoice('voice:announce', { enabled: true });
     } catch (error) {
       console.warn('microphone permission failed', error);
-      label.textContent = '麥克風未允許';
+      button.title = '麥克風未允許';
       alert('需要允許麥克風權限才能使用語音聊天。');
     }
   }
@@ -278,7 +273,7 @@
   socket.on('room:started', (room) => updateVisibility(room));
   socket.on('disconnect', () => {
     closeAllPeers();
-    if (enabled) label.textContent = '語音重連中';
+    if (enabled) button.title = '語音重連中';
   });
   socket.on('connect', () => {
     if (enabled && localStream) emitVoice('voice:announce', { enabled: true });
