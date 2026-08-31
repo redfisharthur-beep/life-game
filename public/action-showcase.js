@@ -70,6 +70,8 @@
     NEGATIVE_FATE_IMAGES[3],
   ];
 
+  const TARGET_EFFECT_LABELS = ['現金', '股票', '土地', '幸福'];
+
   const CHOICE_MS = 1500;
   const DICE_MS = 3000;
   const RESULT_MS = 3500;
@@ -234,7 +236,6 @@
   function buildResultRows(room, event, actor) {
     const rows = [];
     const target = room.players.find((item) => item.id === event.targetId);
-    const total = Number(event.diceTotal || 0);
     const playerName = actor?.name || '玩家';
 
     if (event.type === 'salary') {
@@ -252,17 +253,25 @@
     } else if (event.type === 'dream') {
       pushRow(rows, actor, playerName, []);
     } else if (event.type === 'sabotage' || event.type === 'help') {
-      if (target) pushRow(rows, target, target.name, [firstSignedEffect(event.text)]);
-      else pushRow(rows, actor, playerName, [firstSignedEffect(event.text)]);
+      const effectLabel = TARGET_EFFECT_LABELS[Math.max(0, Math.min(3, Number(event.effectIndex) || 0))];
+      const effect = makeEffect(effectLabel, Number(event.targetChange || 0));
+      if (target) pushRow(rows, target, target.name, [effect]);
+      else pushRow(rows, actor, playerName, [effect]);
     } else if (event.type === 'fate') {
       const index = Number(event.fateIndex);
-      if (index === 0) pushRow(rows, actor, playerName, [makeEffect('現金', 150 * total)]);
-      else if (index === 2) pushRow(rows, actor, playerName, [makeEffect('股票', 5 * total)]);
-      else if (index === 4) pushRow(rows, actor, playerName, [makeEffect('土地', 5 * total)]);
-      else if (index === 6) pushRow(rows, actor, playerName, [makeEffect('現金', event.received)]);
-      else if (index === 7) pushRow(rows, actor, playerName, [makeEffect('幸福', event.happinessChange || total)]);
-      else if (index === 8) pushRow(rows, actor, playerName, [makeEffect('幸福', event.happinessChange || -(0.5 * total))]);
-      else pushRow(rows, actor, playerName, [firstSignedEffect(event.text)]);
+      if (index === 0 || index === 1) {
+        pushRow(rows, actor, playerName, [makeEffect('現金', Number(event.amount || 0))]);
+      } else if (index === 2 || index === 3) {
+        pushRow(rows, actor, playerName, [makeEffect('股票', Number(event.units || 0))]);
+      } else if (index === 4 || index === 5) {
+        pushRow(rows, actor, playerName, [makeEffect('土地', Number(event.units || 0))]);
+      } else if (index === 6) {
+        pushRow(rows, actor, playerName, [makeEffect('現金', Number(event.received || 0))]);
+      } else if (index === 7 || index === 8) {
+        pushRow(rows, actor, playerName, [makeEffect('幸福', Number(event.happinessChange || 0))]);
+      } else {
+        pushRow(rows, actor, playerName, [firstSignedEffect(event.text)]);
+      }
     } else {
       pushRow(rows, actor, playerName, [firstSignedEffect(event.text)]);
     }
