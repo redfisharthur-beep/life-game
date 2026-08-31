@@ -44,12 +44,12 @@
   pointer-events: none;
 }
 
-/* 名字輸入區：整體往上約 5%。 */
+/* 名字輸入區：再往上約 5%。 */
 .home-entry-panel .field.entry-control {
   position: absolute;
   display: block;
   left: 22.1%;
-  top: calc(52.7% - .2em - 3px);
+  top: calc(47.7% - .2em - 3px);
   width: 51.8%;
   height: 9.6%;
   margin: 0;
@@ -85,10 +85,8 @@
 }
 
 .home-entry-panel input::placeholder {
-  color: rgba(122, 81, 47, .52);
-  opacity: 1;
-  text-align: center;
-  font-weight: 800;
+  color: transparent;
+  opacity: 0;
 }
 
 .home-entry-panel input:focus {
