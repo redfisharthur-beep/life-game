@@ -55,7 +55,7 @@
   display: grid;
   grid-template-rows: repeat(6, minmax(0, 1fr));
   align-content: stretch;
-  gap: clamp(9px, 1.15vw, 14px);
+  gap: clamp(5px, .65vw, 8px);
   margin: 0;
   padding: 0;
   transform: translateX(-50%);
@@ -244,7 +244,7 @@
     width: 68%;
     top: calc(19.8% + 25px);
     height: 57.5%;
-    gap: 9px;
+    gap: 5px;
   }
 
   .room-browser-item {
@@ -289,7 +289,7 @@
     width: 70%;
     top: calc(19.4% + 25px);
     height: 58%;
-    gap: 8px;
+    gap: 4px;
   }
 
   .room-browser-item {
