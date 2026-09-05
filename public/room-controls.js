@@ -34,14 +34,23 @@
     socket.on('room:started', (room) => requestAnimationFrame(() => syncRoomControls(room)));
   }
 
-  // app.js 會先依多人規則更新 disabled；這裡在 DOM 更新後再校正一次，
-  // 讓只有房主一人的等待室也能直接按「啟程」進入單人模式。
-  const observer = new MutationObserver(() => {
-    requestAnimationFrame(() => {
-      try { syncRoomControls(); } catch (_) {}
+  // app.js 仍保留多人模式的 disabled 計算；若它把單人房主重新鎖住，
+  // 只監看 disabled 這一個屬性並立即校正，避免 MutationObserver 自我循環。
+  if (startBtn) {
+    const observer = new MutationObserver(() => {
+      const room = typeof currentRoom !== 'undefined' ? currentRoom : null;
+      const mine = typeof myPlayerId !== 'undefined' ? myPlayerId : null;
+      const shouldEnable = Boolean(
+        room?.phase === 'lobby'
+        && room?.hostId === mine
+        && Array.isArray(room?.players)
+        && room.players.length === 1
+        && !room.started
+      );
+      if (shouldEnable && startBtn.disabled) startBtn.disabled = false;
     });
-  });
-  if (startBtn) observer.observe(startBtn, { attributes: true, childList: true, subtree: true });
+    observer.observe(startBtn, { attributes: true, attributeFilter: ['disabled'] });
+  }
 
   window.addEventListener('pageshow', () => requestAnimationFrame(() => {
     try { syncRoomControls(); } catch (_) {}
